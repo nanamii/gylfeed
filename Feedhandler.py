@@ -5,6 +5,7 @@
 
 import feedparser
 import pprint
+import pickle
 
 
 class Feedhandler():
@@ -33,13 +34,46 @@ class Feedhandler():
                     nr=title_num, entry=entry_str)
                 )
 
-fm = Feedhandler()
-fm.add_Feed("http://rss.sueddeutsche.de/rss/Muenchen")
-fm.add_Feed("http://golem.de.dynamic.feedsportal.com/pf/578068/http://rss.golem.de/rss.php?tp=pol&feed=RSS2.0")
-pprint.pprint(fm.feedList)
-pprint.pprint(fm.get_FeedURL(0))
+    def update(self):
+        latestFeedList = []
+        for feed in self.feedList:
+            latestFeedList.append(feedparser.parse(feed["href"]))
+
+        for feed in latestFeedList:
+            if feed
+            for entry in feed["entries"]:
+                if entry["id"] not in self.feedList["entries"]:
+                    self.feedList.append()
+
+
+    def save_to_Disk(self):
+        try:
+            with open ('feeds.pickle', 'wb') as fp:
+                pickle.dump(self,fp)
+                print("Saving data to disk")
+        except IOError as ie:
+            print("Fail to save data" + str(ie))
+
+
+def load_from_Disk():
+    try:
+        with open('feeds.pickle', 'rb') as fp:
+            print("Loading data from disk")
+            return pickle.load(fp)
+    except IOError as ie:
+            print("Fail to load data" +str(ie))
+
+#fm = Feedhandler()
+#fm.add_Feed("http://rss.sueddeutsche.de/rss/Muenchen")
+#fm.add_Feed("http://golem.de.dynamic.feedsportal.com/pf/578068/http://rss.golem.de/rss.php?tp=pol&feed=RSS2.0")
+#pprint.pprint(fm.feedList)
+#pprint.pprint(fm.get_FeedURL(0))
 #fm.update_Feed(0)
 #pprint.pprint(fm.feedList)
-print(fm.count_Feeds())
-fm.print_FeedTitles()
+#print(fm.count_Feeds())
+#fm.print_FeedTitles()
+#fm.save_to_Disk()
+fh = load_from_Disk()
+fh.print_FeedTitles()
+pprint.pprint(fh.update())
 
