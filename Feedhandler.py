@@ -34,16 +34,29 @@ class Feedhandler():
                     nr=title_num, entry=entry_str)
                 )
 
+
     def update(self):
         latestFeedList = []
         for feed in self.feedList:
             latestFeedList.append(feedparser.parse(feed["href"]))
 
+        latest_Id_Set = list()
         for feed in latestFeedList:
-            if feed
-            for entry in feed["entries"]:
-                if entry["id"] not in self.feedList["entries"]:
-                    self.feedList.append()
+            latest_Id_Set.extend([entry["id"] for entry in feed["entries"]])
+        return str(set(latest_Id_Set))
+
+
+        #for entry in latest_entry_List:
+         #   new_Entry = compare_Id(entry["id"], saved_entry_List)
+          #  if new_Entry is True:
+           #     self.
+
+    def compare_Id(self, id, entry_List):
+        for entry in entry_List:
+            if id in entry:
+                return false
+            else:
+                return true
 
 
     def save_to_Disk(self):
@@ -75,5 +88,5 @@ def load_from_Disk():
 #fm.save_to_Disk()
 fh = load_from_Disk()
 fh.print_FeedTitles()
-pprint.pprint(fh.update())
+print(fh.update())
 
