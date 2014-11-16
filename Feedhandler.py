@@ -40,16 +40,24 @@ class Feedhandler():
         for feed in self.feedList:
             latestFeedList.append(feedparser.parse(feed["href"]))
 
-        latest_Id_Set = list()
         for feed in latestFeedList:
-            latest_Id_Set.extend([entry["id"] for entry in feed["entries"]])
-        return str(set(latest_Id_Set))
+            for xfeed in self.feedList:
+                if feed["href"] == xfeed["href"]:
+                    self.compare_entries(feed, xfeed)
+                else:
+                    print("Keinen übereinstimmenden Feed gefunden")
 
 
-        #for entry in latest_entry_List:
-         #   new_Entry = compare_Id(entry["id"], saved_entry_List)
-          #  if new_Entry is True:
-           #     self.
+    def compare_entries(self, latest_feed, safed_feed):
+        print(latest_feed['href'], safed_feed["href"])
+        templist = []
+        tag = False
+        for cur_entry in latest_feed["entries"]:
+                if cur_entry["id"] not in [entry['id'] for entry in safed_feed["entries"]]:
+                    templist.append(cur_entry)
+                    print(cur_entry["id"])
+        safed_feed["entries"].extend(templist)
+
 
     def compare_Id(self, id, entry_List):
         for entry in entry_List:
@@ -88,5 +96,8 @@ def load_from_Disk():
 #fm.save_to_Disk()
 fh = load_from_Disk()
 fh.print_FeedTitles()
-print(fh.update())
+#print(fh.update())
+#pprint.pprint(fh.feedList)
+fh.update()
+fh.print_FeedTitles()
 
