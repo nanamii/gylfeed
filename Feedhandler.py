@@ -10,6 +10,7 @@ import pickle
 
 class Feedhandler():
     """ Handles different feeds. """
+
     def __init__(self):
         self.feedList = []
 
@@ -31,8 +32,21 @@ class Feedhandler():
             for title_num, entry in enumerate(feed.entries, start=1):
                 entry_str = entry.title
                 print("TitleNr. {nr} -> {entry}".format(
-                    nr=title_num, entry=entry_str)
-                )
+                    nr=title_num, entry=entry_str))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     def update(self):
