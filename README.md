@@ -1,4 +1,4 @@
 gylfeed
 =======
 
-RSS-feedreader
+RSS-feedreader, called gylfeed.
