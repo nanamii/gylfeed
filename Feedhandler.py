@@ -31,22 +31,9 @@ class Feedhandler():
         for feed in self.feedList:
             for title_num, entry in enumerate(feed.entries, start=1):
                 entry_str = entry.title
-                print("TitleNr. {nr} -> {entry}".format(
+                print("TitleNr. {nr} -> {entry} \n".format(
                     nr=title_num, entry=entry_str))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                print("published: {date} \n".format(date= entry.published))
 
 
     def update(self):
@@ -69,7 +56,9 @@ class Feedhandler():
                 if cur_entry["id"] not in [entry["id"] for entry in safed_feed.entries]:
                     templist.append(cur_entry)
                     print(cur_entry["id"])
-        safed_feed.entries.extend(templist)
+
+        templist.sort(key=lambda entry:entry["published_parsed"], reverse=True)
+        safed_feed.entries = templist + safed_feed.entries
 
 
     def compare_Id(self, id, entry_List):
