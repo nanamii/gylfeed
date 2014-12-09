@@ -1,0 +1,9 @@
+*.log
+*.pdf
+*.glade
+*.glade#
+*.pickle
+misc
+Literatur
+pycache
+

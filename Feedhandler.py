@@ -61,14 +61,6 @@ class Feedhandler():
         safed_feed.entries = templist + safed_feed.entries
 
 
-    def compare_Id(self, id, entry_List):
-        for entry in entry_List:
-            if id in entry:
-                return False
-            else:
-                return True
-
-
     def save_to_Disk(self):
         try:
             with open ('feeds.pickle', 'wb') as fp:
@@ -102,4 +94,12 @@ fh.print_FeedTitles()
 #pprint.pprint(fh.feedList)
 fh.update()
 fh.print_FeedTitles()
+
+
+class Feed:
+    pass
+
+
+
+
 
