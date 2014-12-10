@@ -2,28 +2,6 @@ from gi.repository import Gtk, Gio
 
 class EntryWindow(Gtk.Window):
 
-    def switch_child_left(self, button, current_child):
-        print("hello")
-        print(button, current_child)
-        if current_child.get_visible_child() == self.listbox:
-            print("left, =listbox")
-            self.stack.set_visible_child(self.button)
-        else:
-            print("left, else")
-            self.stack.set_visible_child(self.button1)
-
-    def switch_child_right(self, button, current_child):
-        print("hello")
-        print(button, current_child.get_visible_child())
-        if current_child.get_visible_child() == self.button1:
-            print("right, =feeds")
-            self.stack.set_visible_child(self.listbox)
-        else:
-            print("right, =else")
-            self.stack.set_visible_child(self.button)
-
-
-
     def __init__(self):
         Gtk.Window.__init__(self, title="gylfeed - Feedreader")
         self.set_border_width(10)
@@ -34,30 +12,23 @@ class EntryWindow(Gtk.Window):
         ewindow.props.title = "gylfeed"
         self.set_titlebar(ewindow)
 
-        #button = Gtk.Button()
-        #icon = Gio.ThemedIcon(name="mail-send-receive-symbolic")
-        #image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
-        #button.add(image)
-        #ewindow.pack_end(button)
-
         box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         Gtk.StyleContext.add_class(box.get_style_context(), "linked")
 
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
         self.add(vbox)
 
-
         self.stack = Gtk.Stack()
         self.stack.set_transition_type(Gtk.StackTransitionType.SLIDE_LEFT_RIGHT)
         self.stack.set_transition_duration(500)
 
-        button_left = Gtk.Button()
-        button_left.add(Gtk.Arrow(Gtk.ArrowType.LEFT, Gtk.ShadowType.NONE))
-        box.add(button_left)
+        self.button_left = Gtk.Button()
+        self.button_left.add(Gtk.Arrow(Gtk.ArrowType.LEFT, Gtk.ShadowType.NONE))
+        box.add(self.button_left)
 
-        button_right = Gtk.Button()
-        button_right.add(Gtk.Arrow(Gtk.ArrowType.RIGHT, Gtk.ShadowType.NONE))
-        box.add(button_right)
+        self.button_right = Gtk.Button()
+        self.button_right.add(Gtk.Arrow(Gtk.ArrowType.RIGHT, Gtk.ShadowType.NONE))
+        box.add(self.button_right)
 
         ewindow.pack_start(box)
 
@@ -72,8 +43,30 @@ class EntryWindow(Gtk.Window):
         self.button = Gtk.Button("Hello")
         self.stack.add_named(self.button, "a")
 
-        button_left.connect("clicked", self.switch_child_left, self.stack)
-        button_right.connect("clicked", self.switch_child_right, self.stack)
+        self.button_left.connect("clicked", self.switch_child)
+        self.button_right.connect("clicked", self.switch_child)
+
+
+    def switch_child(self, direction):
+        child = {
+            self.listbox:{
+                self.button_left:self.button1,
+                self.button_right:self.button
+            },
+            self.button1:{
+                self.button_left:self.button1,
+                self.button_right:self.listbox
+            },
+            self.button:{
+                self.button_left:self.listbox,
+                self.button_right:self.button
+            }
+        }.get(self.stack.get_visible_child()).get(direction)
+
+
+        if child is not None:
+            self.stack.set_visible_child(child)
+
 
     def new_ListBoxRow(self, buttonlabel, entry):
         grid = Gtk.Grid()
