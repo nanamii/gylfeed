@@ -1,4 +1,4 @@
-from gi.repository import Gtk, Gio
+from gi.repository import Gtk, Gio, GdkPixbuf
 
 class EntryWindow(Gtk.Window):
 
@@ -54,12 +54,12 @@ class EntryWindow(Gtk.Window):
                 self.button_right:self.button
             },
             self.button1:{
-                self.button_left:self.button1,
+                self.button_left:None,
                 self.button_right:self.listbox
             },
             self.button:{
                 self.button_left:self.listbox,
-                self.button_right:self.button
+                self.button_right:None
             }
         }.get(self.stack.get_visible_child()).get(direction)
 
@@ -72,10 +72,12 @@ class EntryWindow(Gtk.Window):
         grid = Gtk.Grid()
         row = Gtk.ListBoxRow()
         row.add(grid)
-        button = Gtk.Button(label=buttonlabel)
-        grid.add(button)
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file('logo_sz.png')
+        image = Gtk.Image()
+        image.set_from_pixbuf(pixbuf)
+        grid.add(image)
         label = Gtk.Label(entry)
-        grid.attach(label, 1, 0, 2, 1)
+        grid.attach(label, 2, 0, 2, 1)
         self.listbox.add(row)
 
 
