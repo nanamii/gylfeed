@@ -1,9 +1,9 @@
 *.log
 *.pdf
-*.glade
-*.glade#
+*.pyc
+*.glade*
 *.pickle
 misc
 Literatur
-pycache
+*pycache*
 
