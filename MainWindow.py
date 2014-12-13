@@ -85,8 +85,8 @@ class MainWindow(Gtk.Window):
 
 main_Window = MainWindow()
 main_Window.connect("delete-event", Gtk.main_quit)
-main_Window.entrylist.new_ListBoxRow("buttonMeth", "Entry aus Methodenaufruf")
-main_Window.entrylist.new_ListBoxRow("button2", "2. Entry aus Methodenaufruf")
+main_Window.entrylist.new_ListBoxRow("default_icon.png", "Entry aus Methodenaufruf", "Entry Methodenaufrauf", "fldldld")
+main_Window.entrylist.new_ListBoxRow("default_icon.png", "2. Entry aus Methodenaufruf", "Entry 2 Methonen...", "fkfkfk")
 main_Window.feedview.new_ListBoxRow_Box("default_icon.png","Sueddeutsche", "Sueddeutsche", "new: 12 ")
 main_Window.feedview.new_ListBoxRow_Box("default_icon.png","Golem-Feed", "Golem-Feed", "new: 30")
 main_Window.show_all()

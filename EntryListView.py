@@ -8,7 +8,7 @@ class EntryListView():
     def __init__(self):
         self.listbox = Gtk.ListBox()
 
-    def new_ListBoxRow(self, buttonlabel, entry):
+    def new_ListBoxRow_old(self, buttonlabel, entry):
         grid = Gtk.Grid()
         row = Gtk.ListBoxRow()
         row.add(grid)
@@ -19,5 +19,31 @@ class EntryListView():
         label = Gtk.Label(entry)
         grid.attach(label, 2, 0, 2, 1)
         self.listbox.add(row)
+
+    def new_ListBoxRow(self, logo, buttonlabel, feed, new_entries):
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        hbox1 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        hbox2 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file(logo)
+        image = Gtk.Image()
+        image.set_from_pixbuf(pixbuf)
+
+        label = Gtk.Label(feed)
+        label.set_markup("<b>{feed}</b>".format(feed=feed))
+        opt_button = Gtk.Button.new_from_icon_name('preferences-system', Gtk.IconSize.BUTTON)
+        hbox1.pack_start(image, False, False, 10)
+        hbox1.add(label)
+        hbox1.pack_end(opt_button, False, False, 10)
+        vbox.add(hbox1)
+
+        new_entries_label = Gtk.Label(new_entries)
+        hbox2.pack_start(new_entries_label, False, False, 37)
+        vbox.add(hbox2)
+
+        row = Gtk.ListBoxRow()
+        row.add(vbox)
+        self.listbox.add(row)
+
 
 
