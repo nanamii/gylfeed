@@ -5,22 +5,23 @@ from gi.repository import Gtk, Gio, GdkPixbuf
 
 
 class Feedview():
-    def __init__(self):
+    def __init__(self, mainview):
         self.box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.top_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
 
+        update_button = Gtk.Button.new_from_icon_name('view-refresh-symbolic', Gtk.IconSize.BUTTON)
+
+
         new_feed_button = Gtk.Button.new_from_icon_name('list-add', Gtk.IconSize.BUTTON)
-        #new_feed_button.connect("clicked", self.add_feed)
+        new_feed_button.connect("clicked", self.show_feed_options, mainview)
 
         self.listbox = Gtk.ListBox()
 
         #self.box.pack_start(view, True, True, 10)
-        self.top_box.pack_end(new_feed_button, False, False, 10)
+        self.top_box.pack_end(new_feed_button, False, False, 15)
+        self.top_box.pack_start(update_button, False, False, 15)
         self.box.pack_end(self.listbox, True, True, 20)
         self.box.pack_start(self.top_box, False, False, 10)
-
-   # def add_feed(self, new_feed_button):
-    #    add_feed_window = AddFeedWindow(self)
 
     def new_ListBoxRow(self, buttonlabel, entry):
         grid = Gtk.Grid()
@@ -47,7 +48,7 @@ class Feedview():
 
         label = Gtk.Label(feed)
         label.set_markup("<b>{feed}</b>".format(feed=feed))
-        opt_button = Gtk.Button.new_from_icon_name('preferences-system', Gtk.IconSize.BUTTON)
+        opt_button = Gtk.Button.new_from_icon_name('view-more-symbolic', Gtk.IconSize.BUTTON)
         hbox1.pack_start(image, False, False, 10)
         hbox1.add(label)
         hbox1.pack_end(opt_button, False, False, 10)
@@ -60,6 +61,13 @@ class Feedview():
         row = Gtk.ListBoxRow()
         row.add(vbox)
         self.listbox.add(row)
+
+    def show_feed_options(self, new_feed_button, mainview):
+        mainview.stack.set_visible_child(mainview.feed_options.grid)
+
+
+
+
 
 
 

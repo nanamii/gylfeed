@@ -2,7 +2,7 @@
 # encoding:utf8
 
 from gi.repository import Gtk
-
+from Feed import Feed
 
 class FeedOptionsView():
 
@@ -27,6 +27,7 @@ class FeedOptionsView():
 
         hbox = Gtk.Box()
         ok_button = Gtk.Button("  OK  ")
+        ok_button.connect("clicked", self.check_user_input, url_entry, naming_entry)
         back_button = Gtk.Button(" Back ")
         hbox.pack_end(back_button, False, False, 5)
         hbox.pack_end(ok_button, False, False, 5)
@@ -50,3 +51,9 @@ class FeedOptionsView():
 
         self.grid.insert_row(5)
         self.grid.attach(hbox, 0, 5, 12, 1)
+
+    def check_user_input(self, button, url_entry, naming_entry):
+        new_feed = Feed(url_entry.get_text(), naming_entry.get_text())
+        print(new_feed.url)
+        print(new_feed.name)
+

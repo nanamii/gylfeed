@@ -44,7 +44,7 @@ class MainWindow(Gtk.Window):
         self.feed_options = FeedOptionsView()
         self.stack.add_named(self.feed_options.grid, "feed_options")
 
-        self.feedview = Feedview()
+        self.feedview = Feedview(self)
         self.stack.add_named(self.feedview.box, "listbox")
 
         self.entrylist = EntryListView()
