@@ -14,11 +14,11 @@ class MainWindow(Gtk.Window):
         self.set_border_width(10)
         self.set_default_size(800, 600)
 
-        headerbar = Gtk.HeaderBar()
-        headerbar.set_show_close_button(True)
-        headerbar.props.title = "gylfeed"
-        headerbar.props.subtitle = "the FeeedReader"
-        self.set_titlebar(headerbar)
+        self.headerbar = Gtk.HeaderBar()
+        self.headerbar.set_show_close_button(True)
+        self.headerbar.props.title = "gylfeed"
+        self.headerbar.props.subtitle = "the FeeedReader"
+        self.set_titlebar(self.headerbar)
 
         box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         Gtk.StyleContext.add_class(box.get_style_context(), "linked")
@@ -47,9 +47,9 @@ class MainWindow(Gtk.Window):
         self.button_search.connect("clicked", self.manage_searchbar)
         self.button_search.set_tooltip_text("search for content")
 
-        headerbar.pack_start(box)
-        headerbar.pack_end(self.button_search)
-        headerbar.pack_end(self.button_settings)
+        self.headerbar.pack_start(box)
+        self.headerbar.pack_end(self.button_search)
+        self.headerbar.pack_end(self.button_settings)
 
         self.searchbar = Gtk.SearchBar()
         searchentry = Gtk.SearchEntry()
@@ -66,19 +66,19 @@ class MainWindow(Gtk.Window):
         vbox.add(self.stack)
 
         self.feedview = Feedview(self)
-        self.stack.add_named(self.feedview.box, "listbox")
+        self.stack.add_named(self.feedview.box, "feedview")
 
         self.entrylist = EntryListView()
-        self.stack.add_named(self.entrylist.listbox, "B")
+        self.stack.add_named(self.entrylist.listbox, "entrylist")
 
         self.button = Gtk.Button("Hello")
-        self.stack.add_named(self.button, "a")
+        self.stack.add_named(self.button, "entrydetails")
 
         self.button_left.connect("clicked", self.switch_child)
         self.button_right.connect("clicked", self.switch_child)
 
         self.feed_options = FeedOptionsView()
-        self.stack.add_named(self.feed_options.grid, "feed_options")
+        self.stack.add_named(self.feed_options.grid, "feedoptions")
 
 
     def switch_child(self, direction):
@@ -103,6 +103,29 @@ class MainWindow(Gtk.Window):
 
         if child is not None:
             self.stack.set_visible_child(child)
+            self.update_childview(child)
+
+
+    def update_childview(self, child):
+
+        child_name = self.stack.get_visible_child_name()
+
+        if child_name == "feedview":
+            self.set_button_sensitive(False, True)
+        elif child_name == "entrylist":
+            self.set_button_sensitive(True, True)
+        elif child_name == "entrydetails":
+            self.set_button_sensitive(True, False)
+        else:
+            self.set_button_sensitive(False, False)
+
+    def set_button_sensitive(self, left_value, right_value):
+        self.button_left.set_sensitive(left_value)
+        self.button_right.set_sensitive(right_value)
+
+    def set_title(title, subtitle = None):
+        self.headerbar.props.title = title
+        self.headerbar.props.subtitle = subtitle
 
 
     def manage_searchbar(self, button_search):
@@ -120,8 +143,8 @@ class MainWindow(Gtk.Window):
 
 main_Window = MainWindow()
 main_Window.connect("delete-event", Gtk.main_quit)
-main_Window.entrylist.new_ListBoxRow("default_icon.png", "Entry aus Methodenaufruf", "Entry Methodenaufrauf", "fldldld")
-main_Window.entrylist.new_ListBoxRow("default_icon.png", "2. Entry aus Methodenaufruf", "Entry 2 Methonen...", "fkfkfk")
+main_Window.entrylist.new_ListBoxRow("default_icon.png", "Mittelschulen in München: Gut ist nicht gut genug", "Mo, 10:12")
+main_Window.entrylist.new_ListBoxRow("default_icon.png", "Tod einer Münchner Bardame: Mord wegen enttäuschter Hoffnung", "Fr, 13:20")
 main_Window.feedview.new_ListBoxRow_Box("default_icon.png","Sueddeutsche", "Sueddeutsche", "new: 12 ")
 main_Window.feedview.new_ListBoxRow_Box("default_icon.png","Golem-Feed", "Golem-Feed", "new: 30")
 main_Window.show_all()

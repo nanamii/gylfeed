@@ -20,7 +20,7 @@ class EntryListView():
         grid.attach(label, 2, 0, 2, 1)
         self.listbox.add(row)
 
-    def new_ListBoxRow(self, logo, buttonlabel, feed, new_entries):
+    def new_ListBoxRow(self, logo, feed, time):
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         hbox1 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         hbox2 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
@@ -29,16 +29,24 @@ class EntryListView():
         image = Gtk.Image()
         image.set_from_pixbuf(pixbuf)
 
-        label = Gtk.Label(feed)
-        label.set_markup("<b>{feed}</b>".format(feed=feed))
-        opt_button = Gtk.Button.new_from_icon_name('preferences-system', Gtk.IconSize.BUTTON)
+        headline = Gtk.Label(feed)
+        headline.set_markup("<b>{feed}</b>".format(feed=feed))
+
+        time = Gtk.Label(time)
+
         hbox1.pack_start(image, False, False, 10)
-        hbox1.add(label)
-        hbox1.pack_end(opt_button, False, False, 10)
+        hbox1.add(headline)
+        hbox1.pack_end(time, False, False, 10)
         vbox.add(hbox1)
 
-        new_entries_label = Gtk.Label(new_entries)
-        hbox2.pack_start(new_entries_label, False, False, 37)
+
+        open_button = Gtk.Button()
+        open_button.set_label("open")
+        browse_button = Gtk.Button(label = "browse")
+        open_button.set_relief(Gtk.ReliefStyle.NONE)
+        browse_button.set_relief(Gtk.ReliefStyle.NONE)
+        hbox2.pack_start(open_button, False, False, 37)
+        hbox2.add(browse_button)
         vbox.add(hbox2)
 
         row = Gtk.ListBoxRow()

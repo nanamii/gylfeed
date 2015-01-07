@@ -23,20 +23,6 @@ class Feedview():
         self.box.pack_end(self.listbox, True, True, 20)
         self.box.pack_start(self.top_box, False, False, 10)
 
-    def new_ListBoxRow(self, buttonlabel, entry):
-        grid = Gtk.Grid()
-        row = Gtk.ListBoxRow()
-        row.add(grid)
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file('logo_sz.png')
-        image = Gtk.Image()
-        image.set_from_pixbuf(pixbuf)
-        grid.add(image)
-        label = Gtk.Label(entry)
-        grid.attach(label, 2, 0, 6, 1)
-        opt_button = Gtk.Button("options")
-        grid.attach(opt_button, 3,1 , 1, 2)
-        self.listbox.add(row)
-
     def new_ListBoxRow_Box(self, logo, buttonlabel, feed, new_entries):
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         hbox1 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
@@ -49,6 +35,7 @@ class Feedview():
         label = Gtk.Label(feed)
         label.set_markup("<b>{feed}</b>".format(feed=feed))
         opt_button = Gtk.Button.new_from_icon_name('view-more-symbolic', Gtk.IconSize.BUTTON)
+        opt_button.set_relief(Gtk.ReliefStyle.NONE)
         hbox1.pack_start(image, False, False, 10)
         hbox1.add(label)
         hbox1.pack_end(opt_button, False, False, 10)
