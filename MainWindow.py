@@ -5,6 +5,8 @@ from gi.repository import Gtk, Gio, GdkPixbuf
 from Feedview import Feedview
 from FeedOptionsView import FeedOptionsView
 from EntryListView import EntryListView
+from simple_popup_menu import SimplePopupMenu
+from EntryDetailsView import EntryDetailsView
 
 
 class MainWindow(Gtk.Window):
@@ -30,7 +32,7 @@ class MainWindow(Gtk.Window):
 
         self.stack = Gtk.Stack()
         self.stack.set_transition_type(Gtk.StackTransitionType.SLIDE_LEFT_RIGHT)
-        self.stack.set_transition_duration(500)
+        self.stack.set_transition_duration(300)
 
         self.button_left = Gtk.Button()
         self.button_left.add(Gtk.Arrow(Gtk.ArrowType.LEFT, Gtk.ShadowType.NONE))
@@ -58,21 +60,22 @@ class MainWindow(Gtk.Window):
         searchbox.add(self.searchbar)
         self.searchbar.set_search_mode(False)
 
-        self.menu = Gtk.Menu()
-        menuitem = Gtk.MenuItem(label="update")
-        self.menu.append(menuitem)
+        self.menu = SimplePopupMenu()
+        self.menu.simple_add('update', self.update, stock_id='view-refresh-symbolic')
+        self.menu.simple_add('add feed', self.add_feed, stock_id='gtk-new' )
+        self.menu.simple_add_separator()
 
         vbox.add(searchbox)
-        vbox.add(self.stack)
+        vbox.pack_start(self.stack, True, True, 0)
 
         self.feedview = Feedview(self)
-        self.stack.add_named(self.feedview.box, "feedview")
+        self.stack.add_named(self.feedview.container, "feedview")
 
         self.entrylist = EntryListView()
-        self.stack.add_named(self.entrylist.listbox, "entrylist")
+        self.stack.add_named(self.entrylist.container, "entrylist")
 
-        self.button = Gtk.Button("Hello")
-        self.stack.add_named(self.button, "entrydetails")
+        self.entry_details = EntryDetailsView()
+        self.stack.add_named(self.entry_details.container, "entrydetails")
 
         self.button_left.connect("clicked", self.switch_child)
         self.button_right.connect("clicked", self.switch_child)
@@ -85,18 +88,18 @@ class MainWindow(Gtk.Window):
         child = {
             self.feed_options.grid:{
                 self.button_left:None,
-                self.button_right:self.feedview.box,
+                self.button_right:self.feedview.container,
             },
-            self.entrylist.listbox:{
-                self.button_left:self.feedview.box,
-                self.button_right:self.button
+            self.entrylist.container:{
+                self.button_left:self.feedview.container,
+                self.button_right:self.entry_details.container
             },
-            self.feedview.box:{
+            self.feedview.container:{
                 self.button_left:None,
-                self.button_right:self.entrylist.listbox
+                self.button_right:self.entrylist.container
             },
-            self.button:{
-                self.button_left:self.entrylist.listbox,
+            self.entry_details.container:{
+                self.button_left:self.entrylist.container,
                 self.button_right:None
             }
         }.get(self.stack.get_visible_child()).get(direction)
@@ -127,22 +130,56 @@ class MainWindow(Gtk.Window):
         self.headerbar.props.title = title
         self.headerbar.props.subtitle = subtitle
 
-
     def manage_searchbar(self, button_search):
         if self.searchbar.get_search_mode():
             self.searchbar.set_search_mode(False)
         else:
             self.searchbar.set_search_mode(True)
 
-
     def open_settingsmenu(self, button_settings):
         self.menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
         self.menu.show_all()
+
+    #def built_settings_menu(self, menu):
+     #   menuitem1 = Gtk.MenuItem(self.built_menu_item("view-refresh-symbolic", "update", "F5"))
+
+        #menuitem1 = Gtk.MenuItem(label="update")
+        #menuitem2 = Gtk.MenuItem(label="add Feed")
+      #  self.menu.attach(menuitem1, 0,1,0,1)
+        #self.menu.append(menuitem2)
+
+    #def built_menu_item(self, icon, label, accel):
+     #   itembox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+      #  #icon = Gtk.Label.new_from_icon_name(icon, Gtk.IconSize.LABEL)
+       # item_label = Gtk.Label(label)
+        #accel_label = Gtk.Label(accel)
+
+        #itembox.pack_start(icon, True, True, 10)
+        #itembox.add(item_label)
+        #itembox.pack_end(accel_label, False, False, 10)
+        #return itembox
+
+    def update(self, update):
+        pass
+
+    def add_feed(self, add):
+        self.stack.set_visible_child(self.feed_options.grid)
 
 
 
 main_Window = MainWindow()
 main_Window.connect("delete-event", Gtk.main_quit)
+main_Window.entrylist.new_ListBoxRow("default_icon.png", "Mittelschulen in München: Gut ist nicht gut genug", "Mo, 10:12")
+main_Window.entrylist.new_ListBoxRow("default_icon.png", "Tod einer Münchner Bardame: Mord wegen enttäuschter Hoffnung", "Fr, 13:20")
+main_Window.entrylist.new_ListBoxRow("default_icon.png", "Mittelschulen in München: Gut ist nicht gut genug", "Mo, 10:12")
+main_Window.entrylist.new_ListBoxRow("default_icon.png", "Tod einer Münchner Bardame: Mord wegen enttäuschter Hoffnung", "Fr, 13:20")
+main_Window.entrylist.new_ListBoxRow("default_icon.png", "Mittelschulen in München: Gut ist nicht gut genug", "Mo, 10:12")
+main_Window.entrylist.new_ListBoxRow("default_icon.png", "Tod einer Münchner Bardame: Mord wegen enttäuschter Hoffnung", "Fr, 13:20")
+main_Window.entrylist.new_ListBoxRow("default_icon.png", "Mittelschulen in München: Gut ist nicht gut genug", "Mo, 10:12")
+main_Window.entrylist.new_ListBoxRow("default_icon.png", "Tod einer Münchner Bardame: Mord wegen enttäuschter Hoffnung", "Fr, 13:20")
+main_Window.entrylist.new_ListBoxRow("default_icon.png", "Tod einer Münchner Bardame: Mord wegen enttäuschter Hoffnung", "Fr, 13:20")
+main_Window.entrylist.new_ListBoxRow("default_icon.png", "Mittelschulen in München: Gut ist nicht gut genug", "Mo, 10:12")
+main_Window.entrylist.new_ListBoxRow("default_icon.png", "Tod einer Münchner Bardame: Mord wegen enttäuschter Hoffnung", "Fr, 13:20")
 main_Window.entrylist.new_ListBoxRow("default_icon.png", "Mittelschulen in München: Gut ist nicht gut genug", "Mo, 10:12")
 main_Window.entrylist.new_ListBoxRow("default_icon.png", "Tod einer Münchner Bardame: Mord wegen enttäuschter Hoffnung", "Fr, 13:20")
 main_Window.feedview.new_ListBoxRow_Box("default_icon.png","Sueddeutsche", "Sueddeutsche", "new: 12 ")

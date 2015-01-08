@@ -6,22 +6,11 @@ from gi.repository import Gtk, Gio, GdkPixbuf
 
 class Feedview():
     def __init__(self, mainview):
+        self.container = Gtk.ScrolledWindow()
         self.box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        self.top_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-
-        update_button = Gtk.Button.new_from_icon_name('view-refresh-symbolic', Gtk.IconSize.BUTTON)
-
-
-        new_feed_button = Gtk.Button.new_from_icon_name('list-add', Gtk.IconSize.BUTTON)
-        new_feed_button.connect("clicked", self.show_feed_options, mainview)
-
         self.listbox = Gtk.ListBox()
-
-        #self.box.pack_start(view, True, True, 10)
-        self.top_box.pack_end(new_feed_button, False, False, 15)
-        self.top_box.pack_start(update_button, False, False, 15)
-        self.box.pack_end(self.listbox, True, True, 20)
-        self.box.pack_start(self.top_box, False, False, 10)
+        self.box.pack_start(self.listbox, True, True, 10)
+        self.container.add(self.box)
 
     def new_ListBoxRow_Box(self, logo, buttonlabel, feed, new_entries):
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
@@ -49,8 +38,6 @@ class Feedview():
         row.add(vbox)
         self.listbox.add(row)
 
-    def show_feed_options(self, new_feed_button, mainview):
-        mainview.stack.set_visible_child(mainview.feed_options.grid)
 
 
 

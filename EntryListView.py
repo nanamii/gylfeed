@@ -6,7 +6,9 @@ from gi.repository import Gtk, Gio, GdkPixbuf
 
 class EntryListView():
     def __init__(self):
+        self.container = Gtk.ScrolledWindow()
         self.listbox = Gtk.ListBox()
+        self.container.add(self.listbox)
 
     def new_ListBoxRow_old(self, buttonlabel, entry):
         grid = Gtk.Grid()
