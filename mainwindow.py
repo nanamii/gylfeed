@@ -1,18 +1,22 @@
 #!usr/bin/env python3
 # encoding:utf8
 
-from gi.repository import Gtk, Gio, GdkPixbuf
-from Feedview import Feedview
-from FeedOptionsView import FeedOptionsView
-from EntryListView import EntryListView
+from gi.repository import Gtk, Gio, GdkPixbuf, GObject
+from feedhandler import Feedhandler
+from feedview import Feedview
+from feedoptionsview import FeedOptionsView
+from entrylistview import EntryListView
 from simple_popup_menu import SimplePopupMenu
-from EntryDetailsView import EntryDetailsView
+from entrydetailsview import EntryDetailsView
 
 
-class MainWindow(Gtk.Window):
+class MainWindow(Gtk.Window, GObject.GObject):
+    #__gsignals__ = { 'update-clicked': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, ())}
 
-    def __init__(self):
+    def __init__(self, feedhandler):
+
         Gtk.Window.__init__(self, title="gylfeed - Feedreader")
+     #   GObject.GObject.__init__(self)
         self.set_border_width(10)
         self.set_default_size(800, 600)
 
@@ -61,8 +65,8 @@ class MainWindow(Gtk.Window):
         self.searchbar.set_search_mode(False)
 
         self.menu = SimplePopupMenu()
-        self.menu.simple_add('update', self.update, stock_id='view-refresh-symbolic')
-        self.menu.simple_add('add feed', self.add_feed, stock_id='gtk-new' )
+        self.menu.simple_add('update', self.update_clicked, stock_id='view-refresh-symbolic')
+        self.menu.simple_add('add feed', self.add_feed_clicked, stock_id='gtk-new' )
         self.menu.simple_add_separator()
 
         vbox.add(searchbox)
@@ -159,30 +163,27 @@ class MainWindow(Gtk.Window):
         #itembox.pack_end(accel_label, False, False, 10)
         #return itembox
 
-    def update(self, update):
+    def update_clicked(self, update):
         pass
 
-    def add_feed(self, add):
+    def add_feed_clicked(self, add):
         self.stack.set_visible_child(self.feed_options.grid)
 
-
-
-main_Window = MainWindow()
-main_Window.connect("delete-event", Gtk.main_quit)
-main_Window.entrylist.new_ListBoxRow("default_icon.png", "Mittelschulen in München: Gut ist nicht gut genug", "Mo, 10:12")
-main_Window.entrylist.new_ListBoxRow("default_icon.png", "Tod einer Münchner Bardame: Mord wegen enttäuschter Hoffnung", "Fr, 13:20")
-main_Window.entrylist.new_ListBoxRow("default_icon.png", "Mittelschulen in München: Gut ist nicht gut genug", "Mo, 10:12")
-main_Window.entrylist.new_ListBoxRow("default_icon.png", "Tod einer Münchner Bardame: Mord wegen enttäuschter Hoffnung", "Fr, 13:20")
-main_Window.entrylist.new_ListBoxRow("default_icon.png", "Mittelschulen in München: Gut ist nicht gut genug", "Mo, 10:12")
-main_Window.entrylist.new_ListBoxRow("default_icon.png", "Tod einer Münchner Bardame: Mord wegen enttäuschter Hoffnung", "Fr, 13:20")
-main_Window.entrylist.new_ListBoxRow("default_icon.png", "Mittelschulen in München: Gut ist nicht gut genug", "Mo, 10:12")
-main_Window.entrylist.new_ListBoxRow("default_icon.png", "Tod einer Münchner Bardame: Mord wegen enttäuschter Hoffnung", "Fr, 13:20")
-main_Window.entrylist.new_ListBoxRow("default_icon.png", "Tod einer Münchner Bardame: Mord wegen enttäuschter Hoffnung", "Fr, 13:20")
-main_Window.entrylist.new_ListBoxRow("default_icon.png", "Mittelschulen in München: Gut ist nicht gut genug", "Mo, 10:12")
-main_Window.entrylist.new_ListBoxRow("default_icon.png", "Tod einer Münchner Bardame: Mord wegen enttäuschter Hoffnung", "Fr, 13:20")
-main_Window.entrylist.new_ListBoxRow("default_icon.png", "Mittelschulen in München: Gut ist nicht gut genug", "Mo, 10:12")
-main_Window.entrylist.new_ListBoxRow("default_icon.png", "Tod einer Münchner Bardame: Mord wegen enttäuschter Hoffnung", "Fr, 13:20")
-main_Window.feedview.new_ListBoxRow_Box("default_icon.png","Sueddeutsche", "Sueddeutsche", "new: 12 ")
-main_Window.feedview.new_ListBoxRow_Box("default_icon.png","Golem-Feed", "Golem-Feed", "new: 30")
-main_Window.show_all()
-Gtk.main()
+    def init_main_window(self):
+        self.connect("delete-event", Gtk.main_quit)
+        self.entrylist.new_ListBoxRow("default_icon.png", "Mittelschulen in München: Gut ist nicht gut genug", "Mo, 10:12")
+        self.entrylist.new_ListBoxRow("default_icon.png", "Tod einer Münchner Bardame: Mord wegen enttäuschter Hoffnung", "Fr, 13:20")
+        self.entrylist.new_ListBoxRow("default_icon.png", "Mittelschulen in München: Gut ist nicht gut genug", "Mo, 10:12")
+        self.entrylist.new_ListBoxRow("default_icon.png", "Tod einer Münchner Bardame: Mord wegen enttäuschter Hoffnung", "Fr, 13:20")
+        self.entrylist.new_ListBoxRow("default_icon.png", "Mittelschulen in München: Gut ist nicht gut genug", "Mo, 10:12")
+        self.entrylist.new_ListBoxRow("default_icon.png", "Tod einer Münchner Bardame: Mord wegen enttäuschter Hoffnung", "Fr, 13:20")
+        self.entrylist.new_ListBoxRow("default_icon.png", "Mittelschulen in München: Gut ist nicht gut genug", "Mo, 10:12")
+        self.entrylist.new_ListBoxRow("default_icon.png", "Tod einer Münchner Bardame: Mord wegen enttäuschter Hoffnung", "Fr, 13:20")
+        self.entrylist.new_ListBoxRow("default_icon.png", "Tod einer Münchner Bardame: Mord wegen enttäuschter Hoffnung", "Fr, 13:20")
+        self.entrylist.new_ListBoxRow("default_icon.png", "Mittelschulen in München: Gut ist nicht gut genug", "Mo, 10:12")
+        self.entrylist.new_ListBoxRow("default_icon.png", "Tod einer Münchner Bardame: Mord wegen enttäuschter Hoffnung", "Fr, 13:20")
+        self.entrylist.new_ListBoxRow("default_icon.png", "Mittelschulen in München: Gut ist nicht gut genug", "Mo, 10:12")
+        self.entrylist.new_ListBoxRow("default_icon.png", "Tod einer Münchner Bardame: Mord wegen enttäuschter Hoffnung", "Fr, 13:20")
+        self.feedview.new_ListBoxRow_Box("default_icon.png","Sueddeutsche", "Sueddeutsche", "new: 12 ")
+        self.feedview.new_ListBoxRow_Box("default_icon.png","Golem-Feed", "Golem-Feed", "new: 30")
+        self.show_all()

@@ -78,6 +78,7 @@ def load_from_Disk():
     except IOError as ie:
             print("Fail to load data {ie}".format(ie=ie))
 
+
 #fm = Feedhandler()
 #fm.add_Feed("http://rss.sueddeutsche.de/rss/Muenchen")
 #fm.add_Feed("http://golem.de.dynamic.feedsportal.com/pf/578068/http://rss.golem.de/rss.php?tp=pol&feed=RSS2.0")
@@ -88,9 +89,9 @@ def load_from_Disk():
 #print(fm.count_Feeds())
 #fm.print_FeedTitles()
 #fm.save_to_Disk()
-fh = load_from_Disk()
-fh.print_FeedTitles()
+# fh = load_from_Disk()
+# fh.print_FeedTitles()
 #print(fh.update())
 #pprint.pprint(fh.feedList)
-fh.update()
-fh.print_FeedTitles()
+## fh.update()
+## fh.print_FeedTitles()
