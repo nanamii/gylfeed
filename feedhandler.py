@@ -3,32 +3,34 @@
 
 """ Testmodule for parsing feeds. """
 
+
+from gi.repository import Gtk, GObject
 import feedparser
 import pprint
 import pickle
+from feed import Feed
 
 
-class Feedhandler():
+class Feedhandler(GObject.GObject):
     """ Handles different feeds. """
+    __gsignals__ = {'feed-updated' : (GObject.SIGNAL_RUN_FIRST, None, ())}
+
 
     def __init__(self):
-        self.feedList = []
+        GObject.GObject.__init__(self)
+        self.feeds = []
 
-    def add_Feed(self, url):
-        new_Feed = feedparser.parse(url)
-        self.feedList.append(new_Feed)
-
-    def update_Feed(self, feed_Num):
-        self.feedList.append(feedparser.parse(self.get_FeedURL(feed_Num)))
-
-    def get_FeedURL(self, feed_Num):
-        return self.feedList[feed_Num].feed.title_detail.base
+    def create_feed(self, url, feed_name):
+        feed = Feed(url, feed_name)
+        feed.connect('updated', self.sig_feed_updated)
+        self.feeds.append(feed)
+        feed.update()
 
     def count_Feeds(self):
-        return len(self.feedList)
+        return len(self.feeds)
 
     def print_FeedTitles(self):
-        for feed in self.feedList:
+        for feed in self.raw_feeds:
             for title_num, entry in enumerate(feed.entries, start=1):
                 entry_str = entry.title
                 print("TitleNr. {nr} -> {entry} \n".format(
@@ -38,11 +40,11 @@ class Feedhandler():
 
     def update(self):
         latestFeedList = []
-        for feed in self.feedList:
+        for feed in self.raw_feeds:
             latestFeedList.append(feedparser.parse(feed.href))
 
         for feed in latestFeedList:
-            for xfeed in self.feedList:
+            for xfeed in self.raw_feeds:
                 if feed.href == xfeed.href:
                     self.compare_entries(feed, xfeed)
                 else:
@@ -69,6 +71,9 @@ class Feedhandler():
         except IOError as ie:
             print("Fail to save data {ie}".format(ie=ie))
 
+    def sig_feed_updated(self, feed):
+        self.emit('feed-updated')
+
 
 def load_from_Disk():
     try:
@@ -79,19 +84,3 @@ def load_from_Disk():
             print("Fail to load data {ie}".format(ie=ie))
 
 
-#fm = Feedhandler()
-#fm.add_Feed("http://rss.sueddeutsche.de/rss/Muenchen")
-#fm.add_Feed("http://golem.de.dynamic.feedsportal.com/pf/578068/http://rss.golem.de/rss.php?tp=pol&feed=RSS2.0")
-#pprint.pprint(fm.feedList)
-#pprint.pprint(fm.get_FeedURL(0))
-#fm.update_Feed(0)
-#pprint.pprint(fm.feedList)
-#print(fm.count_Feeds())
-#fm.print_FeedTitles()
-#fm.save_to_Disk()
-# fh = load_from_Disk()
-# fh.print_FeedTitles()
-#print(fh.update())
-#pprint.pprint(fh.feedList)
-## fh.update()
-## fh.print_FeedTitles()

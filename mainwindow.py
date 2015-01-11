@@ -10,15 +10,15 @@ from simple_popup_menu import SimplePopupMenu
 from entrydetailsview import EntryDetailsView
 
 
-class MainWindow(Gtk.Window, GObject.GObject):
-    #__gsignals__ = { 'update-clicked': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, ())}
+class MainWindow(Gtk.Window):
 
     def __init__(self, feedhandler):
 
         Gtk.Window.__init__(self, title="gylfeed - Feedreader")
-     #   GObject.GObject.__init__(self)
         self.set_border_width(10)
         self.set_default_size(800, 600)
+        self.feedhandler = feedhandler
+        self.feedhandler.connect("feed-updated", self.update_entryview)
 
         self.headerbar = Gtk.HeaderBar()
         self.headerbar.set_show_close_button(True)
@@ -86,6 +86,7 @@ class MainWindow(Gtk.Window, GObject.GObject):
 
         self.feed_options = FeedOptionsView()
         self.stack.add_named(self.feed_options.grid, "feedoptions")
+        self.feed_options.connect('feed-options', self.set_feedview)
 
 
     def switch_child(self, direction):
@@ -144,46 +145,28 @@ class MainWindow(Gtk.Window, GObject.GObject):
         self.menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
         self.menu.show_all()
 
-    #def built_settings_menu(self, menu):
-     #   menuitem1 = Gtk.MenuItem(self.built_menu_item("view-refresh-symbolic", "update", "F5"))
-
-        #menuitem1 = Gtk.MenuItem(label="update")
-        #menuitem2 = Gtk.MenuItem(label="add Feed")
-      #  self.menu.attach(menuitem1, 0,1,0,1)
-        #self.menu.append(menuitem2)
-
-    #def built_menu_item(self, icon, label, accel):
-     #   itembox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-      #  #icon = Gtk.Label.new_from_icon_name(icon, Gtk.IconSize.LABEL)
-       # item_label = Gtk.Label(label)
-        #accel_label = Gtk.Label(accel)
-
-        #itembox.pack_start(icon, True, True, 10)
-        #itembox.add(item_label)
-        #itembox.pack_end(accel_label, False, False, 10)
-        #return itembox
-
     def update_clicked(self, update):
-        pass
+        self.feedhandler.update()
 
     def add_feed_clicked(self, add):
         self.stack.set_visible_child(self.feed_options.grid)
 
+    # call-back-function für feedview_add_feed
+    def set_feedview(self, options, url, name, new_entries):
+        self.feedhandler.create_feed(url, name)
+        self.feedview.new_listbox_row("default_icon.png", url, name, new_entries)
+        self.show_all()
+        print("callback set_feedview in MainWindow")
+
+    # call-back-function um feedentries darzustellen, nach update
+    def update_entryview(self, feedhandler):
+        # hier noch feste Werte, ändern!!
+        feed = feedhandler.feeds[0]
+        entries = feed.get_entries()
+        for title,plot,date in entries:
+            self.entrylist.new_ListBoxRow("default_icon.png", title, date)
+
+
     def init_main_window(self):
         self.connect("delete-event", Gtk.main_quit)
-        self.entrylist.new_ListBoxRow("default_icon.png", "Mittelschulen in München: Gut ist nicht gut genug", "Mo, 10:12")
-        self.entrylist.new_ListBoxRow("default_icon.png", "Tod einer Münchner Bardame: Mord wegen enttäuschter Hoffnung", "Fr, 13:20")
-        self.entrylist.new_ListBoxRow("default_icon.png", "Mittelschulen in München: Gut ist nicht gut genug", "Mo, 10:12")
-        self.entrylist.new_ListBoxRow("default_icon.png", "Tod einer Münchner Bardame: Mord wegen enttäuschter Hoffnung", "Fr, 13:20")
-        self.entrylist.new_ListBoxRow("default_icon.png", "Mittelschulen in München: Gut ist nicht gut genug", "Mo, 10:12")
-        self.entrylist.new_ListBoxRow("default_icon.png", "Tod einer Münchner Bardame: Mord wegen enttäuschter Hoffnung", "Fr, 13:20")
-        self.entrylist.new_ListBoxRow("default_icon.png", "Mittelschulen in München: Gut ist nicht gut genug", "Mo, 10:12")
-        self.entrylist.new_ListBoxRow("default_icon.png", "Tod einer Münchner Bardame: Mord wegen enttäuschter Hoffnung", "Fr, 13:20")
-        self.entrylist.new_ListBoxRow("default_icon.png", "Tod einer Münchner Bardame: Mord wegen enttäuschter Hoffnung", "Fr, 13:20")
-        self.entrylist.new_ListBoxRow("default_icon.png", "Mittelschulen in München: Gut ist nicht gut genug", "Mo, 10:12")
-        self.entrylist.new_ListBoxRow("default_icon.png", "Tod einer Münchner Bardame: Mord wegen enttäuschter Hoffnung", "Fr, 13:20")
-        self.entrylist.new_ListBoxRow("default_icon.png", "Mittelschulen in München: Gut ist nicht gut genug", "Mo, 10:12")
-        self.entrylist.new_ListBoxRow("default_icon.png", "Tod einer Münchner Bardame: Mord wegen enttäuschter Hoffnung", "Fr, 13:20")
-        self.feedview.new_ListBoxRow_Box("default_icon.png","Sueddeutsche", "Sueddeutsche", "new: 12 ")
-        self.feedview.new_ListBoxRow_Box("default_icon.png","Golem-Feed", "Golem-Feed", "new: 30")
         self.show_all()

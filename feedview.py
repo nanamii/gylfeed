@@ -12,7 +12,7 @@ class Feedview():
         self.box.pack_start(self.listbox, True, True, 10)
         self.container.add(self.box)
 
-    def new_ListBoxRow_Box(self, logo, buttonlabel, feed, new_entries):
+    def new_listbox_row(self, logo, buttonlabel, feed, new_entries):
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         hbox1 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         hbox2 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
@@ -37,6 +37,7 @@ class Feedview():
         row = Gtk.ListBoxRow()
         row.add(vbox)
         self.listbox.add(row)
+
 
 
 
