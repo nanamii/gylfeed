@@ -6,7 +6,6 @@ from time import strftime
 import feedparser
 
 class Feed(GObject.GObject):
-    __gsignals__ = {'feed-init' : (GObject.SIGNAL_RUN_FIRST, None, ())}
     __gsignals__ = {'updated' : (GObject.SIGNAL_RUN_FIRST, None, ())}
 
 
@@ -39,6 +38,7 @@ class Feed(GObject.GObject):
                 date_string = self._date_to_string(entry.updated_parsed)
                 entries.append((entry.title, entry.summary, date_string))
             return entries
+
 
 
     def _is_modified(self, feed):

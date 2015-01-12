@@ -74,9 +74,11 @@ class MainWindow(Gtk.Window):
 
         self.feedview = Feedview(self)
         self.stack.add_named(self.feedview.container, "feedview")
+        self.feedview.listbox.connect('row-activated', self.show_entries)
 
         self.entrylist = EntryListView()
         self.stack.add_named(self.entrylist.container, "entrylist")
+        self.entrylist.listbox.connect('row-activated', self.show_entry_details)
 
         self.entry_details = EntryDetailsView()
         self.stack.add_named(self.entry_details.container, "entrydetails")
@@ -145,26 +147,42 @@ class MainWindow(Gtk.Window):
         self.menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
         self.menu.show_all()
 
+    # callback-function für update-button
     def update_clicked(self, update):
         self.feedhandler.update()
 
+    # callback-function für addfeed-button
     def add_feed_clicked(self, add):
         self.stack.set_visible_child(self.feed_options.grid)
 
-    # call-back-function für feedview_add_feed
-    def set_feedview(self, options, url, name, new_entries):
-        self.feedhandler.create_feed(url, name)
-        self.feedview.new_listbox_row("default_icon.png", url, name, new_entries)
+    # callback-function für feedview_add_feed
+    def set_feedview(self, options, url, feed_name, new_entries):
+        new_feed = self.feedhandler.create_feed(url, feed_name)
+        self.feedview.new_listbox_row("default_icon.png", feed_name, new_entries, new_feed)
         self.show_all()
-        print("callback set_feedview in MainWindow")
+        self.stack.set_visible_child(self.feedview.container)
+        self.update_childview(self.stack.get_visible_child)
 
-    # call-back-function um feedentries darzustellen, nach update
-    def update_entryview(self, feedhandler):
-        # hier noch feste Werte, ändern!!
-        feed = feedhandler.feeds[0]
+    # callback-function um feedentries darzustellen, nach update
+    def update_entryview(self, feedhandler, feed):
         entries = feed.get_entries()
         for title,plot,date in entries:
-            self.entrylist.new_ListBoxRow("default_icon.png", title, date)
+            self.entrylist.new_ListBoxRow("default_icon.png", title, date, plot)
+
+    # callback-function für listbox in feedview, Row=feed gewählt
+    def show_entries(self, listbox, row):
+        selected_row = listbox.get_selected_row()
+        selected_row.get_feed().update()
+        self.stack.set_visible_child(self.entrylist.container)
+        self.update_childview(self.stack.get_visible_child)
+
+
+    # call-back-function für listbox in entryview, Row=entry gewählt
+    def show_entry_details(self, listbox, row):
+        selected_row = listbox.get_selected_row()
+        self.entry_details.load_headline(selected_row.get_feed(),selected_row.get_time(), selected_row.get_plot())
+        self.stack.set_visible_child(self.entry_details.container)
+        self.update_childview(self.stack.get_visible_child)
 
 
     def init_main_window(self):

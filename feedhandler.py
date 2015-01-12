@@ -13,7 +13,8 @@ from feed import Feed
 
 class Feedhandler(GObject.GObject):
     """ Handles different feeds. """
-    __gsignals__ = {'feed-updated' : (GObject.SIGNAL_RUN_FIRST, None, ())}
+    __gsignals__ = {'feed-updated' : (GObject.SIGNAL_RUN_FIRST, None,
+    (GObject.GObject, ))}
 
 
     def __init__(self):
@@ -25,6 +26,7 @@ class Feedhandler(GObject.GObject):
         feed.connect('updated', self.sig_feed_updated)
         self.feeds.append(feed)
         feed.update()
+        return feed
 
     def count_Feeds(self):
         return len(self.feeds)
@@ -71,8 +73,11 @@ class Feedhandler(GObject.GObject):
         except IOError as ie:
             print("Fail to save data {ie}".format(ie=ie))
 
+
+    # callback-function zu update von feed,
+    #löst selbst Signal aus --> MainWindow
     def sig_feed_updated(self, feed):
-        self.emit('feed-updated')
+        self.emit('feed-updated', feed)
 
 
 def load_from_Disk():
