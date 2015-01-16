@@ -113,15 +113,17 @@ class MainWindow(Gtk.Window):
 
         if child is not None:
             self.stack.set_visible_child(child)
-            self.update_childview(child)
+            self.update_headerbar(child)
 
 
-    def update_childview(self, child):
+    def update_headerbar(self, child):
 
         child_name = self.stack.get_visible_child_name()
 
         if child_name == "feedview":
             self.set_button_sensitive(False, True)
+            self.set_title("{num_feeds} Feeds"
+            .format (num_feeds = self.feedhandler.count_feeds()))
         elif child_name == "entrylist":
             self.set_button_sensitive(True, True)
         elif child_name == "entrydetails":
@@ -133,9 +135,9 @@ class MainWindow(Gtk.Window):
         self.button_left.set_sensitive(left_value)
         self.button_right.set_sensitive(right_value)
 
-    def set_title(title, subtitle = None):
-        self.headerbar.props.title = title
-        self.headerbar.props.subtitle = subtitle
+    def set_title(self, title, subtitle = None):
+        self.headerbar.set_title(title)
+        self.headerbar.set_subtitle(subtitle)
 
     def manage_searchbar(self, button_search):
         if self.searchbar.get_search_mode():
@@ -155,13 +157,17 @@ class MainWindow(Gtk.Window):
     def add_feed_clicked(self, add):
         self.stack.set_visible_child(self.feed_options.grid)
 
-    # callback-function für feedview_add_feed
+    # callback-function für feedview_add_feed(durch OK-Button ausgelöst)
     def set_feedview(self, options, url, feed_name, new_entries):
         new_feed = self.feedhandler.create_feed(url, feed_name)
-        self.feedview.new_listbox_row("default_icon.png", feed_name, new_entries, new_feed)
-        self.show_all()
-        self.stack.set_visible_child(self.feedview.container)
-        self.update_childview(self.stack.get_visible_child)
+        if new_feed:
+            self.feedview.new_listbox_row("default_icon.png", feed_name, new_entries, new_feed)
+            self.show_all()
+            self.stack.set_visible_child(self.feedview.container)
+            self.update_headerbar(self.stack.get_visible_child)
+        else:
+            self.feed_options.infobar.show()
+            print("show infobar")
 
     # callback-function um feedentries darzustellen, nach update
     def update_entryview(self, feedhandler, feed):
@@ -174,7 +180,7 @@ class MainWindow(Gtk.Window):
         selected_row = listbox.get_selected_row()
         selected_row.get_feed().update()
         self.stack.set_visible_child(self.entrylist.container)
-        self.update_childview(self.stack.get_visible_child)
+        self.update_headerbar(self.stack.get_visible_child)
 
 
     # call-back-function für listbox in entryview, Row=entry gewählt
@@ -182,7 +188,7 @@ class MainWindow(Gtk.Window):
         selected_row = listbox.get_selected_row()
         self.entry_details.load_headline(selected_row.get_feed(),selected_row.get_time(), selected_row.get_plot())
         self.stack.set_visible_child(self.entry_details.container)
-        self.update_childview(self.stack.get_visible_child)
+        self.update_headerbar(self.stack.get_visible_child)
 
 
     def init_main_window(self):

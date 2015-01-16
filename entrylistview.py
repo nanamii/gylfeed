@@ -1,7 +1,7 @@
 #!usr/bin/env python3
 # encoding:utf8
 
-from gi.repository import Gtk, Gio, GdkPixbuf
+from gi.repository import GLib, Gtk, Gio, GdkPixbuf
 
 class EntryRow(Gtk.ListBoxRow):
     def __init__(self, logo, feed, time, plot):
@@ -19,8 +19,10 @@ class EntryRow(Gtk.ListBoxRow):
         image = Gtk.Image()
         image.set_from_pixbuf(pixbuf)
 
-        headline = Gtk.Label(feed)
-        headline.set_markup("<b>{headline}</b>".format(headline=headline))
+        headline_text = GLib.markup_escape_text(feed, -1)
+        headline = Gtk.Label(headline_text)
+        headline.set_markup("<b>{htext}</b>".format(htext=headline_text))
+
 
         time = Gtk.Label(time)
 

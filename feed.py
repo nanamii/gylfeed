@@ -20,7 +20,6 @@ class Feed(GObject.GObject):
     def parse(self):
         self.raw_feed = feedparser.parse(self.url)
 
-
     def update(self):
         if self.raw_feed:
             new_raw_feed = feedparser.parse(self.url, self.raw_feed.etag)

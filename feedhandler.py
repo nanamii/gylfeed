@@ -23,12 +23,15 @@ class Feedhandler(GObject.GObject):
 
     def create_feed(self, url, feed_name):
         feed = Feed(url, feed_name)
-        feed.connect('updated', self.sig_feed_updated)
-        self.feeds.append(feed)
-        feed.update()
-        return feed
+        if feed.raw_feed.bozo == 1:
+            print("Nochmal!!!!!!!!")
+        else:
+            feed.connect('updated', self.sig_feed_updated)
+            self.feeds.append(feed)
+            feed.update()
+            return feed
 
-    def count_Feeds(self):
+    def count_feeds(self):
         return len(self.feeds)
 
     def print_FeedTitles(self):

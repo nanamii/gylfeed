@@ -36,6 +36,17 @@ class FeedOptionsView(GObject.GObject):
         hbox.pack_end(back_button, False, False, 5)
         hbox.pack_end(ok_button, False, False, 5)
 
+        #ibox = Gtk.Box()
+        self.infobar = Gtk.InfoBar()
+        self.infobar.set_message_type(Gtk.MessageType.ERROR)
+        infobar_label = Gtk.Label("There is an Error while loading the URL. Please TRY again")
+        infobar_content = self.infobar.get_content_area()
+        infobar_content.add(infobar_label)
+        self.infobar.set_no_show_all(True)
+        infobar_label.show()
+        #self.infobar.expand()
+        #ibox.pack_start(self.infobar, True, True, 5)
+
         self.grid.set_border_width(20)
         self.grid.set_column_spacing(30)
         self.grid.set_row_spacing(20)
@@ -56,6 +67,9 @@ class FeedOptionsView(GObject.GObject):
         self.grid.insert_row(5)
         self.grid.attach(hbox, 0, 5, 12, 1)
 
+        self.grid.insert_row(6)
+        self.grid.attach(self.infobar, 0, 6, 1, 1)
+
     def get_url(self):
         return self.url_entry.get_text()
 
@@ -65,3 +79,7 @@ class FeedOptionsView(GObject.GObject):
     #call-back-function für ok-button
     def set_user_input(self, button, url_entry, naming_entry):
         self.emit('feed-options', self.get_url(), self.get_name(), 13)
+
+    def infobar_hide(self, infobar):
+        infobar.hide()
+

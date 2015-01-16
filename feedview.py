@@ -1,7 +1,7 @@
 #!usr/bin/env python3
 # encoding: utf8
 
-from gi.repository import Gtk, Gio, GdkPixbuf
+from gi.repository import GLib, Gtk, Gio, GdkPixbuf
 
 class FeedRow(Gtk.ListBoxRow):
     def __init__(self, logo, feed_name, new_entries, feed):
@@ -16,12 +16,14 @@ class FeedRow(Gtk.ListBoxRow):
         image = Gtk.Image()
         image.set_from_pixbuf(pixbuf)
 
-        label = Gtk.Label(feed)
-        label.set_markup("<b>{feed_name}</b>".format(feed_name=feed_name))
+
+        feed_label_text = GLib.markup_escape_text(feed_name, -1)
+        feed_label = Gtk.Label(feed_label_text)
+        feed_label.set_markup("<b>{flabel}</b>".format(flabel=feed_label_text))
         opt_button = Gtk.Button.new_from_icon_name('view-more-symbolic', Gtk.IconSize.BUTTON)
         opt_button.set_relief(Gtk.ReliefStyle.NONE)
         hbox1.pack_start(image, False, False, 10)
-        hbox1.add(label)
+        hbox1.add(feed_label)
         hbox1.pack_end(opt_button, False, False, 10)
         vbox.add(hbox1)
 
