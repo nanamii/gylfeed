@@ -47,6 +47,7 @@ class Feedview():
 
     def new_listbox_row(self, logo, feed_name, new_entries, feed):
         row = FeedRow(logo, feed_name, new_entries, feed)
+        row.grab_focus()
         self.listbox.add(row)
 
 

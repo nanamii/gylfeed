@@ -23,7 +23,6 @@ class EntryRow(Gtk.ListBoxRow):
         headline = Gtk.Label(headline_text)
         headline.set_markup("<b>{htext}</b>".format(htext=headline_text))
 
-
         time = Gtk.Label(time)
 
         hbox1.pack_start(image, False, False, 10)

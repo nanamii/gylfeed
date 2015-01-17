@@ -30,6 +30,7 @@ class MainWindow(Gtk.Window):
         Gtk.StyleContext.add_class(box.get_style_context(), "linked")
 
         searchbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        infobox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
 
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
         self.add(vbox)
@@ -57,6 +58,15 @@ class MainWindow(Gtk.Window):
         self.headerbar.pack_end(self.button_search)
         self.headerbar.pack_end(self.button_settings)
 
+        self.infobar = Gtk.InfoBar()
+        self.infobar.set_message_type(Gtk.MessageType.ERROR)
+        infobar_label = Gtk.Label("There is an Error while loading the URL. Please try again")
+        infobar_content = self.infobar.get_content_area()
+        infobar_content.add(infobar_label)
+        self.infobar.set_no_show_all(True)
+        infobar_label.show()
+        infobox.add(self.infobar)
+
         self.searchbar = Gtk.SearchBar()
         searchentry = Gtk.SearchEntry()
         self.searchbar.connect_entry(searchentry)
@@ -69,6 +79,7 @@ class MainWindow(Gtk.Window):
         self.menu.simple_add('add feed', self.add_feed_clicked, stock_id='gtk-new' )
         self.menu.simple_add_separator()
 
+        vbox.add(infobox)
         vbox.add(searchbox)
         vbox.pack_start(self.stack, True, True, 0)
 
@@ -116,7 +127,7 @@ class MainWindow(Gtk.Window):
             self.update_headerbar(child)
 
 
-    def update_headerbar(self, child):
+    def update_headerbar(self, child, selected_row=None):
 
         child_name = self.stack.get_visible_child_name()
 
@@ -126,6 +137,8 @@ class MainWindow(Gtk.Window):
             .format (num_feeds = self.feedhandler.count_feeds()))
         elif child_name == "entrylist":
             self.set_button_sensitive(True, True)
+            self.set_title("{feed_name}"
+                           .format (feed_name = selected_row.get_feed().get_name()))
         elif child_name == "entrydetails":
             self.set_button_sensitive(True, False)
         else:
@@ -165,9 +178,10 @@ class MainWindow(Gtk.Window):
             self.show_all()
             self.stack.set_visible_child(self.feedview.container)
             self.update_headerbar(self.stack.get_visible_child)
+            self.infobar.hide()
+            self.feed_options.empty_form()
         else:
-            self.feed_options.infobar.show()
-            print("show infobar")
+            self.infobar.show()
 
     # callback-function um feedentries darzustellen, nach update
     def update_entryview(self, feedhandler, feed):
@@ -180,7 +194,7 @@ class MainWindow(Gtk.Window):
         selected_row = listbox.get_selected_row()
         selected_row.get_feed().update()
         self.stack.set_visible_child(self.entrylist.container)
-        self.update_headerbar(self.stack.get_visible_child)
+        self.update_headerbar(self.stack.get_visible_child, selected_row)
 
 
     # call-back-function für listbox in entryview, Row=entry gewählt

@@ -9,10 +9,12 @@ class Feed(GObject.GObject):
     __gsignals__ = {'updated' : (GObject.SIGNAL_RUN_FIRST, None, ())}
 
 
-    def __init__(self, url, name):
+    def __init__(self, url, name, automatic_update=True, notifications=True):
         GObject.GObject.__init__(self)
         self.url = url
         self.name = name
+        self.automatic_update = automatic_update
+        self.notifications = notifications
         self.raw_feed = ''
         self.parse()
 
@@ -38,14 +40,17 @@ class Feed(GObject.GObject):
                 entries.append((entry.title, entry.summary, date_string))
             return entries
 
-
+    def get_name(self):
+        return self.name
 
     def _is_modified(self, feed):
         return feed.status != '304' and feed.feed
 
 
     def _date_to_string(self, date_struct):
-        return strftime("%FT%T%z", date_struct)
+        #return strftime("%FT%T%z", date_struct)
+        return strftime("%c", date_struct)
+
 
 
 if __name__ == '__main__':

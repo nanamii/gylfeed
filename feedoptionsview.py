@@ -14,38 +14,27 @@ class FeedOptionsView(GObject.GObject):
         self.grid = Gtk.Grid()
 
         url_label = Gtk.Label("Feed-URL:")
-        url_label.set_alignment(0,0.5)
+        url_label.set_alignment(5,0.5)
         self.url_entry = Gtk.Entry()
 
-        naming_label = Gtk.Label("Set a feed name, if you want:")
-        naming_label.set_alignment(0, 0.5)
+        naming_label = Gtk.Label("Set a feed name:")
+        naming_label.set_alignment(5, 0.5)
         self.naming_entry = Gtk.Entry()
 
         auto_label = Gtk.Label("Update feed automatic")
-        auto_label.set_alignment(0, 0.5)
+        auto_label.set_alignment(5, 0.5)
         auto_switch = Gtk.Switch()
 
-        news_label = Gtk.Label("Show only new feed-entries")
-        news_label.set_alignment(0, 0.5)
-        news_switch = Gtk.Switch()
+        notify_label = Gtk.Label("Enable sytem-notifies")
+        notify_label.set_alignment(5, 0.5)
+        notify_switch = Gtk.Switch()
 
-        hbox = Gtk.Box()
+        button_box = Gtk.Box()
         ok_button = Gtk.Button("  OK  ")
         ok_button.connect("clicked", self.set_user_input, self.url_entry, self.naming_entry)
-        back_button = Gtk.Button(" Back ")
-        hbox.pack_end(back_button, False, False, 5)
-        hbox.pack_end(ok_button, False, False, 5)
-
-        #ibox = Gtk.Box()
-        self.infobar = Gtk.InfoBar()
-        self.infobar.set_message_type(Gtk.MessageType.ERROR)
-        infobar_label = Gtk.Label("There is an Error while loading the URL. Please TRY again")
-        infobar_content = self.infobar.get_content_area()
-        infobar_content.add(infobar_label)
-        self.infobar.set_no_show_all(True)
-        infobar_label.show()
-        #self.infobar.expand()
-        #ibox.pack_start(self.infobar, True, True, 5)
+        cancel_button = Gtk.Button(" Cancel ")
+        button_box.pack_end(ok_button, False, False, 5)
+        button_box.pack_end(cancel_button, False, False, 5)
 
         self.grid.set_border_width(20)
         self.grid.set_column_spacing(30)
@@ -61,14 +50,12 @@ class FeedOptionsView(GObject.GObject):
         self.grid.attach(auto_label,0, 3, 2, 1 )
         self.grid.attach_next_to(auto_switch, auto_label, Gtk.PositionType.RIGHT, 1,1)
 
-        self.grid.attach(news_label, 0, 4, 2, 1)
-        self.grid.attach_next_to(news_switch, news_label, Gtk.PositionType.RIGHT, 1,1)
+        self.grid.attach(notify_label, 0, 4, 2, 1)
+        self.grid.attach_next_to(notify_switch, notify_label, Gtk.PositionType.RIGHT, 1,1)
 
         self.grid.insert_row(5)
-        self.grid.attach(hbox, 0, 5, 12, 1)
+        self.grid.attach(button_box, 0, 5, 12, 1)
 
-        self.grid.insert_row(6)
-        self.grid.attach(self.infobar, 0, 6, 1, 1)
 
     def get_url(self):
         return self.url_entry.get_text()
@@ -76,10 +63,12 @@ class FeedOptionsView(GObject.GObject):
     def get_name(self):
         return self.naming_entry.get_text()
 
+    def empty_form(self):
+        self.url_entry.set_text("")
+        self.naming_entry.set_text("")
+
     #call-back-function für ok-button
     def set_user_input(self, button, url_entry, naming_entry):
         self.emit('feed-options', self.get_url(), self.get_name(), 13)
 
-    def infobar_hide(self, infobar):
-        infobar.hide()
 

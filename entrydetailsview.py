@@ -11,7 +11,6 @@ class EntryDetailsView():
         self.container = Gtk.ScrolledWindow()
 
         self.web = WebKit.WebView()
-        #self.load_headline("Headline", "12:15", "Tralala, Plot....")
         self.web.grab_focus()
         self.web.set_size_request(300, 200)
         self.container.add(self.web)
