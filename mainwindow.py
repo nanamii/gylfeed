@@ -15,7 +15,7 @@ class MainWindow(Gtk.Window):
     def __init__(self, feedhandler):
 
         Gtk.Window.__init__(self, title="gylfeed - Feedreader")
-        self.set_border_width(10)
+        # self.set_border_width(10)
         self.set_default_size(800, 600)
         self.feedhandler = feedhandler
         self.feedhandler.connect("feed-updated", self.update_entryview)
@@ -32,7 +32,7 @@ class MainWindow(Gtk.Window):
         searchbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         infobox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
 
-        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
         self.add(vbox)
 
         self.stack = Gtk.Stack()
@@ -54,9 +54,53 @@ class MainWindow(Gtk.Window):
         self.button_search.connect("clicked", self.manage_searchbar)
         self.button_search.set_tooltip_text("search for content")
 
+        self.popover = Gtk.Popover.new(self.button_settings)
+        self.popover.get_preferred_size()
+        self.popover.set_border_width(10)
+
+        popover_box = Gtk.ListBox()
+        #popover_box.set_selection_mode(Gtk.SelectionMode.NONE)
+        popover_row = Gtk.ListBoxRow()
+
+        #button_grid = Gtk.Grid ()
+        #button_icon_add = Gtk.Image.new_from_icon_name('add', Gtk.IconSize.BUTTON)
+        #button_icon_add.set_margin_right(3)
+
+        button_label_add = Gtk.Label('add Feed')
+
+        #button_grid.attach(button_icon_add, 0, 0, 1, 1)
+        #button_grid.attach(button_label_add, 1, 0, 1, 1)
+        #button_grid.show_all()
+
+        #button_add = Gtk.Button()
+        #button_add.add(button_grid)
+        #button_add.set_relief(Gtk.ReliefStyle.NONE)
+        #button_add.connect("clicked", self.add_feed_clicked)
+        #popover_row.add(button_label_add)
+
+        button_update = Gtk.Button("Update")
+        button_update.set_relief(Gtk.ReliefStyle.NONE)
+        button_update.connect("clicked", self.update_clicked)
+        #popover_box.add(popover_row)
+        #popover_box.insert(button_update, -1)
+        #self.popover.add(popover_box)
+
+        ###########################################################################
+
+        action_group = Gtk.ActionGroup()
+        add_feed = Gtk.Action(name="addFeed", label="add Feed", stock_id= 'add')
+        action_group.add_action(add_feed)
+        #popover_box.add(action_group)
+        self.popover.insert_action_group("add", action_group)
+
+
+
+
+        ###########################################################################
+
         self.headerbar.pack_start(box)
-        self.headerbar.pack_end(self.button_search)
         self.headerbar.pack_end(self.button_settings)
+        self.headerbar.pack_end(self.button_search)
 
         self.infobar = Gtk.InfoBar()
         self.infobar.set_message_type(Gtk.MessageType.ERROR)
@@ -74,10 +118,10 @@ class MainWindow(Gtk.Window):
         searchbox.add(self.searchbar)
         self.searchbar.set_search_mode(False)
 
-        self.menu = SimplePopupMenu()
-        self.menu.simple_add('update', self.update_clicked, stock_id='view-refresh-symbolic')
-        self.menu.simple_add('add feed', self.add_feed_clicked, stock_id='gtk-new' )
-        self.menu.simple_add_separator()
+        #self.menu = SimplePopupMenu()
+        #self.menu.simple_add('update', self.update_clicked, stock_id='view-refresh-symbolic')
+        #self.menu.simple_add('add feed', self.add_feed_clicked, stock_id='gtk-new' )
+        #self.menu.simple_add_separator()
 
         vbox.add(infobox)
         vbox.add(searchbox)
@@ -159,8 +203,9 @@ class MainWindow(Gtk.Window):
             self.searchbar.set_search_mode(True)
 
     def open_settingsmenu(self, button_settings):
-        self.menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
-        self.menu.show_all()
+        self.popover.show_all()
+        #self.menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
+        #self.menu.show_all()
 
     # callback-function für update-button
     def update_clicked(self, update):

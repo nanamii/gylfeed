@@ -42,7 +42,7 @@ class Feedview():
         self.container = Gtk.ScrolledWindow()
         self.box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.listbox = Gtk.ListBox()
-        self.box.pack_start(self.listbox, True, True, 10)
+        self.box.pack_start(self.listbox, True, True, 0)
         self.container.add(self.box)
 
     def new_listbox_row(self, logo, feed_name, new_entries, feed):
