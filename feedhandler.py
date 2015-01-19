@@ -13,8 +13,8 @@ from feed import Feed
 
 class Feedhandler(GObject.GObject):
     """ Handles different feeds. """
-    __gsignals__ = {'feed-updated' : (GObject.SIGNAL_RUN_FIRST, None,
-    (GObject.GObject, ))}
+    __gsignals__ = {'feed-updated' : (GObject.SIGNAL_RUN_FIRST, None,(GObject.GObject, )),
+                    'feed-add-exception' : (GObject.SIGNAL_RUN_FIRST, None, (str, ))}
 
 
     def __init__(self):
@@ -24,12 +24,21 @@ class Feedhandler(GObject.GObject):
     def create_feed(self, url, feed_name):
         feed = Feed(url, feed_name)
         if feed.raw_feed.bozo == 1:
-            print("Nochmal!!!!!!!!")
+            self.emit('feed-add-exception', "URL liefert kein Ergebnis, bitte erneut eingeben.")
+        if self.feed_exists(url):
+            print("Feed bereits vorhanden!!")
+            self.emit('feed-add-exception', "Feed bereits vorhanden!")
         else:
             feed.connect('updated', self.sig_feed_updated)
             self.feeds.append(feed)
             feed.update()
             return feed
+
+    def feed_exists(self, url):
+        for feed in self.feeds:
+            if feed.get_url() == url:
+                return True
+        return False
 
     def count_feeds(self):
         return len(self.feeds)

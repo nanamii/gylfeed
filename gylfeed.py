@@ -28,5 +28,6 @@ if __name__ == '__main__':
 #    mw = MainWindow(fh)
 #    mw.init_main_window()
 #
-    sys.exit(MainApplication().run(sys.argv))
-    Gtk.main()
+    app = MainApplication()
+    print("before run")
+    sys.exit(app.run(sys.argv))

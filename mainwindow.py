@@ -17,6 +17,7 @@ class MainWindow(Gtk.ApplicationWindow):
         self.set_default_size(800, 600)
         self.feedhandler = feedhandler
         self.feedhandler.connect("feed-updated", self.update_entryview)
+        self.feedhandler.connect("feed-add-exception", self.exception_handling)
 
         self.headerbar = Gtk.HeaderBar()
         self.headerbar.set_show_close_button(True)
@@ -76,11 +77,7 @@ class MainWindow(Gtk.ApplicationWindow):
 
         self.infobar = Gtk.InfoBar()
         self.infobar.set_message_type(Gtk.MessageType.ERROR)
-        infobar_label = Gtk.Label("There is an Error while loading the URL. Please try again")
-        infobar_content = self.infobar.get_content_area()
-        infobar_content.add(infobar_label)
         self.infobar.set_no_show_all(True)
-        infobar_label.show()
         infobox.add(self.infobar)
 
         self.searchbar = Gtk.SearchBar()
@@ -154,6 +151,8 @@ class MainWindow(Gtk.ApplicationWindow):
             self.set_button_sensitive(True, False)
         else:
             self.set_button_sensitive(False, False)
+            self.set_title("Feed Options")
+            self.button_search.set_sensitive(False)
 
     def set_button_sensitive(self, left_value, right_value):
         self.button_left.set_sensitive(left_value)
@@ -177,8 +176,9 @@ class MainWindow(Gtk.ApplicationWindow):
         self.feedhandler.update()
 
     # callback-function für addfeed-button
-    def add_feed_clicked(self, add):
+    def add_feed_clicked(self, add, name):
         self.stack.set_visible_child(self.feed_options.grid)
+        self.update_headerbar(self.stack.get_visible_child())
 
     # callback-function für feedview_add_feed(durch OK-Button ausgelöst)
     def set_feedview(self, options, url, feed_name, new_entries):
@@ -190,8 +190,15 @@ class MainWindow(Gtk.ApplicationWindow):
             self.update_headerbar(self.stack.get_visible_child)
             self.infobar.hide()
             self.feed_options.empty_form()
-        else:
-            self.infobar.show()
+
+    # callback-function für Ausnahmefälle bei add_feed
+    def exception_handling(self, feedhandler, exception):
+        label = Gtk.Label(exception)
+        content = self.infobar.get_content_area()
+        content.add(label)
+        label.show()
+        self.infobar.show()
+        print("exception_handling callback")
 
     # callback-function um feedentries darzustellen, nach update
     def update_entryview(self, feedhandler, feed):
@@ -246,7 +253,7 @@ class MainApplication(Gtk.Application):
                 action.connect('activate', callback)
             return action
 
-        self.add_action(create_action("add"))
+        self.add_action(create_action("add", self.win.add_feed_clicked))
         self.add_action(create_action("update"))
         self.add_action(create_action("quit", callback=lambda *_: self.quit()))
         self.add_action(create_action("save"))
@@ -258,3 +265,6 @@ class MainApplication(Gtk.Application):
 
     def action_clicked(self, *args):
         print(args)
+
+    #def add_feed_clicked(self, add, name):
+    #    self.win.stack.set_visible_child(self.win.feed_options.grid)

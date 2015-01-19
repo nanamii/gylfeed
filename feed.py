@@ -43,6 +43,9 @@ class Feed(GObject.GObject):
     def get_name(self):
         return self.name
 
+    def get_url(self):
+        return self.url
+
     def _is_modified(self, feed):
         return feed.status != '304' and feed.feed
 
