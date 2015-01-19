@@ -10,12 +10,10 @@ from simple_popup_menu import SimplePopupMenu
 from entrydetailsview import EntryDetailsView
 
 
-class MainWindow(Gtk.Window):
+class MainWindow(Gtk.ApplicationWindow):
 
-    def __init__(self, feedhandler):
-
-        Gtk.Window.__init__(self, title="gylfeed - Feedreader")
-        # self.set_border_width(10)
+    def __init__(self, app, feedhandler):
+        Gtk.ApplicationWindow.__init__(self, title="gylfeed - Feedreader", application=app)
         self.set_default_size(800, 600)
         self.feedhandler = feedhandler
         self.feedhandler.connect("feed-updated", self.update_entryview)
@@ -54,47 +52,21 @@ class MainWindow(Gtk.Window):
         self.button_search.connect("clicked", self.manage_searchbar)
         self.button_search.set_tooltip_text("search for content")
 
-        self.popover = Gtk.Popover.new(self.button_settings)
+        ########################################################################
+
+        def create_item(name, action, icon):
+            item = Gio.MenuItem.new(name, action)
+            item.set_icon(Gio.ThemedIcon.new(icon))
+            return item
+
+        menu = Gio.Menu()
+        menu.append_item(create_item('Add Feed', 'app.add', 'add'))
+        menu.append_item(create_item('Update Feeds', 'app.update', 'application-rss+xml'))
+        menu.append_item(create_item('About gylfeed', 'app.quit', 'window-close'))
+
+        self.popover = Gtk.Popover.new_from_model(self.button_settings, menu)
         self.popover.get_preferred_size()
         self.popover.set_border_width(10)
-
-        popover_box = Gtk.ListBox()
-        #popover_box.set_selection_mode(Gtk.SelectionMode.NONE)
-        popover_row = Gtk.ListBoxRow()
-
-        #button_grid = Gtk.Grid ()
-        #button_icon_add = Gtk.Image.new_from_icon_name('add', Gtk.IconSize.BUTTON)
-        #button_icon_add.set_margin_right(3)
-
-        button_label_add = Gtk.Label('add Feed')
-
-        #button_grid.attach(button_icon_add, 0, 0, 1, 1)
-        #button_grid.attach(button_label_add, 1, 0, 1, 1)
-        #button_grid.show_all()
-
-        #button_add = Gtk.Button()
-        #button_add.add(button_grid)
-        #button_add.set_relief(Gtk.ReliefStyle.NONE)
-        #button_add.connect("clicked", self.add_feed_clicked)
-        #popover_row.add(button_label_add)
-
-        button_update = Gtk.Button("Update")
-        button_update.set_relief(Gtk.ReliefStyle.NONE)
-        button_update.connect("clicked", self.update_clicked)
-        #popover_box.add(popover_row)
-        #popover_box.insert(button_update, -1)
-        #self.popover.add(popover_box)
-
-        ###########################################################################
-
-        action_group = Gtk.ActionGroup()
-        add_feed = Gtk.Action(name="addFeed", label="add Feed", stock_id= 'add')
-        action_group.add_action(add_feed)
-        #popover_box.add(action_group)
-        self.popover.insert_action_group("add", action_group)
-
-
-
 
         ###########################################################################
 
@@ -117,11 +89,6 @@ class MainWindow(Gtk.Window):
         self.searchbar.add(searchentry)
         searchbox.add(self.searchbar)
         self.searchbar.set_search_mode(False)
-
-        #self.menu = SimplePopupMenu()
-        #self.menu.simple_add('update', self.update_clicked, stock_id='view-refresh-symbolic')
-        #self.menu.simple_add('add feed', self.add_feed_clicked, stock_id='gtk-new' )
-        #self.menu.simple_add_separator()
 
         vbox.add(infobox)
         vbox.add(searchbox)
@@ -204,8 +171,6 @@ class MainWindow(Gtk.Window):
 
     def open_settingsmenu(self, button_settings):
         self.popover.show_all()
-        #self.menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
-        #self.menu.show_all()
 
     # callback-function für update-button
     def update_clicked(self, update):
@@ -253,3 +218,43 @@ class MainWindow(Gtk.Window):
     def init_main_window(self):
         self.connect("delete-event", Gtk.main_quit)
         self.show_all()
+
+
+class MainApplication(Gtk.Application):
+    def __init__(self):
+        Gtk.Application.__init__(
+            self,
+            application_id='org.test.gylfeed',
+            flags=Gio.ApplicationFlags.FLAGS_NONE
+        )
+
+    def do_activate(self):
+        self.win.present()
+
+    def do_startup(self):
+        Gtk.Application.do_startup(self)
+
+        fh = Feedhandler()
+        self.win = MainWindow(self, fh)
+
+        def create_action(name, callback=None):
+            action = Gio.SimpleAction.new(name, None)
+
+            if callback is None:
+                action.connect('activate', self.action_clicked)
+            else:
+                action.connect('activate', callback)
+            return action
+
+        self.add_action(create_action("add"))
+        self.add_action(create_action("update"))
+        self.add_action(create_action("quit", callback=lambda *_: self.quit()))
+        self.add_action(create_action("save"))
+
+        self.set_accels_for_action('app.add', ['<Ctrl>A'])
+        self.set_accels_for_action('app.quit', ['<Ctrl>Q'])
+
+        self.win.show_all()
+
+    def action_clicked(self, *args):
+        print(args)

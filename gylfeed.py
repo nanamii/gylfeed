@@ -2,17 +2,17 @@
 # encoding: utf8
 
 
-from mainwindow import MainWindow
+from mainwindow import MainApplication
 from gi.repository import Gtk, Gio, GdkPixbuf, GObject
 
 import os
 import feedhandler
 import feed
+import sys
 
 if __name__ == '__main__':
 
-    feed_list = []
-
+    #feed_list = []
 
     #if os.path.exists('feeds.pickle'):
     #    fh = feedhandler.load_from_Disk()
@@ -25,8 +25,8 @@ if __name__ == '__main__':
 
     #fh.save_to_Disk()
 
-    fh = feedhandler.Feedhandler()
-    mw = MainWindow(fh)
-    mw.init_main_window()
-
+#    mw = MainWindow(fh)
+#    mw.init_main_window()
+#
+    sys.exit(MainApplication().run(sys.argv))
     Gtk.main()
