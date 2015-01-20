@@ -4,7 +4,7 @@
 from gi.repository import GLib, Gtk, Gio, GdkPixbuf
 
 class EntryRow(Gtk.ListBoxRow):
-    def __init__(self, logo, feed, time, plot):
+    def __init__(self, logo, feed, time, plot, feed_name):
         self._plot = plot
         self._time = time
         self._feed = feed
@@ -37,6 +37,12 @@ class EntryRow(Gtk.ListBoxRow):
         browse_button.set_relief(Gtk.ReliefStyle.NONE)
         hbox2.pack_start(open_button, False, False, 37)
         hbox2.add(browse_button)
+
+        feed_name = Gtk.Label(feed_name)
+        feed_name_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        feed_name_box.pack_start(feed_name, False, False, 10)
+
+        vbox.add(feed_name_box)
         vbox.add(hbox2)
         self.add(vbox)
 
@@ -59,9 +65,14 @@ class EntryListView():
         self.listbox = Gtk.ListBox()
         self.container.add(self.listbox)
 
-    def new_ListBoxRow(self, logo, feed, time, entry):
-        row = EntryRow(logo, feed, time, entry)
+    def new_ListBoxRow(self, logo, feed, time, entry, feed_name="FeedName"):
+        row = EntryRow(logo, feed, time, entry, feed_name)
         self.listbox.add(row)
+        row.show_all()
+
+    def clear_listbox(self):
+        for entry in self.listbox:
+            self.listbox.remove(entry)
 
 
 

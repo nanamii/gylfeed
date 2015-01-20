@@ -29,5 +29,4 @@ if __name__ == '__main__':
 #    mw.init_main_window()
 #
     app = MainApplication()
-    print("before run")
     sys.exit(app.run(sys.argv))
