@@ -11,50 +11,48 @@ class FeedOptionsView(GObject.GObject):
 
     def __init__(self):
         GObject.GObject.__init__(self)
-        self.grid = Gtk.Grid()
+
+        listbox_entries = Gtk.ListBox()
+        listbox_options = Gtk.ListBox()
+
+        def build_listbox_row(start_element, end_element):
+            box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+            box.pack_start(start_element, False, False, 10)
+            box.pack_end(end_element, False, False, 10)
+            listbox_row = Gtk.ListBoxRow()
+            listbox_row.add(box)
+            return listbox_row
 
         url_label = Gtk.Label("Feed-URL:")
-        url_label.set_alignment(5,0.5)
         self.url_entry = Gtk.Entry()
+        url_listbox_row = build_listbox_row(url_label, self.url_entry)
 
         naming_label = Gtk.Label("Set a feed name:")
-        naming_label.set_alignment(5, 0.5)
         self.naming_entry = Gtk.Entry()
+        name_listbox_row = build_listbox_row(naming_label, self.naming_entry)
 
-        auto_label = Gtk.Label("Update feed automatic")
-        auto_label.set_alignment(5, 0.5)
-        auto_switch = Gtk.Switch()
+        update_label = Gtk.Label("Update feed automatic")
+        self.update_switch = Gtk.Switch()
+        update_listbox_row = build_listbox_row(update_label, self.update_switch)
 
-        notify_label = Gtk.Label("Enable sytem-notifies")
-        notify_label.set_alignment(5, 0.5)
-        notify_switch = Gtk.Switch()
+        notify_label = Gtk.Label("Enable system-notifications")
+        self.notify_switch = Gtk.Switch()
+        notify_listbox_row = build_listbox_row(notify_label, self.notify_switch)
 
-        button_box = Gtk.Box()
-        ok_button = Gtk.Button("  OK  ")
-        ok_button.connect("clicked", self.set_user_input, self.url_entry, self.naming_entry)
-        cancel_button = Gtk.Button(" Cancel ")
-        button_box.pack_end(ok_button, False, False, 5)
-        button_box.pack_end(cancel_button, False, False, 5)
+        listbox_entries.add(url_listbox_row)
+        listbox_entries.add(name_listbox_row)
+        listbox_options.add(update_listbox_row)
+        listbox_options.add(notify_listbox_row)
 
-        self.grid.set_border_width(20)
-        self.grid.set_column_spacing(30)
-        self.grid.set_row_spacing(20)
-        self.grid.attach(url_label, 0, 1, 2, 1)
+        self.container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.container.add(listbox_entries)
+        self.container.add(listbox_options)
+        self.container.set_border_width(30)
 
-        self.grid.insert_row(2)
-        self.grid.attach_next_to(self.url_entry,url_label,Gtk.PositionType.RIGHT, 10, 1)
-        self.grid.attach(naming_label, 0, 2, 2, 1)
-        self.grid.attach_next_to(self.naming_entry, naming_label, Gtk.PositionType.RIGHT, 10, 1)
 
-        self.grid.insert_row(3)
-        self.grid.attach(auto_label,0, 3, 2, 1 )
-        self.grid.attach_next_to(auto_switch, auto_label, Gtk.PositionType.RIGHT, 1,1)
 
-        self.grid.attach(notify_label, 0, 4, 2, 1)
-        self.grid.attach_next_to(notify_switch, notify_label, Gtk.PositionType.RIGHT, 1,1)
+        #ok_button.connect("clicked", self.set_user_input, self.url_entry, self.naming_entry)
 
-        self.grid.insert_row(5)
-        self.grid.attach(button_box, 0, 5, 12, 1)
 
 
     def get_url(self):

@@ -38,6 +38,9 @@ class MainWindow(Gtk.ApplicationWindow):
         self.stack.set_transition_type(Gtk.StackTransitionType.SLIDE_LEFT_RIGHT)
         self.stack.set_transition_duration(300)
 
+
+
+        # headerbar-buttons
         self.button_left = Gtk.Button()
         self.button_left.add(Gtk.Arrow(Gtk.ArrowType.LEFT, Gtk.ShadowType.NONE))
         box.add(self.button_left)
@@ -45,6 +48,10 @@ class MainWindow(Gtk.ApplicationWindow):
         self.button_right = Gtk.Button()
         self.button_right.add(Gtk.Arrow(Gtk.ArrowType.RIGHT, Gtk.ShadowType.NONE))
         box.add(self.button_right)
+
+         # only shown in feed_options_view
+        self.button_ok = Gtk.Button("Add Feed")
+        self.button_ok.get_style_context().add_class(Gtk.STYLE_CLASS_SUGGESTED_ACTION)
 
         self.button_settings = Gtk.Button.new_from_icon_name('view-sidebar-symbolic', Gtk.IconSize.BUTTON)
         self.button_settings.connect("clicked", self.open_settingsmenu)
@@ -74,6 +81,7 @@ class MainWindow(Gtk.ApplicationWindow):
         self.headerbar.pack_start(box)
         self.headerbar.pack_end(self.button_settings)
         self.headerbar.pack_end(self.button_search)
+        self.headerbar.pack_end(self.button_ok)
 
         self.infobar = Gtk.InfoBar()
         self.infobar.set_message_type(Gtk.MessageType.ERROR)
@@ -106,8 +114,11 @@ class MainWindow(Gtk.ApplicationWindow):
         self.button_right.connect("clicked", self.switch_child)
 
         self.feed_options = FeedOptionsView()
-        self.stack.add_named(self.feed_options.grid, "feedoptions")
-        self.feed_options.connect('feed-options', self.set_feedview)
+        self.stack.add_named(self.feed_options.container, "feedoptions")
+        #self.feed_options.connect('feed-options', self.set_feedview)
+
+        self.button_ok.connect("clicked", self.set_feedview)
+
 
 
     def switch_child(self, direction):
@@ -177,11 +188,16 @@ class MainWindow(Gtk.ApplicationWindow):
 
     # callback-function für addfeed-button
     def add_feed_clicked(self, add, name):
-        self.stack.set_visible_child(self.feed_options.grid)
+        self.stack.set_visible_child(self.feed_options.container)
         self.update_headerbar(self.stack.get_visible_child())
 
     # callback-function für feedview_add_feed(durch OK-Button ausgelöst)
-    def set_feedview(self, options, url, feed_name, new_entries):
+    def set_feedview(self, ok_button):
+        url = self.feed_options.get_url()
+        feed_name = self.feed_options.get_name()
+        # Konstanter Wert, ändern!!!!!
+        new_entries = 20
+
         new_feed = self.feedhandler.create_feed(url, feed_name)
         if new_feed:
             self.feedview.new_listbox_row("default_icon.png", feed_name, new_entries, new_feed)
