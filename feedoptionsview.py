@@ -76,6 +76,12 @@ class FeedOptionsView(GObject.GObject):
     def get_name(self):
         return self.naming_entry.get_text()
 
+    def set_url(self, url):
+        self.url_entry.set_text(url)
+
+    def set_name(self, name):
+        self.naming_entry.set_text(name)
+
     def empty_form(self):
         self.url_entry.set_text("")
         self.naming_entry.set_text("")

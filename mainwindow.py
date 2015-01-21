@@ -38,8 +38,6 @@ class MainWindow(Gtk.ApplicationWindow):
         self.stack.set_transition_type(Gtk.StackTransitionType.SLIDE_LEFT_RIGHT)
         self.stack.set_transition_duration(300)
 
-
-
         # headerbar-buttons
         self.button_left = Gtk.Button()
         self.button_left.add(Gtk.Arrow(Gtk.ArrowType.LEFT, Gtk.ShadowType.NONE))
@@ -50,13 +48,18 @@ class MainWindow(Gtk.ApplicationWindow):
         box.add(self.button_right)
 
          ######### only shown in feed_options_view ##################################
-        self.button_ok = Gtk.Button("Add Feed")
-        self.button_ok.get_style_context().add_class(Gtk.STYLE_CLASS_SUGGESTED_ACTION)
-        self.button_ok.set_no_show_all(True)
+        self.button_suggest = Gtk.Button("Add Feed")
+        self.button_suggest.get_style_context().add_class(Gtk.STYLE_CLASS_SUGGESTED_ACTION)
+        self.button_suggest.set_no_show_all(True)
 
         self.button_discard = Gtk.Button("Discard")
         self.button_discard.get_style_context().add_class(Gtk.STYLE_CLASS_DESTRUCTIVE_ACTION)
         self.button_discard.set_no_show_all(True)
+
+        self.button_edit = Gtk.Button("Change Data")
+        self.button_edit.get_style_context().add_class(Gtk.STYLE_CLASS_SUGGESTED_ACTION)
+        self.button_edit.set_no_show_all(True)
+
         ##############################################################################
 
         self.button_settings = Gtk.Button.new_from_icon_name('view-sidebar-symbolic', Gtk.IconSize.BUTTON)
@@ -86,7 +89,8 @@ class MainWindow(Gtk.ApplicationWindow):
         self.headerbar.pack_start(self.button_discard)
         self.headerbar.pack_end(self.button_settings)
         self.headerbar.pack_end(self.button_search)
-        self.headerbar.pack_end(self.button_ok)
+        self.headerbar.pack_end(self.button_suggest)
+        self.headerbar.pack_end(self.button_edit)
 
         self.infobar = Gtk.InfoBar()
         self.infobar.set_message_type(Gtk.MessageType.ERROR)
@@ -104,9 +108,10 @@ class MainWindow(Gtk.ApplicationWindow):
         vbox.add(searchbox)
         vbox.pack_start(self.stack, True, True, 0)
 
-        self.feedview = Feedview(self)
+        self.feedview = Feedview()
         self.stack.add_named(self.feedview.container, "feedview")
         self.feedview.listbox.connect('row-activated', self.show_entries)
+        self.feedview.connect('preferences-clicked', self.show_options_filled)
 
         self.entrylist = EntryListView()
         self.stack.add_named(self.entrylist.container, "entrylist")
@@ -121,8 +126,9 @@ class MainWindow(Gtk.ApplicationWindow):
         self.feed_options = FeedOptionsView()
         self.stack.add_named(self.feed_options.container, "feedoptions")
 
-        self.button_ok.connect("clicked", self.set_feedview)
+        self.button_suggest.connect("clicked", self.set_feedview)
         self.button_discard.connect("clicked", self.discard_action)
+        self.button_edit.connect("clicked", self.change_data)
 
 
 
@@ -160,7 +166,7 @@ class MainWindow(Gtk.ApplicationWindow):
             self.set_title("{num_feeds} Feeds"
             .format (num_feeds = self.feedhandler.count_feeds()))
             self.button_discard.hide()
-            self.button_ok.hide()
+            self.button_suggest.hide()
         elif child_name == "entrylist":
             self.set_button_sensitive(True, True)
             self.set_title("{feed_name}"
@@ -171,7 +177,7 @@ class MainWindow(Gtk.ApplicationWindow):
             self.set_button_sensitive(False, False)
             self.set_title("Feed Options")
             self.button_search.set_sensitive(False)
-            self.button_ok.show()
+            self.button_suggest.show()
             self.button_discard.show()
 
     def set_button_sensitive(self, left_value, right_value):
@@ -253,8 +259,19 @@ class MainWindow(Gtk.ApplicationWindow):
         selected_row = listbox.get_selected_row()
         self.entry_details.load_headline(selected_row.get_feed(),selected_row.get_time(), selected_row.get_plot())
         self.stack.set_visible_child(self.entry_details.container)
-        self.update_headerbar(self.stack.get_visible_child)
+        self.update_headerbar(self.stack.get_visible_child, selected_row)
 
+
+    # call-back-function für feed-optionen-gewählt
+    def show_options_filled(self, feedview, feed):
+        self.stack.set_visible_child(self.feed_options.container)
+        self.feed_options.set_url(feed.get_url())
+        self.feed_options.set_name(feed.get_name())
+        self.update_headerbar(self.stack.get_visible_child)
+        ########### neue Werte in feed übernehmen ################
+
+    def change_data(self, button):
+        print("change button pressed")
 
     def init_main_window(self):
         self.connect("delete-event", Gtk.main_quit)

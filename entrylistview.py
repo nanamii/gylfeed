@@ -74,5 +74,8 @@ class EntryListView():
         for entry in self.listbox:
             self.listbox.remove(entry)
 
+    def get_listbox(self):
+        return self.listbox
+
 
 
