@@ -21,8 +21,8 @@ class Feedhandler(GObject.GObject):
         GObject.GObject.__init__(self)
         self.feeds = []
 
-    def create_feed(self, url, feed_name):
-        feed = Feed(url, feed_name)
+    def create_feed(self, url, feed_name, update_switch, notify_switch):
+        feed = Feed(url, feed_name, update_switch, notify_switch)
         if feed.raw_feed.bozo == 1:
             self.emit('feed-add-exception', "URL liefert kein Ergebnis, bitte erneut eingeben.")
         if self.feed_exists(url):

@@ -131,7 +131,7 @@ class MainWindow(Gtk.ApplicationWindow):
         self.button_edit.connect("clicked", self.change_data)
 
 
-
+    # callback-function für button_left und button_right
     def switch_child(self, direction):
         child = {
             self.feed_options.container:{
@@ -154,7 +154,7 @@ class MainWindow(Gtk.ApplicationWindow):
 
         if child is not None:
             self.stack.set_visible_child(child)
-            self.update_headerbar(child)
+            self.update_headerbar(child, )
 
 
     def update_headerbar(self, child, selected_row=None): # TODO!!!!
@@ -217,11 +217,13 @@ class MainWindow(Gtk.ApplicationWindow):
     def set_feedview(self, ok_button):
         url = self.feed_options.get_url()
         feed_name = self.feed_options.get_name()
-        # Konstanter Wert, ändern!!!!!
-        new_entries = 20
+        update_switch = self.feed_options.get_uswitch_state()
+        notify_switch = self.feed_options.get_nswitch_state()
+        new_entries = 0
 
-        new_feed = self.feedhandler.create_feed(url, feed_name)
+        new_feed = self.feedhandler.create_feed(url, feed_name, update_switch, notify_switch)
         if new_feed:
+            new_entries = len(new_feed.get_entries())
             self.feedview.new_listbox_row("default_icon.png", feed_name, new_entries, new_feed)
             self.show_all()
             self.stack.set_visible_child(self.feedview.container)

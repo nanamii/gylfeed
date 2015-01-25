@@ -16,7 +16,6 @@ class FeedRow(Gtk.ListBoxRow):
         image = Gtk.Image()
         image.set_from_pixbuf(pixbuf)
 
-
         feed_label_text = GLib.markup_escape_text(feed_name, -1)
         feed_label = Gtk.Label(feed_label_text)
         feed_label.set_markup("<b>{flabel}</b>".format(flabel=feed_label_text))
@@ -33,7 +32,7 @@ class FeedRow(Gtk.ListBoxRow):
         hbox1.pack_end(delete_button, False, False, 10)
         vbox.add(hbox1)
 
-        new_entries_label = Gtk.Label(new_entries)
+        new_entries_label = Gtk.Label(" {num} entries".format(num=new_entries))
         hbox2.pack_start(new_entries_label, False, False, 37)
         vbox.add(hbox2)
         self.add(vbox)

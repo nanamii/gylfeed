@@ -14,8 +14,12 @@ class FeedOptionsView(GObject.GObject):
 
         listbox_entries = Gtk.ListBox()
         listbox_entries.set_selection_mode(Gtk.SelectionMode.NONE)
+        frame_entries = Gtk.Frame()
+        frame_entries.add(listbox_entries)
         listbox_options = Gtk.ListBox()
         listbox_options.set_selection_mode(Gtk.SelectionMode.NONE)
+        frame_options = Gtk.Frame()
+        frame_options.add(listbox_options)
 
         def build_listbox_row(start_element, end_element):
             box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
@@ -26,30 +30,40 @@ class FeedOptionsView(GObject.GObject):
             listbox_row.add(box)
             return listbox_row
 
+        def build_separator_row():
+            sep = Gtk.Separator()
+            listbox_row = Gtk.ListBoxRow()
+            listbox_row.add(sep)
+            return sep
+
         url_label = Gtk.Label("Feed-URL:")
         self.url_entry = Gtk.Entry()
-        self.url_entry.set_width_chars(30)
+        self.url_entry.set_width_chars(40)
         self.url_entry.set_placeholder_text("Type in the URL of Feed ...")
         url_listbox_row = build_listbox_row(url_label, self.url_entry)
 
         naming_label = Gtk.Label("Set a feed name:")
         self.naming_entry = Gtk.Entry()
-        self.naming_entry.set_width_chars(30)
+        self.naming_entry.set_width_chars(40)
+        self.naming_entry.set_placeholder_text("Type in the name for Feed. max. 10 chars")
         name_listbox_row = build_listbox_row(naming_label, self.naming_entry)
 
         update_label = Gtk.Label("Update feed automatic")
         self.update_switch = Gtk.Switch()
+        self.update_switch.set_active(True)
         update_listbox_row = build_listbox_row(update_label, self.update_switch)
 
         notify_label = Gtk.Label("Enable system-notifications")
         self.notify_switch = Gtk.Switch()
+        self.notify_switch.set_active(True)
         notify_listbox_row = build_listbox_row(notify_label, self.notify_switch)
 
         listbox_entries.add(url_listbox_row)
+        listbox_entries.add(build_separator_row())
         listbox_entries.add(name_listbox_row)
         listbox_options.add(update_listbox_row)
+        listbox_options.add(build_separator_row())
         listbox_options.add(notify_listbox_row)
-        listbox_entries.set_margin_bottom(30)
 
         listbox_label_entries = Gtk.Label()
         listbox_label_entries.set_markup("<b>{dates}</b>".format(dates="Dates of Feed"))
@@ -61,12 +75,13 @@ class FeedOptionsView(GObject.GObject):
         listbox_label_options.set_halign(Gtk.Align.START)
         listbox_label_entries.set_margin_bottom(15)
         listbox_label_options.set_margin_bottom(15)
+        listbox_label_options.set_margin_top(30)
 
         self.container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.container.add(listbox_label_entries)
-        self.container.add(listbox_entries)
+        self.container.add(frame_entries)
         self.container.add(listbox_label_options)
-        self.container.add(listbox_options)
+        self.container.add(frame_options)
         self.container.set_border_width(50)
 
 
@@ -81,6 +96,12 @@ class FeedOptionsView(GObject.GObject):
 
     def set_name(self, name):
         self.naming_entry.set_text(name)
+
+    def get_uswitch_state(self):
+        return self.update_switch.get_active()
+
+    def get_nswitch_state(self):
+        return self.notify_switch.get_active()
 
     def empty_form(self):
         self.url_entry.set_text("")
