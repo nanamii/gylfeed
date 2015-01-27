@@ -307,7 +307,7 @@ class MainApplication(Gtk.Application):
             return action
 
         self.add_action(create_action("add", self.win.add_feed_clicked))
-        self.add_action(create_action("update"))
+        self.add_action(create_action("update", fh.update_all_feeds))
         self.add_action(create_action("quit", callback=lambda *_: self.quit()))
         self.add_action(create_action("save"))
 

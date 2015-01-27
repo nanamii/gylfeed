@@ -43,38 +43,10 @@ class Feedhandler(GObject.GObject):
     def count_feeds(self):
         return len(self.feeds)
 
-    def print_FeedTitles(self):
-        for feed in self.raw_feeds:
-            for title_num, entry in enumerate(feed.entries, start=1):
-                entry_str = entry.title
-                print("TitleNr. {nr} -> {entry} \n".format(
-                    nr=title_num, entry=entry_str))
-                print("published: {date} \n".format(date= entry.published))
 
-
-    def update(self):
-        latestFeedList = []
-        for feed in self.raw_feeds:
-            latestFeedList.append(feedparser.parse(feed.href))
-
-        for feed in latestFeedList:
-            for xfeed in self.raw_feeds:
-                if feed.href == xfeed.href:
-                    self.compare_entries(feed, xfeed)
-                else:
-                    print("Keinen übereinstimmenden Feed gefunden")
-
-
-    def compare_entries(self, latest_feed, safed_feed):
-        print(latest_feed.href, safed_feed.href)
-        templist = []
-        for cur_entry in latest_feed.entries:
-                if cur_entry["id"] not in [entry["id"] for entry in safed_feed.entries]:
-                    templist.append(cur_entry)
-                    print(cur_entry["id"])
-
-        templist.sort(key=lambda entry:entry["published_parsed"], reverse=True)
-        safed_feed.entries = templist + safed_feed.entries
+    def update_all_feeds(self, update_button, action):
+        for feed in self.feeds:
+            feed.update()
 
 
     def save_to_Disk(self):

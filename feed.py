@@ -65,7 +65,6 @@ class Feed(GObject.GObject):
         if self.raw_feed:
             entries = []
             for entry in self.raw_feed.entries:
-                print(entry.updated_parsed)
                 date_string = self._date_to_string(entry.updated_parsed)
                 entries.append((entry.title, entry.summary, date_string))
             return entries
