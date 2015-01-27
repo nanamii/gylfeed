@@ -24,18 +24,48 @@ class Feed(GObject.GObject):
 
     def update(self):
         if self.raw_feed:
-            new_raw_feed = feedparser.parse(self.url, self.raw_feed.etag)
-            if self._is_modified(new_raw_feed):
-                new_raw_feed.entries.extend(self.raw_feed.entries)
-                self.raw_feed = new_raw_feed
-        #hier noch überlegen, in welchem Fall signal abgesetzt wird !!!
-        self.emit('updated')
+            try:
+                new_raw_feed = feedparser.parse(self.url, self.raw_feed.etag)
+                if self._is_modified(new_raw_feed):
+                    new_raw_feed.entries.extend(self.raw_feed.entries)
+                    self.raw_feed = new_raw_feed
+                #hier noch überlegen, in welchem Fall signal abgesetzt wird !!!
+                self.emit('updated')
+            except AttributeError as aerror:
+                print(aerror)
+                self.update_no_etag()
+
+    def update_no_etag(self):
+        try:
+            new_raw_feed = feedparser.parse(self.url)
+            #print(new_raw_feed)
+            # Achtung!! Hier noch Vergleichsoperator anpassen, eigentlich >
+            if new_raw_feed.feed.published_parsed == self.raw_feed.entries[0].published_parsed:
+                print("neue entries!!!")
+                self.compare_entries_no_etag(new_raw_feed)
+                self.emit('updated')
+            else:
+                print("keine neuen entries")
+        except IOError as error:
+            print(error)
+
+    # wird durch update_no_etag aufgerufen
+    def compare_entries_no_etag(self, new_raw_feed):
+        templist = []
+        for new_entry in new_raw_feed.entries:
+                if new_entry.id not in [entry.id for entry in self.raw_feed.entries]:
+                    templist.append(new_entry)
+
+        templist.sort(key=lambda entry:entry["published_parsed"], reverse=True)
+        self.raw_feed.entries = templist + self.raw_feed.entries
+        self.raw_feed.feed.published_parsed = new_raw_feed.feed.published_parsed
 
 
     def get_entries(self):
         if self.raw_feed:
             entries = []
             for entry in self.raw_feed.entries:
+                print(entry.updated_parsed)
                 date_string = self._date_to_string(entry.updated_parsed)
                 entries.append((entry.title, entry.summary, date_string))
             return entries
