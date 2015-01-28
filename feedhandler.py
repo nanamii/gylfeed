@@ -53,7 +53,7 @@ class Feedhandler(GObject.GObject):
     def save_to_disk(self):
         try:
             with open ('feeds.pickle', 'wb') as fp:
-                pickle.dump(self.feeds, fp)
+                pickle.dump([f.get_serializable_data() for f in self.feeds], fp)
                 print("Saving data to disk")
         except IOError as ie:
             print("Fail to save data {ie}".format(ie=ie))
@@ -62,6 +62,7 @@ class Feedhandler(GObject.GObject):
     # callback-function zu update von feed,
     #löst selbst Signal aus --> MainWindow
     def sig_feed_updated(self, feed):
+        print("in feedhandler")
         self.emit('feed-updated', feed)
 
 

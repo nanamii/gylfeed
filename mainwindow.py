@@ -3,6 +3,7 @@
 
 from gi.repository import Gtk, Gio, GdkPixbuf, GObject
 from feedhandler import Feedhandler, load_from_disk
+from feed import Feed
 from feedview import Feedview
 from feedoptionsview import FeedOptionsView
 from entrylistview import EntryListView
@@ -252,7 +253,7 @@ class MainWindow(Gtk.ApplicationWindow):
 
     def show_feedview_saved(self, feedlist):
         for feed in feedlist:
-            self.feedview.new_listbox_row("default_icon.png", feed.get_name(), len(feed.get_entries()), feed)
+            self.feedview.new_listbox_row("default_icon.png", feed.get_name(), len(feed .get_entries()), feed)
             self.show_all()
             self.stack.set_visible_child(self.feedview.container)
 
@@ -268,6 +269,7 @@ class MainWindow(Gtk.ApplicationWindow):
     # callback-function um feedentries darzustellen, nach update; Hilfsfunktion
     # für show_entries
     def update_entryview(self, feedhandler, feed):
+        print("update_entryview function")
         self.entrylist.clear_listbox()
         entries = feed.get_entries()
         feed_name = feed.get_name()
@@ -276,6 +278,7 @@ class MainWindow(Gtk.ApplicationWindow):
 
     # callback-function für listbox in feedview, Row=feed gewählt
     def show_entries(self, listbox, row):
+        print("show_entries function")
         selected_row = listbox.get_selected_row()
         selected_row.get_feed().update()
         self.stack.set_visible_child(self.entrylist.container)
@@ -328,10 +331,8 @@ class MainApplication(Gtk.Application):
         fh = Feedhandler()
         if os.path.exists('feeds.pickle'):
             print("pickle vorhanden")
-            fh.feeds = load_from_disk()
-            for feed in fh.feeds:
-                feed.re_init()
-
+            fh.feeds = [Feed(*ftuple) for ftuple in load_from_disk()]
+            print(fh.feeds)
         self.win = MainWindow(self, fh)
 
         def create_action(name, callback=None):

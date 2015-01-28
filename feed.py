@@ -9,23 +9,22 @@ class Feed(GObject.GObject):
     __gsignals__ = {'updated' : (GObject.SIGNAL_RUN_FIRST, None, ())}
 
 
-    def __init__(self, url, name, automatic_update=True, notifications=True):
+    def __init__(self, url, name, automatic_update=True, notifications=True, raw_feed=None):
         GObject.GObject.__init__(self)
         self.url = url
         self.name = name
         self.automatic_update = automatic_update
         self.notifications = notifications
-        self.raw_feed = ''
-        self.parse()
+        self.raw_feed = raw_feed
+        if raw_feed is None:
+            self.parse()
 
     def parse(self):
         self.raw_feed = feedparser.parse(self.url)
 
-    def re_init(self):
-        GObject.GObject.__init__(self)
-
 
     def update(self):
+        print("update function in feed")
         if self.raw_feed:
             try:
                 new_raw_feed = feedparser.parse(self.url, self.raw_feed.etag)
@@ -33,7 +32,9 @@ class Feed(GObject.GObject):
                     new_raw_feed.entries.extend(self.raw_feed.entries)
                     self.raw_feed = new_raw_feed
                 #hier noch überlegen, in welchem Fall signal abgesetzt wird !!!
+                print("for emit")
                 self.emit('updated')
+                print("nach emit")
             except AttributeError as aerror:
                 print(aerror)
                 self.update_no_etag()
@@ -85,6 +86,9 @@ class Feed(GObject.GObject):
     def _date_to_string(self, date_struct):
         #return strftime("%FT%T%z", date_struct)
         return strftime("%c", date_struct)
+
+    def get_serializable_data(self):
+        return (self.url, self.name, self.automatic_update, self.notifications, self.raw_feed)
 
 
 
