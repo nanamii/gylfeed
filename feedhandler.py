@@ -47,12 +47,13 @@ class Feedhandler(GObject.GObject):
     def update_all_feeds(self, update_button, action):
         for feed in self.feeds:
             feed.update()
+        self.save_to_disk()
 
 
     def save_to_disk(self):
         try:
             with open ('feeds.pickle', 'wb') as fp:
-                pickle.dump(self,fp)
+                pickle.dump(self.feeds, fp)
                 print("Saving data to disk")
         except IOError as ie:
             print("Fail to save data {ie}".format(ie=ie))

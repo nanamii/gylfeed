@@ -18,9 +18,12 @@ class Feed(GObject.GObject):
         self.raw_feed = ''
         self.parse()
 
-
     def parse(self):
         self.raw_feed = feedparser.parse(self.url)
+
+    def re_init(self):
+        GObject.GObject.__init__(self)
+
 
     def update(self):
         if self.raw_feed:

@@ -2,12 +2,14 @@
 # encoding:utf8
 
 from gi.repository import Gtk, Gio, GdkPixbuf, GObject
-from feedhandler import Feedhandler
+from feedhandler import Feedhandler, load_from_disk
 from feedview import Feedview
 from feedoptionsview import FeedOptionsView
 from entrylistview import EntryListView
 from simple_popup_menu import SimplePopupMenu
 from entrydetailsview import EntryDetailsView
+
+import os
 
 
 class MainWindow(Gtk.ApplicationWindow):
@@ -148,7 +150,7 @@ class MainWindow(Gtk.ApplicationWindow):
     def switch_child(self, direction):
         child = {
             self.feed_options.container:{
-                self.button_left:None,
+                self.button_left:None,#if os.path.exists('feeds.pickle'):
                 self.button_right:self.feedview.container,
             },
             self.entrylist.container:{
@@ -248,6 +250,12 @@ class MainWindow(Gtk.ApplicationWindow):
             self.infobar.hide()
             self.feed_options.empty_form()
 
+    def show_feedview_saved(self, feedlist):
+        for feed in feedlist:
+            self.feedview.new_listbox_row("default_icon.png", feed.get_name(), len(feed.get_entries()), feed)
+            self.show_all()
+            self.stack.set_visible_child(self.feedview.container)
+
     # callback-function für Ausnahmefälle bei add_feed
     def exception_handling(self, feedhandler, exception):
         label = Gtk.Label(exception)
@@ -257,7 +265,8 @@ class MainWindow(Gtk.ApplicationWindow):
         self.infobar.show()
         print("exception_handling callback")
 
-    # callback-function um feedentries darzustellen, nach update
+    # callback-function um feedentries darzustellen, nach update; Hilfsfunktion
+    # für show_entries
     def update_entryview(self, feedhandler, feed):
         self.entrylist.clear_listbox()
         entries = feed.get_entries()
@@ -317,6 +326,12 @@ class MainApplication(Gtk.Application):
         Gtk.Application.do_startup(self)
 
         fh = Feedhandler()
+        if os.path.exists('feeds.pickle'):
+            print("pickle vorhanden")
+            fh.feeds = load_from_disk()
+            for feed in fh.feeds:
+                feed.re_init()
+
         self.win = MainWindow(self, fh)
 
         def create_action(name, callback=None):
@@ -338,6 +353,8 @@ class MainApplication(Gtk.Application):
         self.set_accels_for_action('app.quit', ['<Ctrl>Q'])
 
         self.win.show_all()
+        self.win.show_feedview_saved(fh.feeds)
+
 
     def action_clicked(self, *args):
         print(args)
