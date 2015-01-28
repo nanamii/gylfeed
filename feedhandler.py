@@ -49,7 +49,7 @@ class Feedhandler(GObject.GObject):
             feed.update()
 
 
-    def save_to_Disk(self):
+    def save_to_disk(self):
         try:
             with open ('feeds.pickle', 'wb') as fp:
                 pickle.dump(self,fp)
@@ -64,7 +64,7 @@ class Feedhandler(GObject.GObject):
         self.emit('feed-updated', feed)
 
 
-def load_from_Disk():
+def load_from_disk():
     try:
         with open('feeds.pickle', 'rb') as fp:
             print("Loading data from disk")

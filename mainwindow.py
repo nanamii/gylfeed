@@ -78,7 +78,8 @@ class MainWindow(Gtk.ApplicationWindow):
         menu = Gio.Menu()
         menu.append_item(create_item('Add Feed', 'app.add', 'add'))
         menu.append_item(create_item('Update Feeds', 'app.update', 'application-rss+xml'))
-        menu.append_item(create_item('About gylfeed', 'app.quit', 'window-close'))
+        menu.append_item(create_item('About gylfeed', 'app.about','stock-about'))
+        menu.append_item(create_item('Quit', 'app.quit', 'window-close'))
 
         self.popover = Gtk.Popover.new_from_model(self.button_settings, menu)
         self.popover.get_preferred_size()
@@ -107,6 +108,18 @@ class MainWindow(Gtk.ApplicationWindow):
         vbox.add(infobox)
         vbox.add(searchbox)
         vbox.pack_start(self.stack, True, True, 0)
+
+        ###### auslagern in eigene View !!!!!!!!!!!!!!1
+        self.aboutview = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.aboutview.set_margin_top(30)
+        about_label = Gtk.Label("Welcome to gylfeed. gylfeed is an simple and quick to use Feed-Reader ...")
+        about_label.set_margin_top(20)
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size("./misc/gylfeed_logo.png", 120, 240)
+        image = Gtk.Image()
+        image.set_from_pixbuf(pixbuf)
+        self.aboutview.add(image)
+        self.aboutview.add(about_label)
+        self.stack.add_named(self.aboutview, "about_view")
 
         self.feedview = Feedview()
         self.stack.add_named(self.feedview.container, "feedview")
@@ -173,6 +186,10 @@ class MainWindow(Gtk.ApplicationWindow):
                            .format (feed_name = selected_row.get_feed().get_name()))
         elif child_name == "entrydetails":
             self.set_button_sensitive(True, False)
+        elif child_name == "about_view":
+            self.set_title("gylfeed", "the owleee Feedreader")
+            self.button_discard.hide()
+            self.button_suggest.hide()
         else:
             self.set_button_sensitive(False, False)
             self.set_title("Feed Options")
@@ -275,6 +292,11 @@ class MainWindow(Gtk.ApplicationWindow):
     def change_data(self, button):
         print("change button pressed")
 
+    def show_about(self, about_button, action):
+        self.stack.set_visible_child(self.aboutview)
+        self.update_headerbar(self.stack.get_visible_child)
+
+
     def init_main_window(self):
         self.connect("delete-event", Gtk.main_quit)
         self.show_all()
@@ -308,6 +330,7 @@ class MainApplication(Gtk.Application):
 
         self.add_action(create_action("add", self.win.add_feed_clicked))
         self.add_action(create_action("update", fh.update_all_feeds))
+        self.add_action(create_action("about", self.win.show_about))
         self.add_action(create_action("quit", callback=lambda *_: self.quit()))
         self.add_action(create_action("save"))
 
