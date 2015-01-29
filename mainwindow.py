@@ -253,7 +253,7 @@ class MainWindow(Gtk.ApplicationWindow):
 
     def show_feedview_saved(self, feedlist):
         for feed in feedlist:
-            self.feedview.new_listbox_row("default_icon.png", feed.get_name(), len(feed .get_entries()), feed)
+            self.feedview.new_listbox_row("default_icon.png", feed.get_name(), len(feed.get_entries()), feed)
             self.show_all()
             self.stack.set_visible_child(self.feedview.container)
 
@@ -332,6 +332,8 @@ class MainApplication(Gtk.Application):
         if os.path.exists('feeds.pickle'):
             print("pickle vorhanden")
             fh.feeds = [Feed(*ftuple) for ftuple in load_from_disk()]
+            fh.connect_feeds()
+
             print(fh.feeds)
         self.win = MainWindow(self, fh)
 
