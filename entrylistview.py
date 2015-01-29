@@ -11,9 +11,8 @@ class EntryRow(Gtk.ListBoxRow):
 
         Gtk.ListBoxRow.__init__(self)
 
-        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        hbox1 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        hbox2 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        container_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        headline_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
 
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(logo)
         image = Gtk.Image()
@@ -22,38 +21,28 @@ class EntryRow(Gtk.ListBoxRow):
         headline_text = GLib.markup_escape_text(feed, -1)
         headline = Gtk.Label(headline_text)
         headline.set_markup("<b>{htext}</b>".format(htext=headline_text))
-
-        time = Gtk.Label(time)
-
-        hbox1.pack_start(image, False, False, 10)
-        hbox1.add(headline)
-        hbox1.pack_end(time, False, False, 10)
-        vbox.add(hbox1)
-
-        open_button = Gtk.Button()
-        open_button.set_label("open")
-        browse_button = Gtk.Button(label = "browse")
-        open_button.set_relief(Gtk.ReliefStyle.NONE)
-        browse_button.set_relief(Gtk.ReliefStyle.NONE)
-        hbox2.pack_start(open_button, False, False, 37)
-        hbox2.add(browse_button)
+        headline_box.pack_start(image, False, False, 10)
+        headline_box.add(headline)
 
         feed_name = Gtk.Label(feed_name)
         feed_name_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        feed_name_box.pack_start(feed_name, False, False, 10)
+        feed_name_box.pack_start(feed_name, False, False, 35)
 
-        vbox.add(feed_name_box)
-        vbox.add(hbox2)
-        self.add(vbox)
+        time = Gtk.Label(self._time)
+        time_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        time_box.pack_start(time, False, False, 35)
+
+        container_box.add(headline_box)
+        container_box.add(feed_name_box)
+        container_box.add(time_box)
+        self.add(container_box)
 
 
     def get_plot(self):
         return self._plot
 
-
     def get_feed(self):
         return self._feed
-
 
     def get_time(self):
         return self._time
@@ -67,6 +56,8 @@ class EntryListView():
 
     def new_ListBoxRow(self, logo, feed, time, entry, feed_name="FeedName"):
         row = EntryRow(logo, feed, time, entry, feed_name)
+        row.set_margin_top(10)
+        row.set_margin_bottom(10)
         self.listbox.add(row)
         row.show_all()
 

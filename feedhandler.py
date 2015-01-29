@@ -66,7 +66,6 @@ class Feedhandler(GObject.GObject):
     # callback-function zu update von feed,
     #löst selbst Signal aus --> MainWindow
     def sig_feed_updated(self, feed):
-        print("in feedhandler")
         self.emit('feed-updated', feed)
 
 

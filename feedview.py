@@ -1,16 +1,16 @@
 #!usr/bin/env python3
 # encoding: utf8
 
-from gi.repository import GLib, Gtk, Gio, GdkPixbuf, GObject
+from gi.repository import GLib, Gtk, Gio, GdkPixbuf, GObject, Gdk
 
 class FeedRow(Gtk.ListBoxRow):
     def __init__(self, logo, feed_name, new_entries, feed):
         self._feed = feed
         Gtk.ListBoxRow.__init__(self)
 
-        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        hbox1 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        hbox2 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        container_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        feed_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        info_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
 
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(logo)
         image = Gtk.Image()
@@ -26,16 +26,37 @@ class FeedRow(Gtk.ListBoxRow):
         delete_button = Gtk.Button.new_from_icon_name('window-close-symbolic', Gtk.IconSize.BUTTON)
         delete_button.set_relief(Gtk.ReliefStyle.NONE)
 
-        hbox1.pack_start(image, False, False, 10)
-        hbox1.add(feed_label)
-        hbox1.pack_end(self._opt_button, False, False, 10)
-        hbox1.pack_end(delete_button, False, False, 10)
-        vbox.add(hbox1)
+        feed_box.pack_start(image, False, False, 10)
+        feed_box.add(feed_label)
+        feed_box.pack_end(delete_button, False, False, 10)
+        feed_box.pack_end(self._opt_button, False, False, 10)
+        container_box.add(feed_box)
 
         new_entries_label = Gtk.Label(" {num} entries".format(num=new_entries))
-        hbox2.pack_start(new_entries_label, False, False, 37)
-        vbox.add(hbox2)
-        self.add(vbox)
+
+        ####################################################
+        css_provider = Gtk.CssProvider()
+
+        try:
+            css_provider.load_from_path("./label_color.css")
+        except IOError as e:
+            print(e)
+
+        screen = Gdk.Screen.get_default()
+
+        style_context = Gtk.StyleContext()
+        style_context.add_provider_for_screen(screen, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+        #######################################################
+
+        colored_label = Gtk.Label("new: 21", name='colored_label')
+        info_box.pack_start(colored_label, False, False, 35)
+        info_box.add(new_entries_label)
+        container_box.add(info_box)
+
+        separator = Gtk.Separator()
+        container_box.add(separator)
+
+        self.add(container_box)
 
     def get_pref_button(self):
         return self._opt_button
@@ -52,6 +73,7 @@ class Feedview(GObject.GObject):
         self.container = Gtk.ScrolledWindow()
         self.box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.listbox = Gtk.ListBox()
+        self.listbox.set_border_width(0)
         self.box.pack_start(self.listbox, True, True, 0)
         self.container.add(self.box)
 

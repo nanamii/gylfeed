@@ -153,7 +153,6 @@ class MainWindow(Gtk.ApplicationWindow):
         old_child = self.stack.get_visible_child()
         selected_row = None
         if old_child == self.feedview.container:
-            print("if old_child")
             selected_row = self.feedview.listbox.get_selected_row()
 
         child = {
@@ -286,7 +285,6 @@ class MainWindow(Gtk.ApplicationWindow):
     # callback-function um feedentries darzustellen, nach update; Hilfsfunktion
     # für show_entries
     def update_entryview(self, feedhandler, feed):
-        print("update_entryview function")
         self.entrylist.clear_listbox()
         entries = feed.get_entries()
         print(len(entries))
@@ -296,12 +294,10 @@ class MainWindow(Gtk.ApplicationWindow):
 
     # i.O. callback-function für listbox in feedview, Row=feed gewählt
     def show_entries(self, listbox, row):
-        print("show_entries function")
         selected_row = listbox.get_selected_row()
         selected_row.get_feed().update()
         self.stack.set_visible_child(self.entrylist.container)
         self.update_headerbar(selected_row)
-
 
     # i.O. call-back-function für listbox in entryview, Row=entry gewählt
     def show_entry_details(self, listbox, row):
@@ -309,7 +305,6 @@ class MainWindow(Gtk.ApplicationWindow):
         self.entry_details.load_headline(selected_row.get_feed(),selected_row.get_time(), selected_row.get_plot())
         self.stack.set_visible_child(self.entry_details.container)
         self.update_headerbar(selected_row)
-
 
     # i.O. call-back-function für feed-optionen-gewählt
     def show_options_filled(self, feedview, feed):
@@ -325,7 +320,6 @@ class MainWindow(Gtk.ApplicationWindow):
     def show_about(self, about_button, action):
         self.stack.set_visible_child(self.aboutview)
         self.update_headerbar()
-
 
     def init_main_window(self):
         self.connect("delete-event", Gtk.main_quit)
@@ -352,7 +346,7 @@ class MainApplication(Gtk.Application):
             fh.feeds = [Feed(*ftuple) for ftuple in load_from_disk()]
             fh.connect_feeds()
 
-            print(fh.feeds)
+        print(fh.feeds)
         self.win = MainWindow(self, fh)
 
         def create_action(name, callback=None):

@@ -32,9 +32,7 @@ class Feed(GObject.GObject):
                     new_raw_feed.entries.extend(self.raw_feed.entries)
                     self.raw_feed = new_raw_feed
                 #hier noch überlegen, in welchem Fall signal abgesetzt wird !!!
-                print("for emit")
                 self.emit('updated')
-                print("nach emit")
             except AttributeError as aerror:
                 print(aerror)
                 self.update_no_etag()
@@ -85,7 +83,7 @@ class Feed(GObject.GObject):
 
     def _date_to_string(self, date_struct):
         #return strftime("%FT%T%z", date_struct)
-        return strftime("%c", date_struct)
+        return strftime("%a, %d.%b.%Y, %R", date_struct)
 
     def get_serializable_data(self):
         return (self.url, self.name, self.automatic_update, self.notifications, self.raw_feed)
