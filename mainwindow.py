@@ -151,7 +151,7 @@ class MainWindow(Gtk.ApplicationWindow):
     def switch_child(self, direction):
         child = {
             self.feed_options.container:{
-                self.button_left:None,#if os.path.exists('feeds.pickle'):
+                self.button_left:None,
                 self.button_right:self.feedview.container,
             },
             self.entrylist.container:{
@@ -170,10 +170,10 @@ class MainWindow(Gtk.ApplicationWindow):
 
         if child is not None:
             self.stack.set_visible_child(child)
-            self.update_headerbar(child, )
+            self.update_headerbar()
 
 
-    def update_headerbar(self, child, selected_row=None): # TODO!!!!
+    def update_headerbar(self, selected_row=None): # TODO!!!!
 
         child_name = self.stack.get_visible_child_name()
 
@@ -181,8 +181,9 @@ class MainWindow(Gtk.ApplicationWindow):
             self.set_button_sensitive(False, True)
             self.set_title("{num_feeds} Feeds"
             .format (num_feeds = self.feedhandler.count_feeds()))
-            self.button_discard.hide()
-            self.button_suggest.hide()
+            self.button_search.set_sensitive(True)
+            self.set_disc_sugg_button(False, False)
+
         elif child_name == "entrylist":
             self.set_button_sensitive(True, True)
             self.set_title("{feed_name}"
@@ -191,14 +192,13 @@ class MainWindow(Gtk.ApplicationWindow):
             self.set_button_sensitive(True, False)
         elif child_name == "about_view":
             self.set_title("gylfeed", "the owleee Feedreader")
-            self.button_discard.hide()
-            self.button_suggest.hide()
+            self.button_search.set_sensitive(True)
+            self.set_disc_sugg_button(False, False)
         else:
             self.set_button_sensitive(False, False)
             self.set_title("Feed Options")
             self.button_search.set_sensitive(False)
-            self.button_suggest.show()
-            self.button_discard.show()
+            self.set_disc_sugg_button(True, True)
 
     def set_button_sensitive(self, left_value, right_value):
         self.button_left.set_sensitive(left_value)
@@ -207,6 +207,17 @@ class MainWindow(Gtk.ApplicationWindow):
     def set_title(self, title, subtitle = None):
         self.headerbar.set_title(title)
         self.headerbar.set_subtitle(subtitle)
+
+    def set_disc_sugg_button(self, disc_show, sug_show):
+        if disc_show:
+            self.button_discard.show()
+        else:
+            self.button_discard.hide()
+
+        if sug_show:
+            self.button_suggest.show()
+        else:
+            self.button_suggest.hide()
 
     def manage_searchbar(self, button_search):
         if self.searchbar.get_search_mode():
@@ -224,12 +235,12 @@ class MainWindow(Gtk.ApplicationWindow):
     # callback-function für add-feed im settings-menu
     def add_feed_clicked(self, add, name):
         self.stack.set_visible_child(self.feed_options.container)
-        self.update_headerbar(self.stack.get_visible_child())
+        self.update_headerbar()
 
     # callback-function für discard-action
     def discard_action(self, discard_button):
         self.stack.set_visible_child(self.feedview.container)
-        self.update_headerbar(self.stack.get_visible_child)
+        self.update_headerbar()
         self.infobar.hide()
         self.feed_options.empty_form()
 
@@ -247,7 +258,7 @@ class MainWindow(Gtk.ApplicationWindow):
             self.feedview.new_listbox_row("default_icon.png", feed_name, new_entries, new_feed)
             self.show_all()
             self.stack.set_visible_child(self.feedview.container)
-            self.update_headerbar(self.stack.get_visible_child)
+            self.update_headerbar()
             self.infobar.hide()
             self.feed_options.empty_form()
 
@@ -272,33 +283,34 @@ class MainWindow(Gtk.ApplicationWindow):
         print("update_entryview function")
         self.entrylist.clear_listbox()
         entries = feed.get_entries()
+        print(len(entries))
         feed_name = feed.get_name()
         for title,plot,date in entries:
             self.entrylist.new_ListBoxRow("default_icon.png", title, date, plot, feed_name)
 
-    # callback-function für listbox in feedview, Row=feed gewählt
+    # i.O. callback-function für listbox in feedview, Row=feed gewählt
     def show_entries(self, listbox, row):
         print("show_entries function")
         selected_row = listbox.get_selected_row()
         selected_row.get_feed().update()
         self.stack.set_visible_child(self.entrylist.container)
-        self.update_headerbar(self.stack.get_visible_child, selected_row)
+        self.update_headerbar()
 
 
-    # call-back-function für listbox in entryview, Row=entry gewählt
+    # i.O. call-back-function für listbox in entryview, Row=entry gewählt
     def show_entry_details(self, listbox, row):
         selected_row = listbox.get_selected_row()
         self.entry_details.load_headline(selected_row.get_feed(),selected_row.get_time(), selected_row.get_plot())
         self.stack.set_visible_child(self.entry_details.container)
-        self.update_headerbar(self.stack.get_visible_child, selected_row)
+        self.update_headerbar(selected_row)
 
 
-    # call-back-function für feed-optionen-gewählt
+    # i.O. call-back-function für feed-optionen-gewählt
     def show_options_filled(self, feedview, feed):
         self.stack.set_visible_child(self.feed_options.container)
         self.feed_options.set_url(feed.get_url())
         self.feed_options.set_name(feed.get_name())
-        self.update_headerbar(self.stack.get_visible_child)
+        self.update_headerbar()
         ########### neue Werte in feed übernehmen ################
 
     def change_data(self, button):
@@ -306,7 +318,7 @@ class MainWindow(Gtk.ApplicationWindow):
 
     def show_about(self, about_button, action):
         self.stack.set_visible_child(self.aboutview)
-        self.update_headerbar(self.stack.get_visible_child)
+        self.update_headerbar()
 
 
     def init_main_window(self):
