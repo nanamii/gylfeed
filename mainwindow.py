@@ -149,6 +149,13 @@ class MainWindow(Gtk.ApplicationWindow):
 
     # callback-function für button_left und button_right
     def switch_child(self, direction):
+
+        old_child = self.stack.get_visible_child()
+        selected_row = None
+        if old_child == self.feedview.container:
+            print("if old_child")
+            selected_row = self.feedview.listbox.get_selected_row()
+
         child = {
             self.feed_options.container:{
                 self.button_left:None,
@@ -170,7 +177,7 @@ class MainWindow(Gtk.ApplicationWindow):
 
         if child is not None:
             self.stack.set_visible_child(child)
-            self.update_headerbar()
+            self.update_headerbar(selected_row)
 
 
     def update_headerbar(self, selected_row=None): # TODO!!!!
@@ -183,11 +190,10 @@ class MainWindow(Gtk.ApplicationWindow):
             .format (num_feeds = self.feedhandler.count_feeds()))
             self.button_search.set_sensitive(True)
             self.set_disc_sugg_button(False, False)
-
         elif child_name == "entrylist":
             self.set_button_sensitive(True, True)
             self.set_title("{feed_name}"
-                           .format (feed_name = selected_row.get_feed().get_name()))
+                .format (feed_name = selected_row.get_feed().get_name()))
         elif child_name == "entrydetails":
             self.set_button_sensitive(True, False)
         elif child_name == "about_view":
@@ -294,7 +300,7 @@ class MainWindow(Gtk.ApplicationWindow):
         selected_row = listbox.get_selected_row()
         selected_row.get_feed().update()
         self.stack.set_visible_child(self.entrylist.container)
-        self.update_headerbar()
+        self.update_headerbar(selected_row)
 
 
     # i.O. call-back-function für listbox in entryview, Row=entry gewählt
