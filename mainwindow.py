@@ -124,6 +124,15 @@ class MainWindow(Gtk.ApplicationWindow):
         self.aboutview.add(about_label)
         self.stack.add_named(self.aboutview, "about_view")
 
+        self.about = Gtk.AboutDialog()
+        self.about.set_modal(True)
+        self.about.set_transient_for(self)
+        self.about.set_logo(pixbuf)
+        self.about.set_program_name("gylfeed")
+        self.about.set_version("0.0")
+        self.about.set_comments("gylfeed is a simple to use Feedreader")
+        self.about.set_copyright("by Sue Key")
+
         self.feedview = Feedview()
         self.stack.add_named(self.feedview.container, "feedview")
         self.feedview.listbox.connect('row-activated', self.show_entries)
@@ -145,6 +154,10 @@ class MainWindow(Gtk.ApplicationWindow):
         self.button_suggest.connect("clicked", self.set_feedview)
         self.button_discard.connect("clicked", self.discard_action)
         self.button_edit.connect("clicked", self.change_data)
+
+
+    def show_about(self, about_button, action):
+        self.about.show()
 
 
     # callback-function für button_left und button_right
@@ -317,9 +330,9 @@ class MainWindow(Gtk.ApplicationWindow):
     def change_data(self, button):
         print("change button pressed")
 
-    def show_about(self, about_button, action):
-        self.stack.set_visible_child(self.aboutview)
-        self.update_headerbar()
+    #def show_about(self, about_button, action):
+     #   self.stack.set_visible_child(self.aboutview)
+      #  self.update_headerbar()
 
     def init_main_window(self):
         self.connect("delete-event", Gtk.main_quit)

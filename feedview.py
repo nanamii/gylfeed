@@ -49,6 +49,7 @@ class FeedRow(Gtk.ListBoxRow):
         #######################################################
 
         colored_label = Gtk.Label("new: 21", name='colored_label')
+        colored_label.set_size_request(60,30)
         info_box.pack_start(colored_label, False, False, 35)
         info_box.add(new_entries_label)
         container_box.add(info_box)

@@ -42,7 +42,7 @@ class Feed(GObject.GObject):
             new_raw_feed = feedparser.parse(self.url)
             #print(new_raw_feed)
             # Achtung!! Hier noch Vergleichsoperator anpassen, eigentlich >
-            if new_raw_feed.feed.published_parsed == self.raw_feed.entries[0].published_parsed:
+            if new_raw_feed.feed.published_parsed > self.raw_feed.entries[0].published_parsed:
                 print("neue entries!!!")
                 self.compare_entries_no_etag(new_raw_feed)
                 self.emit('updated')
