@@ -22,15 +22,13 @@ class Feed(GObject.GObject):
     def parse(self):
         self.raw_feed = feedparser.parse(self.url)
 
-
     def update(self):
         print("update function in feed")
         if self.raw_feed:
             try:
                 new_raw_feed = feedparser.parse(self.url, self.raw_feed.etag)
                 if self._is_modified(new_raw_feed):
-                    new_raw_feed.entries.extend(self.raw_feed.entries)
-                    self.raw_feed = new_raw_feed
+                    self.compare_entries_no_etag(new_raw_feed)
                 #hier noch überlegen, in welchem Fall signal abgesetzt wird !!!
                 self.emit('updated')
             except AttributeError as aerror:
@@ -62,7 +60,6 @@ class Feed(GObject.GObject):
         self.raw_feed.entries = templist + self.raw_feed.entries
         self.raw_feed.feed.published_parsed = new_raw_feed.feed.published_parsed
 
-
     def get_entries(self):
         if self.raw_feed:
             entries = []
@@ -79,7 +76,6 @@ class Feed(GObject.GObject):
 
     def _is_modified(self, feed):
         return feed.status != '304' and feed.feed
-
 
     def _date_to_string(self, date_struct):
         #return strftime("%FT%T%z", date_struct)

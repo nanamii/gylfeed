@@ -117,21 +117,8 @@ class MainWindow(Gtk.ApplicationWindow):
         self.aboutview.set_margin_top(30)
         about_label = Gtk.Label("Welcome to gylfeed. gylfeed is an simple and quick to use Feed-Reader ...")
         about_label.set_margin_top(20)
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size("./misc/gylfeed_logo.png", 120, 240)
-        image = Gtk.Image()
-        image.set_from_pixbuf(pixbuf)
-        self.aboutview.add(image)
         self.aboutview.add(about_label)
         self.stack.add_named(self.aboutview, "about_view")
-
-        self.about = Gtk.AboutDialog()
-        self.about.set_modal(True)
-        self.about.set_transient_for(self)
-        self.about.set_logo(pixbuf)
-        self.about.set_program_name("gylfeed")
-        self.about.set_version("0.0")
-        self.about.set_comments("gylfeed is a simple to use Feedreader")
-        self.about.set_copyright("by Sue Key")
 
         self.feedview = Feedview()
         self.stack.add_named(self.feedview.container, "feedview")
@@ -157,7 +144,18 @@ class MainWindow(Gtk.ApplicationWindow):
 
 
     def show_about(self, about_button, action):
-        self.about.show()
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size("./misc/gylfeed_logo.png", 120, 240)
+        about = Gtk.AboutDialog()
+        about.set_modal(True)
+        about.set_transient_for(self)
+        about.set_logo(pixbuf)
+        about.set_program_name("gylfeed")
+        about.set_version("0.0")
+        about.set_license_type(Gtk.License.GPL_3_0)
+        about.set_wrap_license(True)
+        about.set_comments("gylfeed is a simple to use Feedreader")
+        about.set_copyright("by Sue Key")
+        about.show()
 
 
     # callback-function für button_left und button_right
