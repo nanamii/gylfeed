@@ -1,0 +1,6 @@
+GtkLabel#colored_label {
+    background: url("label_bg.png");
+    background-size:60px 30px;
+    color: #FFFFFF;
+    font-weight: bold;
+}
