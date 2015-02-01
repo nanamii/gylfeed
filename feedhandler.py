@@ -46,6 +46,7 @@ class Feedhandler(GObject.GObject):
 
     def update_all_feeds(self, update_button, action):
         for feed in self.feeds:
+            print(feed)
             feed.update()
         self.save_to_disk()
 

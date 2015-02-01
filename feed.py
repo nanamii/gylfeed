@@ -21,6 +21,7 @@ class Feed(GObject.GObject):
 
     def parse(self):
         self.raw_feed = feedparser.parse(self.url)
+        print(self.raw_feed)
 
     def update(self):
         print("update function in feed")
@@ -28,7 +29,7 @@ class Feed(GObject.GObject):
             try:
                 new_raw_feed = feedparser.parse(self.url, self.raw_feed.etag)
                 if self._is_modified(new_raw_feed):
-                    self.compare_entries_no_etag(new_raw_feed)
+                    self.compare_entries(new_raw_feed)
                 #hier noch überlegen, in welchem Fall signal abgesetzt wird !!!
                 self.emit('updated')
             except AttributeError as aerror:
@@ -42,21 +43,26 @@ class Feed(GObject.GObject):
             # Achtung!! Hier noch Vergleichsoperator anpassen, eigentlich >
             if new_raw_feed.feed.published_parsed > self.raw_feed.entries[0].published_parsed:
                 print("neue entries!!!")
-                self.compare_entries_no_etag(new_raw_feed)
-                self.emit('updated')
+                self.compare_entries(new_raw_feed)
             else:
                 print("keine neuen entries")
+            self.emit('updated')
+
         except IOError as error:
             print(error)
 
-    # wird durch update_no_etag aufgerufen
-    def compare_entries_no_etag(self, new_raw_feed):
+    # wird durch update und update_no_etag aufgerufen
+    def compare_entries(self, new_raw_feed):
         templist = []
         for new_entry in new_raw_feed.entries:
                 if new_entry.id not in [entry.id for entry in self.raw_feed.entries]:
                     templist.append(new_entry)
 
-        templist.sort(key=lambda entry:entry["published_parsed"], reverse=True)
+        if entries[0].published_parsed:
+            templist.sort(key=lambda entry:entry["published_parsed"], reverse=True)
+        else:
+            templist.sort(key=lambda entry:entry["updated_parsed"], reverse=True)
+
         self.raw_feed.entries = templist + self.raw_feed.entries
         self.raw_feed.feed.published_parsed = new_raw_feed.feed.published_parsed
 
