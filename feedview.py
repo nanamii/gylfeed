@@ -20,15 +20,11 @@ class FeedRow(Gtk.ListBoxRow):
         feed_label = Gtk.Label(feed_label_text)
         feed_label.set_markup("<b>{flabel}</b>".format(flabel=feed_label_text))
 
-        self._opt_button = Gtk.Button.new_from_icon_name('view-more-symbolic', Gtk.IconSize.BUTTON)
+        self._opt_button = Gtk.Button.new_from_icon_name('content-loading-symbolic', Gtk.IconSize.BUTTON)
         self._opt_button.set_relief(Gtk.ReliefStyle.NONE)
-
-        delete_button = Gtk.Button.new_from_icon_name('window-close-symbolic', Gtk.IconSize.BUTTON)
-        delete_button.set_relief(Gtk.ReliefStyle.NONE)
 
         feed_box.pack_start(image, False, False, 10)
         feed_box.add(feed_label)
-        feed_box.pack_end(delete_button, False, False, 10)
         feed_box.pack_end(self._opt_button, False, False, 10)
         container_box.add(feed_box)
 
@@ -54,6 +50,22 @@ class FeedRow(Gtk.ListBoxRow):
         info_box.add(new_entries_label)
         container_box.add(info_box)
 
+        self.delete_button = Gtk.Button.new_from_icon_name('window-close-symbolic', Gtk.IconSize.BUTTON)
+        self.delete_button.set_label("delete")
+        self.delete_button.set_relief(Gtk.ReliefStyle.NONE)
+
+        self.settings_button = Gtk.Button.new_from_icon_name('view-more-symbolic', Gtk.IconSize.BUTTON)
+        self.settings_button.set_label("Settings")
+        self.settings_button.set_relief(Gtk.ReliefStyle.NONE)
+
+        self.revealer = Gtk.Revealer()
+        self.revealer.set_reveal_child(False)
+        button_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        button_box.pack_end(self.delete_button, False, False, 10)
+        button_box.pack_end(self.settings_button, False, False, 10)
+        self.revealer.add(button_box)
+
+        container_box.add(self.revealer)
         separator = Gtk.Separator()
         container_box.add(separator)
 
@@ -62,41 +74,72 @@ class FeedRow(Gtk.ListBoxRow):
     def get_pref_button(self):
         return self._opt_button
 
+    def get_set_button(self):
+        return self.settings_button
+
+    def get_delete_button(self):
+        return self.delete_button
+
     def get_feed(self):
         return self._feed
 
+    def show_revealer(self, button):
+        if self.revealer.get_reveal_child():
+            self.revealer.set_reveal_child(False)
+        else:
+            self.revealer.set_reveal_child(True)
+
 
 class Feedview(GObject.GObject):
-    __gsignals__ = { 'preferences-clicked': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.GObject,))}
+    __gsignals__ = { 'preferences-clicked': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.GObject,)),
+                    'ok-delete-clicked': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.GObject,))}
 
     def __init__(self):
         GObject.GObject.__init__(self)
-        self.container = Gtk.ScrolledWindow()
+
+        self.container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.scr_window = Gtk.ScrolledWindow()
         self.box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.listbox = Gtk.ListBox()
         self.listbox.set_border_width(0)
+        self.listbox.set_vexpand(True)
         self.box.pack_start(self.listbox, True, True, 0)
-        self.container.add(self.box)
+        self.scr_window.add(self.box)
+        self.container.add(self.scr_window)
+
+        def build_action_bar():
+            self.action_bar = Gtk.ActionBar()
+            self.ok_button = Gtk.Button.new_from_icon_name('dialog-ok', Gtk.IconSize.BUTTON)
+            self.ok_button.set_label("Delete")
+            self.ok_button.connect("clicked", self.ok_delete_clicked)
+            self.ok_button.show()
+            discard_button = Gtk.Button("Discard")
+            discard_button.show()
+            self.action_bar.pack_start(self.ok_button)
+            self.action_bar.pack_start(discard_button)
+            self.action_bar.set_no_show_all(True)
+            return self.action_bar
+
+        self.action_bar = build_action_bar()
+        self.container.add(self.action_bar)
+
 
     def new_listbox_row(self, logo, feed_name, new_entries, feed):
         row = FeedRow(logo, feed_name, new_entries, feed)
         row.grab_focus()
-        row.get_pref_button().connect("clicked", self._on_options_clicked, feed)
-
+        row.get_set_button().connect("clicked", self._on_options_clicked, feed)
+        row.get_pref_button().connect("clicked", row.show_revealer)
+        row.get_delete_button().connect("clicked", self.show_actionbar)
         self.listbox.add(row)
 
     def _on_options_clicked(self, button, feed):
         self.emit('preferences-clicked', feed)
 
+    def show_actionbar(self, button):
+        self.action_bar.show()
 
-
-
-
-
-
-
-
-
-
+    def ok_delete_clicked(self, button):
+        row = self.listbox.get_selected_row()
+        self.emit('ok-delete-clicked', row.get_feed())
 
 

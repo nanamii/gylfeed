@@ -54,6 +54,12 @@ class Feedhandler(GObject.GObject):
         for feed in self.feeds:
             feed.connect('updated', self.sig_feed_updated)
 
+    def delete_feed(self, feed):
+        for f in self.feeds:
+            if f.get_url() == feed.get_url():
+                print(self.feeds.index(f))
+                self.feeds.pop(self.feeds.index(f))
+
 
     def save_to_disk(self):
         try:

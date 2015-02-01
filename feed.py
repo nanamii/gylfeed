@@ -58,7 +58,7 @@ class Feed(GObject.GObject):
                 if new_entry.id not in [entry.id for entry in self.raw_feed.entries]:
                     templist.append(new_entry)
 
-        if entries[0].published_parsed:
+        if new_raw_feed.entries[0].published_parsed:
             templist.sort(key=lambda entry:entry["published_parsed"], reverse=True)
         else:
             templist.sort(key=lambda entry:entry["updated_parsed"], reverse=True)

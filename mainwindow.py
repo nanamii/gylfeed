@@ -80,8 +80,8 @@ class MainWindow(Gtk.ApplicationWindow):
 
         menu = Gio.Menu()
         menu.append_item(create_item('Add Feed', 'app.add', 'add'))
-        menu.append_item(create_item('Update Feeds', 'app.update', 'application-rss+xml'))
-        menu.append_item(create_item('About gylfeed', 'app.about','stock-about'))
+        menu.append_item(create_item('Update Feeds', 'app.update', 'reload'))
+        menu.append_item(create_item('About gylfeed', 'app.about','help-about'))
         menu.append_item(create_item('Quit', 'app.quit', 'window-close'))
 
         self.popover = Gtk.Popover.new_from_model(self.button_settings, menu)
@@ -124,6 +124,7 @@ class MainWindow(Gtk.ApplicationWindow):
         self.stack.add_named(self.feedview.container, "feedview")
         self.feedview.listbox.connect('row-activated', self.show_entries)
         self.feedview.connect('preferences-clicked', self.show_options_filled)
+        self.feedview.connect('ok-delete-clicked', self.delete_feed_actions)
 
         self.entrylist = EntryListView()
         self.stack.add_named(self.entrylist.container, "entrylist")
@@ -148,6 +149,7 @@ class MainWindow(Gtk.ApplicationWindow):
         about = Gtk.AboutDialog()
         about.set_modal(True)
         about.set_transient_for(self)
+        about.set_authors(["Sue Key <lalala@lululu.com>"])
         about.set_logo(pixbuf)
         about.set_program_name("gylfeed")
         about.set_version("0.0")
@@ -324,6 +326,12 @@ class MainWindow(Gtk.ApplicationWindow):
         self.feed_options.set_name(feed.get_name())
         self.update_headerbar()
         ########### neue Werte in feed übernehmen ################
+
+    #callback-function für delete-feed, ok-button in ActionBar gewählt
+    def delete_feed_actions(self, feedview, feed):
+        self.feedhandler.delete_feed(feed)
+
+
 
     def change_data(self, button):
         print("change button pressed")
