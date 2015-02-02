@@ -28,7 +28,6 @@ class FeedRow(Gtk.ListBoxRow):
         feed_box.pack_end(self._opt_button, False, False, 10)
         container_box.add(feed_box)
 
-        new_entries_label = Gtk.Label(" {num} entries".format(num=new_entries))
 
         ####################################################
         css_provider = Gtk.CssProvider()
@@ -44,9 +43,18 @@ class FeedRow(Gtk.ListBoxRow):
         style_context.add_provider_for_screen(screen, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
         #######################################################
 
-        colored_label = Gtk.Label("new: 21", name='colored_label')
-        colored_label.set_size_request(60,30)
-        info_box.pack_start(colored_label, False, False, 35)
+        new_entries_label = Gtk.Label(" all: {num}".format(num=new_entries))
+        new_label = Gtk.Label("new:")
+        info_box.pack_start(new_label, False, False, 0)
+
+        new_label.set_margin_left(35)
+        new_label.set_margin_right(5)
+
+        colored_label = Gtk.Label("21", name='colored_label')
+        colored_label.set_size_request(40,30)
+        colored_label.set_margin_left(1)
+        colored_label.set_margin_right(10)
+        info_box.pack_start(colored_label, False, False, 0)
         info_box.add(new_entries_label)
         container_box.add(info_box)
 
@@ -114,6 +122,7 @@ class Feedview(GObject.GObject):
             self.ok_button.connect("clicked", self.ok_delete_clicked)
             self.ok_button.show()
             discard_button = Gtk.Button("Discard")
+            discard_button.connect("clicked", self.hide_action_bar)
             discard_button.show()
             self.action_bar.pack_start(self.ok_button)
             self.action_bar.pack_start(discard_button)
@@ -141,5 +150,12 @@ class Feedview(GObject.GObject):
     def ok_delete_clicked(self, button):
         row = self.listbox.get_selected_row()
         self.emit('ok-delete-clicked', row.get_feed())
+
+    def clear_listbox(self):
+        for feed in self.listbox:
+            self.listbox.remove(feed)
+
+    def hide_action_bar(self, discard_button):
+        self.action_bar.hide()
 
 

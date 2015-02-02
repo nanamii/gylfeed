@@ -105,6 +105,7 @@ class MainWindow(Gtk.ApplicationWindow):
         searchentry = Gtk.SearchEntry()
         self.searchbar.connect_entry(searchentry)
         self.searchbar.add(searchentry)
+        self.searchbar.set_hexpand(True)
         searchbox.add(self.searchbar)
         self.searchbar.set_search_mode(False)
 
@@ -190,6 +191,8 @@ class MainWindow(Gtk.ApplicationWindow):
         if child is not None:
             self.stack.set_visible_child(child)
             self.update_headerbar(selected_row)
+            if child == self.feedview.container:
+                self.show_feedview(self.feedhandler.feeds)
 
 
     def update_headerbar(self, selected_row=None): # TODO!!!!
@@ -280,7 +283,8 @@ class MainWindow(Gtk.ApplicationWindow):
             self.infobar.hide()
             self.feed_options.empty_form()
 
-    def show_feedview_saved(self, feedlist):
+    def show_feedview(self, feedlist):
+        self.feedview.clear_listbox()
         for feed in feedlist:
             self.feedview.new_listbox_row("default_icon.png", feed.get_name(), len(feed.get_entries()), feed)
             self.show_all()
@@ -330,15 +334,12 @@ class MainWindow(Gtk.ApplicationWindow):
     #callback-function für delete-feed, ok-button in ActionBar gewählt
     def delete_feed_actions(self, feedview, feed):
         self.feedhandler.delete_feed(feed)
-
-
+        self.show_feedview(self.feedhandler.feeds)
+        self.entrylist.clear_listbox()
+        self.feedview.action_bar.hide()
 
     def change_data(self, button):
         print("change button pressed")
-
-    #def show_about(self, about_button, action):
-     #   self.stack.set_visible_child(self.aboutview)
-      #  self.update_headerbar()
 
     def init_main_window(self):
         self.connect("delete-event", Gtk.main_quit)
@@ -387,7 +388,7 @@ class MainApplication(Gtk.Application):
         self.set_accels_for_action('app.quit', ['<Ctrl>Q'])
 
         self.win.show_all()
-        self.win.show_feedview_saved(fh.feeds)
+        self.win.show_feedview(fh.feeds)
 
 
     def action_clicked(self, *args):
