@@ -8,7 +8,6 @@ import feedparser
 class Feed(GObject.GObject):
     __gsignals__ = {'updated' : (GObject.SIGNAL_RUN_FIRST, None, ())}
 
-
     def __init__(self, url, name, automatic_update=True, notifications=True, raw_feed=None):
         GObject.GObject.__init__(self)
         self.url = url
@@ -21,7 +20,8 @@ class Feed(GObject.GObject):
 
     def parse(self):
         self.raw_feed = feedparser.parse(self.url)
-        print(self.raw_feed)
+        self.set_readtag(self.raw_feed)
+        print(self.raw_feed.entries[0].read)
 
     def update(self):
         print("update function in feed")
@@ -58,13 +58,18 @@ class Feed(GObject.GObject):
                 if new_entry.id not in [entry.id for entry in self.raw_feed.entries]:
                     templist.append(new_entry)
 
-        if new_raw_feed.entries[0].published_parsed:
-            templist.sort(key=lambda entry:entry["published_parsed"], reverse=True)
-        else:
-            templist.sort(key=lambda entry:entry["updated_parsed"], reverse=True)
+        try:
+            if new_raw_feed.entries[0].published_parsed:
+                templist.sort(key=lambda entry:entry["published_parsed"], reverse=True)
+                self.raw_feed.entries = templist + self.raw_feed.entries
+                self.raw_feed.feed.published_parsed = new_raw_feed.feed.published_parsed
 
-        self.raw_feed.entries = templist + self.raw_feed.entries
-        self.raw_feed.feed.published_parsed = new_raw_feed.feed.published_parsed
+            else:
+                templist.sort(key=lambda entry:entry["updated_parsed"], reverse=True)
+                self.raw_feed.entries = templist + self.raw_feed.entries
+                self.raw_feed.feed.updated_parsed = new_raw_feed.feed.updated_parsed
+        except AttributeError as ae:
+            print(ae)
 
     def get_entries(self):
         if self.raw_feed:
@@ -90,11 +95,14 @@ class Feed(GObject.GObject):
     def get_serializable_data(self):
         return (self.url, self.name, self.automatic_update, self.notifications, self.raw_feed)
 
+    def set_readtag(self, feed):
+        for entry in feed.entries:
+            entry["read"] = False
+
+    def set_entry_is_read(self, entry):
+        entry["read"] = True
 
 
-if __name__ == '__main__':
-    f = Feed(url="http://rss.golem.de/rss.php?tp=foto&feed=ATOM1.0", name="Golem")
-    print(f.get_entries())
-    f.parse()
-    print(f.get_entries())
-    f.update()
+
+
+
