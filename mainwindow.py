@@ -274,7 +274,7 @@ class MainWindow(Gtk.ApplicationWindow):
         new_entries = 0
 
         new_feed = self.feedhandler.create_feed(url, feed_name, update_switch, notify_switch)
-        if new_feed:
+        if new_feed.raw_feed.bozo == 0 :
             new_entries = len(new_feed.get_entries())
             self.feedview.new_listbox_row("default_icon.png", feed_name, new_entries, new_feed)
             self.show_all()
@@ -286,9 +286,10 @@ class MainWindow(Gtk.ApplicationWindow):
     def show_feedview(self, feedlist):
         self.feedview.clear_listbox()
         for feed in feedlist:
-            self.feedview.new_listbox_row("default_icon.png", feed.get_name(), len(feed.get_entries()), feed)
-            self.show_all()
-            self.stack.set_visible_child(self.feedview.container)
+            if feed.raw_feed.bozo == 0:
+                self.feedview.new_listbox_row("default_icon.png", feed.get_name(), len(feed.get_entries()), feed)
+                self.show_all()
+                self.stack.set_visible_child(self.feedview.container)
 
     # callback-function für Ausnahmefälle bei add_feed
     def exception_handling(self, feedhandler, exception):

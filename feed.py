@@ -20,8 +20,10 @@ class Feed(GObject.GObject):
 
     def parse(self):
         self.raw_feed = feedparser.parse(self.url)
-        self.set_readtag(self.raw_feed)
-        print(self.raw_feed.entries[0].read)
+        #if self.raw_feed != []:
+         #    self.set_readtag(self.raw_feed)
+          #   print(self.raw_feed.entries[0].read)
+        
 
     def update(self):
         print("update function in feed")

@@ -25,6 +25,7 @@ class Feedhandler(GObject.GObject):
         feed = Feed(url, feed_name, update_switch, notify_switch)
         if feed.raw_feed.bozo == 1:
             self.emit('feed-add-exception', "URL liefert kein Ergebnis, bitte erneut eingeben.")
+            pass
         if self.feed_exists(url):
             print("Feed bereits vorhanden!!")
             self.emit('feed-add-exception', "Feed bereits vorhanden!")
