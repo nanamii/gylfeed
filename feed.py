@@ -73,12 +73,17 @@ class Feed(GObject.GObject):
         except AttributeError as ae:
             print(ae)
 
+        # getestet, i.O.
+        for entry in templist:
+            entry["read"] = False
+            print(entry.read)
+
     def get_entries(self):
         if self.raw_feed:
             entries = []
             for entry in self.raw_feed.entries:
                 date_string = self._date_to_string(entry.updated_parsed)
-                entries.append((entry.title, entry.summary, date_string))
+                entries.append((entry.title, entry.summary, date_string, entry.id, self))
             return entries
 
     def get_name(self):
@@ -101,8 +106,14 @@ class Feed(GObject.GObject):
         for entry in feed.entries:
             entry["read"] = False
 
-    def set_entry_is_read(self, entry):
-        entry["read"] = True
+    def set_entry_is_read(self, entry_id):
+        for entry in self.raw_feed.entries:
+            print(entry.read)
+           # print(entry.id)
+            if entry.id == entry_id:
+                entry["read"] = True
+                print("in Feed auf TRUE gesetzt!!")
+                print(entry.read)
 
 
 

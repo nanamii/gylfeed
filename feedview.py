@@ -89,6 +89,7 @@ class FeedRow(Gtk.ListBoxRow):
         return self.delete_button
 
     def get_feed(self):
+        print(self._feed)
         return self._feed
 
     def show_revealer(self, button):

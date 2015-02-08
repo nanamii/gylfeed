@@ -307,8 +307,8 @@ class MainWindow(Gtk.ApplicationWindow):
         entries = feed.get_entries()
         print(len(entries))
         feed_name = feed.get_name()
-        for title,plot,date in entries:
-            self.entrylist.new_ListBoxRow("./graphics/default_icon.png", title, date, plot, feed_name)
+        for title,plot,time,id,feed in entries:
+            self.entrylist.new_ListBoxRow("./graphics/default_icon.png", title, time, plot, id, feed, feed_name)
 
     # i.O. callback-function für listbox in feedview, Row=feed gewählt
     def show_entries(self, listbox, row):
@@ -320,9 +320,10 @@ class MainWindow(Gtk.ApplicationWindow):
     # i.O. call-back-function für listbox in entryview, Row=entry gewählt
     def show_entry_details(self, listbox, row):
         selected_row = listbox.get_selected_row()
-        self.entry_details.load_headline(selected_row.get_feed(),selected_row.get_time(), selected_row.get_plot())
+        self.entry_details.load_headline(selected_row.get_title(),selected_row.get_time(), selected_row.get_plot())
         self.stack.set_visible_child(self.entry_details.container)
         self.update_headerbar(selected_row)
+        selected_row.get_feed().set_entry_is_read(selected_row.get_id())
 
     # i.O. call-back-function für feed-optionen-gewählt
     def show_options_filled(self, feedview, feed):

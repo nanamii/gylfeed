@@ -1,28 +1,30 @@
 #!usr/bin/env python3
 # encoding:utf8
 
-from gi.repository import GLib, Gtk, Gio, GdkPixbuf
+from gi.repository import GLib, Gtk, Gio, GdkPixbuf, Gdk
 
 class EntryRow(Gtk.ListBoxRow):
-    def __init__(self, logo, feed, time, plot, feed_name):
+    def __init__(self, logo, title, time, plot, id, feed, feed_name):
         self._plot = plot
         self._time = time
+        self._title = title
+        self._id = id
         self._feed = feed
 
         Gtk.ListBoxRow.__init__(self)
 
         container_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        headline_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        self.headline_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
 
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(logo)
         image = Gtk.Image()
         image.set_from_pixbuf(pixbuf)
 
-        headline_text = GLib.markup_escape_text(feed, -1)
+        headline_text = GLib.markup_escape_text(self._title, -1)
         headline = Gtk.Label(headline_text)
         headline.set_markup("<b>{htext}</b>".format(htext=headline_text))
-        headline_box.pack_start(image, False, False, 10)
-        headline_box.add(headline)
+        self.headline_box.pack_start(image, False, False, 10)
+        self.headline_box.add(headline)
 
         feed_name = Gtk.Label(feed_name)
         feed_name_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
@@ -32,7 +34,7 @@ class EntryRow(Gtk.ListBoxRow):
         time_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         time_box.pack_start(time, False, False, 35)
 
-        container_box.add(headline_box)
+        container_box.add(self.headline_box)
         container_box.add(feed_name_box)
         container_box.add(time_box)
         self.add(container_box)
@@ -41,11 +43,17 @@ class EntryRow(Gtk.ListBoxRow):
     def get_plot(self):
         return self._plot
 
-    def get_feed(self):
-        return self._feed
+    def get_title(self):
+        return self._title
 
     def get_time(self):
         return self._time
+
+    def get_id(self):
+        return self._id
+
+    def get_feed(self):
+        return self._feed
 
 
 class EntryListView():
@@ -54,10 +62,11 @@ class EntryListView():
         self.listbox = Gtk.ListBox()
         self.container.add(self.listbox)
 
-    def new_ListBoxRow(self, logo, feed, time, entry, feed_name="FeedName"):
-        row = EntryRow(logo, feed, time, entry, feed_name)
+    def new_ListBoxRow(self, logo, title, time, plot, id, feed, feed_name="FeedName"):
+        row = EntryRow(logo, title, time, plot, id, feed, feed_name)
         row.set_margin_top(10)
         row.set_margin_bottom(10)
+        self.mark_read_entries(feed, row, id)
         self.listbox.add(row)
         row.show_all()
 
@@ -67,6 +76,14 @@ class EntryListView():
 
     def get_listbox(self):
         return self.listbox
+
+    def mark_read_entries(self, feed, row, id):
+        for entry in feed.raw_feed.entries:
+            if id == entry.id:
+                if entry.read == True:
+                    print(entry.read)
+                    print([entry['read'] for entry in feed.raw_feed.entries])
+                    row.headline_box.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(.5,.5,.5,.5))
 
 
 
