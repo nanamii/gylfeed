@@ -146,7 +146,7 @@ class MainWindow(Gtk.ApplicationWindow):
 
 
     def show_about(self, about_button, action):
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size("./misc/gylfeed_logo.png", 120, 240)
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size("./graphics/gylfeed_logo.png", 120, 240)
         about = Gtk.AboutDialog()
         about.set_modal(True)
         about.set_transient_for(self)
@@ -276,7 +276,7 @@ class MainWindow(Gtk.ApplicationWindow):
         new_feed = self.feedhandler.create_feed(url, feed_name, update_switch, notify_switch)
         if new_feed.raw_feed.bozo == 0 :
             new_entries = len(new_feed.get_entries())
-            self.feedview.new_listbox_row("default_icon.png", feed_name, new_entries, new_feed)
+            self.feedview.new_listbox_row("./graphics/default_icon.png", feed_name, new_entries, new_feed)
             self.show_all()
             self.stack.set_visible_child(self.feedview.container)
             self.update_headerbar()
@@ -287,7 +287,7 @@ class MainWindow(Gtk.ApplicationWindow):
         self.feedview.clear_listbox()
         for feed in feedlist:
             if feed.raw_feed.bozo == 0:
-                self.feedview.new_listbox_row("default_icon.png", feed.get_name(), len(feed.get_entries()), feed)
+                self.feedview.new_listbox_row("./graphics/default_icon.png", feed.get_name(), len(feed.get_entries()), feed)
                 self.show_all()
                 self.stack.set_visible_child(self.feedview.container)
 
@@ -308,7 +308,7 @@ class MainWindow(Gtk.ApplicationWindow):
         print(len(entries))
         feed_name = feed.get_name()
         for title,plot,date in entries:
-            self.entrylist.new_ListBoxRow("default_icon.png", title, date, plot, feed_name)
+            self.entrylist.new_ListBoxRow("./graphics/default_icon.png", title, date, plot, feed_name)
 
     # i.O. callback-function für listbox in feedview, Row=feed gewählt
     def show_entries(self, listbox, row):
