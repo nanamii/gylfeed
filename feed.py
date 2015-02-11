@@ -14,6 +14,7 @@ class Feed(GObject.GObject):
         self.name = name
         self.automatic_update = automatic_update
         self.notifications = notifications
+        self.new_entries = []
         self.raw_feed = raw_feed
         if raw_feed is None:
             self.parse()
@@ -55,28 +56,37 @@ class Feed(GObject.GObject):
 
     # wird durch update und update_no_etag aufgerufen
     def compare_entries(self, new_raw_feed):
-        templist = []
+
+        #######TEST########################################################################
+        try:
+            if self.raw_feed.feed.icon:
+                print("has icon")
+                print(self.raw_feed.feed.icon)
+        except AttributeError as aerr:
+            print(aerr)
+        ##############################################################################
+
+        self.new_entries = []
         for new_entry in new_raw_feed.entries:
                 if new_entry.id not in [entry.id for entry in self.raw_feed.entries]:
-                    templist.append(new_entry)
+                    self.new_entries.append(new_entry)
 
         try:
             if new_raw_feed.entries[0].published_parsed:
-                templist.sort(key=lambda entry:entry["published_parsed"], reverse=True)
-                self.raw_feed.entries = templist + self.raw_feed.entries
+                self.new_entries.sort(key=lambda entry:entry["published_parsed"], reverse=True)
+                self.raw_feed.entries = self.new_entries + self.raw_feed.entries
                 self.raw_feed.feed.published_parsed = new_raw_feed.feed.published_parsed
 
             else:
-                templist.sort(key=lambda entry:entry["updated_parsed"], reverse=True)
-                self.raw_feed.entries = templist + self.raw_feed.entries
+                self.new_entries.sort(key=lambda entry:entry["updated_parsed"], reverse=True)
+                self.raw_feed.entries = self.new_entries + self.raw_feed.entries
                 self.raw_feed.feed.updated_parsed = new_raw_feed.feed.updated_parsed
         except AttributeError as ae:
             print(ae)
 
         # getestet, i.O.
-        for entry in templist:
+        for entry in self.new_entries:
             entry["read"] = False
-            print(entry.read)
 
     def get_entries(self):
         if self.raw_feed:
@@ -91,6 +101,16 @@ class Feed(GObject.GObject):
 
     def get_url(self):
         return self.url
+
+    def get_num_of_new_entries(self):
+        return len(self.new_entries)
+
+    def get_num_of_unread(self):
+        num=0
+        for entry in self.raw_feed.entries:
+            if entry.read == False:
+                num = num+1
+        return num
 
     def _is_modified(self, feed):
         return feed.status != '304' and feed.feed
@@ -108,12 +128,9 @@ class Feed(GObject.GObject):
 
     def set_entry_is_read(self, entry_id):
         for entry in self.raw_feed.entries:
-            print(entry.read)
-           # print(entry.id)
             if entry.id == entry_id:
                 entry["read"] = True
                 print("in Feed auf TRUE gesetzt!!")
-                print(entry.read)
 
 
 

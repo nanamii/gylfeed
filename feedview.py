@@ -2,21 +2,37 @@
 # encoding: utf8
 
 from gi.repository import GLib, Gtk, Gio, GdkPixbuf, GObject, Gdk
+from indicatorlabel import IndicatorLabel
+import urllib.request
 
 class FeedRow(Gtk.ListBoxRow):
-    def __init__(self, logo, feed_name, new_entries, feed):
+    def __init__(self, logo, feed):
         self._feed = feed
+        self._num_of_entries = len(feed.get_entries())
+        self._num_of_new_entries = feed.get_num_of_new_entries()
+        self._num_of_unread_entries = feed.get_num_of_unread()
+        self._feed_name = feed.get_name()
         Gtk.ListBoxRow.__init__(self)
 
         container_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         feed_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         info_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
 
+        try:
+            if self._feed.raw_feed.feed.icon:
+                url = self._feed.raw_feed.feed.icon
+                print(url)
+                logo_raw = urllib.request.urlretrieve(url)
+                logo = logo_raw[0]
+        except AttributeError as aerr:
+            print(aerr)
+
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(logo)
+        pixbuf = pixbuf.scale_simple(20, 20, GdkPixbuf.InterpType.HYPER)
         image = Gtk.Image()
         image.set_from_pixbuf(pixbuf)
 
-        feed_label_text = GLib.markup_escape_text(feed_name, -1)
+        feed_label_text = GLib.markup_escape_text(self._feed_name, -1)
         feed_label = Gtk.Label(feed_label_text)
         feed_label.set_markup("<b>{flabel}</b>".format(flabel=feed_label_text))
 
@@ -43,19 +59,31 @@ class FeedRow(Gtk.ListBoxRow):
         style_context.add_provider_for_screen(screen, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
         #######################################################
 
-        new_entries_label = Gtk.Label(" all: {num}".format(num=new_entries))
+        new_entries_label = IndicatorLabel(" {num_new}★".format(num_new=self._num_of_new_entries))
+        new_entries_label.set_color(IndicatorLabel.THEME)
         new_label = Gtk.Label("new:")
-        info_box.pack_start(new_label, False, False, 0)
+        #info_box.pack_start(new_label, False, False, 0)
 
-        new_label.set_margin_left(35)
-        new_label.set_margin_right(5)
+        new_entries_label.set_margin_left(35)
+        new_entries_label.set_margin_right(5)
 
-        colored_label = Gtk.Label("21", name='colored_label')
-        colored_label.set_size_request(40,30)
-        colored_label.set_margin_left(1)
-        colored_label.set_margin_right(10)
-        info_box.pack_start(colored_label, False, False, 0)
+        #colored_label = Gtk.Label("21", name='colored_label')
+        #colored_label.set_size_request(40,30)
+        #colored_label.set_margin_left(1)
+        #colored_label.set_margin_right(10)
+        #info_box.pack_start(colored_label, False, False, 0)
         info_box.add(new_entries_label)
+
+        self.indi_label = IndicatorLabel("<b>{num_all}</b> ✓".format(num_all=self._num_of_entries))
+        self.indi_label.set_color(IndicatorLabel.SUCCESS)
+        self.indi_label.set_margin_right(5)
+        self.indi_label.set_no_show_all(True)
+        info_box.add(self.indi_label)
+
+        unread_label = IndicatorLabel(" {num_unread}".format(num_unread=self._num_of_unread_entries))
+        unread_label.set_color(IndicatorLabel.WARNING)
+        info_box.add(unread_label)
+
         container_box.add(info_box)
 
         self.delete_button = Gtk.Button.new_from_icon_name('window-close-symbolic', Gtk.IconSize.BUTTON)
@@ -112,6 +140,7 @@ class Feedview(GObject.GObject):
         self.listbox = Gtk.ListBox()
         self.listbox.set_border_width(0)
         self.listbox.set_vexpand(True)
+        self.listbox.connect('row-selected', self.show_all_labels)
         self.box.pack_start(self.listbox, True, True, 0)
         self.scr_window.add(self.box)
         self.container.add(self.scr_window)
@@ -134,8 +163,8 @@ class Feedview(GObject.GObject):
         self.container.add(self.action_bar)
 
 
-    def new_listbox_row(self, logo, feed_name, new_entries, feed):
-        row = FeedRow(logo, feed_name, new_entries, feed)
+    def new_listbox_row(self, logo, feed):
+        row = FeedRow(logo, feed)
         row.grab_focus()
         row.get_set_button().connect("clicked", self._on_options_clicked, feed)
         row.get_pref_button().connect("clicked", row.show_revealer)
@@ -158,5 +187,12 @@ class Feedview(GObject.GObject):
 
     def hide_action_bar(self, discard_button):
         self.action_bar.hide()
+
+    def show_all_labels(self, listbox, label):
+        if listbox.get_selected_row().indi_label.show():
+            listbox.get_selected_row().indi_label.hide()
+        else:
+            listbox.get_selected_row().indi_label.show()
+
 
 

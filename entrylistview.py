@@ -13,8 +13,8 @@ class EntryRow(Gtk.ListBoxRow):
 
         Gtk.ListBoxRow.__init__(self)
 
-        container_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        self.headline_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        self.container_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        headline_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
 
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(logo)
         image = Gtk.Image()
@@ -23,8 +23,8 @@ class EntryRow(Gtk.ListBoxRow):
         headline_text = GLib.markup_escape_text(self._title, -1)
         headline = Gtk.Label(headline_text)
         headline.set_markup("<b>{htext}</b>".format(htext=headline_text))
-        self.headline_box.pack_start(image, False, False, 10)
-        self.headline_box.add(headline)
+        headline_box.pack_start(image, False, False, 10)
+        headline_box.add(headline)
 
         feed_name = Gtk.Label(feed_name)
         feed_name_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
@@ -34,10 +34,10 @@ class EntryRow(Gtk.ListBoxRow):
         time_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         time_box.pack_start(time, False, False, 35)
 
-        container_box.add(self.headline_box)
-        container_box.add(feed_name_box)
-        container_box.add(time_box)
-        self.add(container_box)
+        self.container_box.add(headline_box)
+        self.container_box.add(feed_name_box)
+        self.container_box.add(time_box)
+        self.add(self.container_box)
 
 
     def get_plot(self):
@@ -81,9 +81,7 @@ class EntryListView():
         for entry in feed.raw_feed.entries:
             if id == entry.id:
                 if entry.read == True:
-                    print(entry.read)
-                    print([entry['read'] for entry in feed.raw_feed.entries])
-                    row.headline_box.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(.5,.5,.5,.5))
+                    row.container_box.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(.5,.5,.5,.5))
 
 
 

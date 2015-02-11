@@ -287,7 +287,7 @@ class MainWindow(Gtk.ApplicationWindow):
         self.feedview.clear_listbox()
         for feed in feedlist:
             if feed.raw_feed.bozo == 0:
-                self.feedview.new_listbox_row("./graphics/default_icon.png", feed.get_name(), len(feed.get_entries()), feed)
+                self.feedview.new_listbox_row("./graphics/default_icon.png",  feed)
                 self.show_all()
                 self.stack.set_visible_child(self.feedview.container)
 
