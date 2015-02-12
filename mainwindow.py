@@ -1,7 +1,7 @@
 #!usr/bin/env python3
 # encoding:utf8
 
-from gi.repository import Gtk, Gio, GdkPixbuf, GObject
+from gi.repository import Gtk, Gio, GLib, GdkPixbuf, GObject
 from feedhandler import Feedhandler, load_from_disk
 from feed import Feed
 from feedview import Feedview
@@ -361,6 +361,9 @@ class MainApplication(Gtk.Application):
 
     def do_startup(self):
         Gtk.Application.do_startup(self)
+
+        # Aktion automatisch nach x time durchfuehren
+        #GLib.timeout_add(1 * 1000, lambda: print("Tick!") or 1)
 
         fh = Feedhandler()
         if os.path.exists('feeds.pickle'):
