@@ -61,22 +61,24 @@ class FeedRow(Gtk.ListBoxRow):
         #######################################################
 
         new_entries_label = IndicatorLabel(" {num_new} ★".format(num_new=self._num_of_new_entries))
-        new_entries_label.set_color(IndicatorLabel.THEME)
-
+        new_entries_label.set_color(IndicatorLabel.SUCCESS)
         new_entries_label.set_margin_left(35)
         new_entries_label.set_margin_right(5)
-        info_box.add(new_entries_label)
+        new_entries_label.set_margin_bottom(10)
 
-        self.indi_label = IndicatorLabel("<b>{num_all}</b>  ∑".format(num_all=self._num_of_entries))
-        self.indi_label.set_color(IndicatorLabel.SUCCESS)
+        self.indi_label = IndicatorLabel("<b> all {num_all} </b>  ∑".format(num_all=self._num_of_entries))
+        self.indi_label.set_color(IndicatorLabel.THEME)
         self.indi_label.set_margin_right(5)
         self.indi_label.set_no_show_all(True)
+        self.indi_label.set_margin_bottom(10)
 
-        self.unread_label = IndicatorLabel(" {num_unread}".format(num_unread=self._num_of_unread_entries))
-        self.unread_label.set_color(IndicatorLabel.WARNING)
+        self.unread_label = IndicatorLabel(" unread {num_unread} ".format(num_unread=self._num_of_unread_entries))
+        self.unread_label.set_color(IndicatorLabel.THEME)
         self.unread_label.set_margin_right(5)
         self.unread_label.set_no_show_all(True)
+        self.unread_label.set_margin_bottom(10)
 
+        info_box.add(new_entries_label)
         info_box.add(self.unread_label)
         info_box.add(self.indi_label)
         container_box.add(info_box)

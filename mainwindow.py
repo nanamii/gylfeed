@@ -144,6 +144,27 @@ class MainWindow(Gtk.ApplicationWindow):
         self.button_discard.connect("clicked", self.discard_action)
         self.button_edit.connect("clicked", self.change_data)
 
+        self.connect("key_press_event", self.key_navigation)
+
+    def key_navigation(self, window, event):
+        print("key clicked")
+        print(event.keyval)
+        key = event.keyval
+
+        vis_child = self.stack.get_visible_child()
+        child_name = self.stack.get_visible_child_name()
+
+        if (key == 65363):
+            if (child_name == "entrylist"):
+                print("right-key pressed to open entry-details")
+                self.show_entry_details(self.entrylist.listbox, self.entrylist.listbox.get_selected_row())
+            else:
+                self.show_entries(self.feedview.listbox, self.feedview.listbox.get_selected_row())
+        elif key == 65361:
+            print("left-key pressed")
+            self.switch_child(self.button_left)
+
+
 
     def show_about(self, about_button, action):
         pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size("./graphics/gylfeed_logo.png", 120, 240)
