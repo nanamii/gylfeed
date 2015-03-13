@@ -161,8 +161,15 @@ class MainWindow(Gtk.ApplicationWindow):
             else:
                 self.show_entries(self.feedview.listbox, self.feedview.listbox.get_selected_row())
         elif key == 65361:
-            print("left-key pressed")
+            #if (child_name == "entrydetails"):
+            #    self.show_entries(self.feedview.listbox, self.feedview.listbox.get_selected_row())
+            #    self.entrylist.listbox.get_selected_row().grab_focus()
+            #    print("left-key pressed")
+                #self.switch_child(self.button_left)
+            #else:
             self.switch_child(self.button_left)
+            #self.is_focus()
+            #print(self.has_focus())
 
 
 
