@@ -160,7 +160,7 @@ class MainWindow(Gtk.ApplicationWindow):
                 self.show_entry_details(self.entrylist.listbox, self.entrylist.listbox.get_selected_row())
             else:
                 self.show_entries(self.feedview.listbox, self.feedview.listbox.get_selected_row())
-        elif key == 65361:
+        if key == 65361:
             #if (child_name == "entrydetails"):
             #    self.show_entries(self.feedview.listbox, self.feedview.listbox.get_selected_row())
             #    self.entrylist.listbox.get_selected_row().grab_focus()
@@ -170,8 +170,9 @@ class MainWindow(Gtk.ApplicationWindow):
             self.switch_child(self.button_left)
             #self.is_focus()
             #print(self.has_focus())
-
-
+            #self.entrylist.listbox.set_can_focus(True)
+            #self.entrylist.listbox.get_row_at_index(0).set_can_focus(True)
+            #self.entrylist.listbox.get_row_at_index(0).grab_focus()
 
     def show_about(self, about_button, action):
         pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size("./graphics/gylfeed_logo.png", 120, 240)
@@ -318,6 +319,12 @@ class MainWindow(Gtk.ApplicationWindow):
                 self.feedview.new_listbox_row("./graphics/default_icon.png",  feed)
                 self.show_all()
                 self.stack.set_visible_child(self.feedview.container)
+        #self.feedview.listbox.set_can_focus(True)
+        #self.feedview.listbox.get_row_at_index(0).set_can_focus(True)
+        #self.feedview.listbox.get_row_at_index(0).grab_focus()
+        #self.feedview.listbox.get_row_at_index(0).set_activatable(True)
+        self.feedview.listbox.select_row(self.feedview.listbox.get_row_at_index(0))
+
 
     # callback-function für Ausnahmefälle bei add_feed
     def exception_handling(self, feedhandler, exception):
