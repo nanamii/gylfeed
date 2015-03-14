@@ -50,7 +50,7 @@ class MainWindow(Gtk.ApplicationWindow):
         self.button_right.add(Gtk.Arrow(Gtk.ArrowType.RIGHT, Gtk.ShadowType.NONE))
         box.add(self.button_right)
 
-         ######### only shown in feed_options_view ##################################
+        ######### only shown in feed_options_view ##################################
         self.button_suggest = Gtk.Button("Add Feed")
         self.button_suggest.get_style_context().add_class(Gtk.STYLE_CLASS_SUGGESTED_ACTION)
         self.button_suggest.set_no_show_all(True)
@@ -161,7 +161,7 @@ class MainWindow(Gtk.ApplicationWindow):
             else:
                 self.show_entries(self.feedview.listbox, self.feedview.listbox.get_selected_row())
         if key == 65361:
-            #if (child_name == "entrydetails"):
+            # if (child_name == "entrydetails"):
             #    self.show_entries(self.feedview.listbox, self.feedview.listbox.get_selected_row())
             #    self.entrylist.listbox.get_selected_row().grab_focus()
             #    print("left-key pressed")
@@ -199,21 +199,21 @@ class MainWindow(Gtk.ApplicationWindow):
             selected_row = self.feedview.listbox.get_selected_row()
 
         child = {
-            self.feed_options.container:{
-                self.button_left:None,
-                self.button_right:self.feedview.container,
+            self.feed_options.container: {
+                self.button_left: None,
+                self.button_right: self.feedview.container,
             },
-            self.entrylist.container:{
-                self.button_left:self.feedview.container,
-                self.button_right:self.entry_details.container
+            self.entrylist.container: {
+                self.button_left: self.feedview.container,
+                self.button_right: self.entry_details.container
             },
-            self.feedview.container:{
-                self.button_left:None,
+            self.feedview.container: {
+                self.button_left: None,
                 self.button_right:self.entrylist.container
             },
-            self.entry_details.container:{
-                self.button_left:self.entrylist.container,
-                self.button_right:None
+            self.entry_details.container: {
+                self.button_left: self.entrylist.container,
+                self.button_right: None
             }
         }.get(self.stack.get_visible_child()).get(direction)
 
@@ -223,8 +223,7 @@ class MainWindow(Gtk.ApplicationWindow):
             if child == self.feedview.container:
                 self.show_feedview(self.feedhandler.feeds)
 
-
-    def update_headerbar(self, selected_row=None): # TODO!!!!
+    def update_headerbar(self, selected_row=None):  # TODO!!!!
 
         child_name = self.stack.get_visible_child_name()
 
@@ -236,8 +235,11 @@ class MainWindow(Gtk.ApplicationWindow):
             self.set_disc_sugg_button(False, False)
         elif child_name == "entrylist":
             self.set_button_sensitive(True, True)
-            self.set_title("{feed_name}"
-                .format (feed_name = selected_row.get_feed().get_name()))
+            # hier auf None prüfen, wenn von details-Seite aus aufgerufen,
+            # nichts an feed_name ändern
+            if selected_row is not None:
+                self.set_title("{feed_name}"
+                    .format (feed_name = selected_row.get_feed().get_name()))
         elif child_name == "entrydetails":
             self.set_button_sensitive(True, False)
         elif child_name == "about_view":
@@ -303,7 +305,7 @@ class MainWindow(Gtk.ApplicationWindow):
         new_entries = 0
 
         new_feed = self.feedhandler.create_feed(url, feed_name, update_switch, notify_switch)
-        if new_feed.raw_feed.bozo == 0 :
+        if new_feed.raw_feed.bozo == 0:
             new_entries = len(new_feed.get_entries())
             self.feedview.new_listbox_row("./graphics/default_icon.png", feed_name, new_entries, new_feed)
             self.show_all()
