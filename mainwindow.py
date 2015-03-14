@@ -161,13 +161,15 @@ class MainWindow(Gtk.ApplicationWindow):
             else:
                 self.show_entries(self.feedview.listbox, self.feedview.listbox.get_selected_row())
         if key == 65361:
-            # if (child_name == "entrydetails"):
-            #    self.show_entries(self.feedview.listbox, self.feedview.listbox.get_selected_row())
-            #    self.entrylist.listbox.get_selected_row().grab_focus()
-            #    print("left-key pressed")
-                #self.switch_child(self.button_left)
-            #else:
-            self.switch_child(self.button_left)
+            if (child_name == "entrydetails"):
+                self.show_entries(self.feedview.listbox, self.feedview.listbox.get_selected_row())
+                for row in self.entrylist.listbox:
+                    if row.get_id() == self.entry_details.get_entry_id():
+                        self.entrylist.listbox.select_row(row)
+            else:
+                self.switch_child(self.button_left)
+
+
             #self.is_focus()
             #print(self.has_focus())
             #self.entrylist.listbox.set_can_focus(True)
@@ -223,7 +225,7 @@ class MainWindow(Gtk.ApplicationWindow):
             if child == self.feedview.container:
                 self.show_feedview(self.feedhandler.feeds)
 
-    def update_headerbar(self, selected_row=None):  # TODO!!!!
+    def update_headerbar(self, selected_row=None):
 
         child_name = self.stack.get_visible_child_name()
 
@@ -361,6 +363,8 @@ class MainWindow(Gtk.ApplicationWindow):
         self.stack.set_visible_child(self.entry_details.container)
         self.update_headerbar(selected_row)
         selected_row.get_feed().set_entry_is_read(selected_row.get_id())
+        self.entry_details.set_prev_listbox(listbox)
+        self.entry_details.set_entry_id(selected_row.get_id())
 
     # i.O. call-back-function für feed-optionen-gewählt
     def show_options_filled(self, feedview, feed):

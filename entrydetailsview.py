@@ -17,6 +17,8 @@ class EntryDetailsView():
         self.headline = ""
         self.plot = ""
         self.author = ""
+        self.prev_listbox = None
+        self.entry_id = None
 
     def load_headline(self, headline, author, plot):
         with open("template.html", "r") as fd:
@@ -24,3 +26,12 @@ class EntryDetailsView():
         template = Template(text)
         var = template.render(headline=headline, author=author, plot=plot)
         self.web.load_string(var, "text/html", "UTF-8", "/")
+
+    def set_prev_listbox(self, prev_listbox):
+        self.prev_listbox = prev_listbox
+
+    def set_entry_id(self, entry_id):
+        self.entry_id = entry_id
+
+    def get_entry_id(self):
+        return self.entry_id
