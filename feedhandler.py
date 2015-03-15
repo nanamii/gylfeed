@@ -23,17 +23,32 @@ class Feedhandler(GObject.GObject):
 
     def create_feed(self, url, feed_name, update_switch, notify_switch):
         feed = Feed(url, feed_name, update_switch, notify_switch)
+
+        if self.no_entry_text(url, feed_name):
+            if len(url) == 0:
+                self.emit('feed-add-exception', "Keine URL eingetragen, bitte eintragen!")
+            if len(feed_name) == 0:
+                self.emit('feed-add-exception', "Keinen Feednamen eingetragen, bitte eintragen")
+            return None
+
         if feed.raw_feed.bozo == 1:
             self.emit('feed-add-exception', "URL liefert kein Ergebnis, bitte erneut eingeben.")
-            pass
+            return None
+
         if self.feed_exists(url):
             print("Feed bereits vorhanden!!")
             self.emit('feed-add-exception', "Feed bereits vorhanden!")
-        else:
-            feed.connect('updated', self.sig_feed_updated)
-            self.feeds.append(feed)
-            feed.update()
-            return feed
+            return None
+
+        if self.feed_name_exists(feed_name):
+            print("Es ist bereits ein Feed mit diesem Namen vorhanden, bitte anderen Namen wählen!")
+            self.emit('feed-add-exception', "Es ist bereits ein Feed mit diesem Namen vorhanden, bitte anderen Namen wählen!")
+            return None
+
+        feed.connect('updated', self.sig_feed_updated)
+        self.feeds.append(feed)
+        feed.update()
+        return feed
 
     def feed_exists(self, url):
         for feed in self.feeds:
@@ -41,9 +56,19 @@ class Feedhandler(GObject.GObject):
                 return True
         return False
 
+    def feed_name_exists(self, feed_name):
+        for feed in self.feeds:
+            if feed.get_name() == feed_name:
+                return True
+        return False
+
+    def no_entry_text(self, url, feed_name):
+        if len(url) == 0 or len(feed_name) == 0:
+            return True
+        return False
+
     def count_feeds(self):
         return len(self.feeds)
-
 
     def update_all_feeds(self, update_button, action):
         for feed in self.feeds:
@@ -62,7 +87,6 @@ class Feedhandler(GObject.GObject):
                 print("Feed gelöscht!!!!!")
                 print(len(self.feeds))
 
-
     def save_to_disk(self):
         try:
             with open ('feeds.pickle', 'wb') as fp:
@@ -70,7 +94,6 @@ class Feedhandler(GObject.GObject):
                 print("Saving data to disk")
         except IOError as ie:
             print("Fail to save data {ie}".format(ie=ie))
-
 
     # callback-function zu update von feed,
     #löst selbst Signal aus --> MainWindow
@@ -85,5 +108,3 @@ def load_from_disk():
             return pickle.load(fp)
     except IOError as ie:
             print("Fail to load data {ie}".format(ie=ie))
-
-

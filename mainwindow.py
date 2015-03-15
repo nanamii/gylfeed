@@ -307,7 +307,7 @@ class MainWindow(Gtk.ApplicationWindow):
         new_entries = 0
 
         new_feed = self.feedhandler.create_feed(url, feed_name, update_switch, notify_switch)
-        if new_feed.raw_feed.bozo == 0:
+        if new_feed is not None:
             new_entries = len(new_feed.get_entries())
             self.feedview.new_listbox_row("./graphics/default_icon.png", feed_name, new_entries, new_feed)
             self.show_all()
