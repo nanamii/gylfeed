@@ -25,10 +25,10 @@ class Feedhandler(GObject.GObject):
         feed = Feed(url, feed_name, update_switch, notify_switch)
 
         if self.no_entry_text(url, feed_name):
+            if len(feed_name) == 0:
+                self.emit('feed-add-exception', "Keinen Feednamen eingetragen, bitte eintragen!")
             if len(url) == 0:
                 self.emit('feed-add-exception', "Keine URL eingetragen, bitte eintragen!")
-            if len(feed_name) == 0:
-                self.emit('feed-add-exception', "Keinen Feednamen eingetragen, bitte eintragen")
             return None
 
         if feed.raw_feed.bozo == 1:

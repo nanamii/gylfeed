@@ -32,7 +32,7 @@ class MainWindow(Gtk.ApplicationWindow):
         Gtk.StyleContext.add_class(box.get_style_context(), "linked")
 
         searchbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        infobox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        infobox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
         self.add(vbox)
@@ -98,6 +98,9 @@ class MainWindow(Gtk.ApplicationWindow):
 
         self.infobar = Gtk.InfoBar()
         self.infobar.set_message_type(Gtk.MessageType.ERROR)
+        self.infobar_label = Gtk.Label("")
+        content = self.infobar.get_content_area()
+        content.add(self.infobar_label)
         self.infobar.set_no_show_all(True)
         infobox.add(self.infobar)
 
@@ -332,10 +335,8 @@ class MainWindow(Gtk.ApplicationWindow):
 
     # callback-function für Ausnahmefälle bei add_feed
     def exception_handling(self, feedhandler, exception):
-        label = Gtk.Label(exception)
-        content = self.infobar.get_content_area()
-        content.add(label)
-        label.show()
+        self.infobar_label.set_text(exception)
+        self.infobar_label.show()
         self.infobar.show()
         print("exception_handling callback")
 
