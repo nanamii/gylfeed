@@ -4,6 +4,7 @@
 from gi.repository import GObject
 from time import strftime
 import feedparser
+import urllib.request
 
 class Feed(GObject.GObject):
     __gsignals__ = {'updated' : (GObject.SIGNAL_RUN_FIRST, None, ())}
@@ -15,15 +16,31 @@ class Feed(GObject.GObject):
         self.automatic_update = automatic_update
         self.notifications = notifications
         self.new_entries = []
+        self.has_icon = False
+        self.icon = None
         self.raw_feed = raw_feed
         if raw_feed is None:
             self.parse()
 
     def parse(self):
+        print("parse_def in Feed")
         self.raw_feed = feedparser.parse(self.url)
         if self.raw_feed.bozo == 0:
             self.set_readtag(self.raw_feed)
             print(self.raw_feed.entries[0].read)
+
+            try:
+                if self.raw_feed.feed.icon:
+                    print("Feed has icon")
+                    print(self.raw_feed.feed.icon)
+                    self.has_icon = True
+                    url = self.raw_feed.feed.icon
+                    print(url)
+                    logo_raw = urllib.request.urlretrieve(url)
+                    logo = logo_raw[0]
+                    self.icon = logo
+            except AttributeError as aerr:
+                print(aerr)
 
 
     def update(self):
@@ -56,15 +73,6 @@ class Feed(GObject.GObject):
 
     # wird durch update und update_no_etag aufgerufen
     def compare_entries(self, new_raw_feed):
-
-        #######TEST########################################################################
-        try:
-            if self.raw_feed.feed.icon:
-                print("has icon")
-                print(self.raw_feed.feed.icon)
-        except AttributeError as aerr:
-            print(aerr)
-        ##############################################################################
 
         self.new_entries = []
         for new_entry in new_raw_feed.entries:
@@ -131,8 +139,3 @@ class Feed(GObject.GObject):
             if entry.id == entry_id:
                 entry["read"] = True
                 print("in Feed auf TRUE gesetzt!!")
-
-
-
-
-

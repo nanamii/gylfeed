@@ -74,7 +74,7 @@ class Feedhandler(GObject.GObject):
         for feed in self.feeds:
             feed.update()
         self.save_to_disk()
-
+ 
     def connect_feeds(self):
         for feed in self.feeds:
             feed.connect('updated', self.sig_feed_updated)

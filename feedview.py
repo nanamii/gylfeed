@@ -19,14 +19,8 @@ class FeedRow(Gtk.ListBoxRow):
         feed_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         info_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
 
-        try:
-            if self._feed.raw_feed.feed.icon:
-                url = self._feed.raw_feed.feed.icon
-                print(url)
-                logo_raw = urllib.request.urlretrieve(url)
-                logo = logo_raw[0]
-        except AttributeError as aerr:
-            print(aerr)
+        if feed.has_icon == True:
+            logo = feed.icon
 
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(logo)
         pixbuf = pixbuf.scale_simple(20, 20, GdkPixbuf.InterpType.HYPER)
