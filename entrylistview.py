@@ -2,9 +2,11 @@
 # encoding:utf8
 
 from gi.repository import GLib, Gtk, Gio, GdkPixbuf, Gdk
+from view import View
 
 class EntryRow(Gtk.ListBoxRow):
     def __init__(self, logo, title, time, plot, id, feed, feed_name):
+
         self._plot = plot
         self._time = time
         self._title = title
@@ -60,11 +62,11 @@ class EntryRow(Gtk.ListBoxRow):
         return self._feed
 
 
-class EntryListView():
-    def __init__(self):
-        self.container = Gtk.ScrolledWindow()
+class EntryListView(View):
+    def __init__(self, app):
+        View.__init__(self, app)
         self.listbox = Gtk.ListBox()
-        self.container.add(self.listbox)
+        self.add(self.listbox)
 
     def new_ListBoxRow(self, logo, title, time, plot, id, feed, feed_name="FeedName"):
         row = EntryRow(logo, title, time, plot, id, feed, feed_name)
@@ -86,3 +88,13 @@ class EntryListView():
             if id == entry.id:
                 if entry.read == True:
                     row.container_box.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(.5,.5,.5,.5))
+
+    def on_view_enter(self):
+        # hier auf None prüfen, wenn von details-Seite aus aufgerufen,
+        # nichts an feed_name ändern
+        selected_row = self.app_window.feedview.listbox.get_selected_row()
+        if selected_row is not None:
+            self.app_window.set_title("{feed_name}".format(
+                feed_name=selected_row.get_feed().get_name())
+            )
+

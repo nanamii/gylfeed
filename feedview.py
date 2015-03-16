@@ -4,6 +4,7 @@
 from gi.repository import GLib, Gtk, Gio, GdkPixbuf, GObject, Gdk
 from indicatorlabel import IndicatorLabel
 import urllib.request
+from view import View
 
 class FeedRow(Gtk.ListBoxRow):
     def __init__(self, logo, feed):
@@ -125,14 +126,15 @@ class FeedRow(Gtk.ListBoxRow):
             self.revealer.set_reveal_child(True)
 
 
-class Feedview(GObject.GObject):
+class Feedview(View):
     __gsignals__ = { 'preferences-clicked': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.GObject,)),
                     'ok-delete-clicked': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.GObject,))}
 
-    def __init__(self):
-        GObject.GObject.__init__(self)
+    def __init__(self, app):
+        View.__init__(self, app)
 
-        self.container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        # TODO: long time todo: remove .container in favour of View.
+        self._container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.scr_window = Gtk.ScrolledWindow()
         self.box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.listbox = Gtk.ListBox()
@@ -140,7 +142,8 @@ class Feedview(GObject.GObject):
         self.listbox.set_vexpand(True)
         self.box.pack_start(self.listbox, True, True, 0)
         self.scr_window.add(self.box)
-        self.container.add(self.scr_window)
+        self._container.add(self.scr_window)
+        self.add(self._container)
 
         def build_action_bar():
             self.action_bar = Gtk.ActionBar()
@@ -157,7 +160,7 @@ class Feedview(GObject.GObject):
             return self.action_bar
 
         self.action_bar = build_action_bar()
-        self.container.add(self.action_bar)
+        self._container.add(self.action_bar)
 
         # row, für die aktuell die ActionBar angezeigt wird
         self.temp_row = None
@@ -187,3 +190,15 @@ class Feedview(GObject.GObject):
 
     def hide_action_bar(self, discard_button):
         self.action_bar.hide()
+
+    def on_view_enter(self):
+        self.app_window.set_title("{num_feeds} Feeds".format(
+            num_feeds=self.app_window.feedhandler.count_feeds())
+        )
+        self.app_window.button_search.set_sensitive(True)
+        GLib.idle_add(
+            lambda: self.app_window.views.go_right.set_sensitive(False)
+        )
+
+    def on_view_leave(self):
+        self.app_window.views.go_right.set_sensitive(True)

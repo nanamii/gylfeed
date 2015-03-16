@@ -3,17 +3,16 @@
 
 from gi.repository import Gtk, WebKit
 from jinja2 import Template
+from view import View
 
-
-class EntryDetailsView():
-    def __init__(self):
-
-        self.container = Gtk.ScrolledWindow()
+class EntryDetailsView(View):
+    def __init__(self, app):
+        View.__init__(self, app)
 
         self.web = WebKit.WebView()
         self.web.grab_focus()
         self.web.set_size_request(300, 200)
-        self.container.add(self.web)
+        self.add(self.web)
         self.headline = ""
         self.plot = ""
         self.author = ""

@@ -3,14 +3,19 @@
 
 from gi.repository import Gtk, GObject
 from feed import Feed
+from view import View
 
 
-
-class FeedOptionsView(GObject.GObject):
+class FeedOptionsView(View):
     __gsignals__ = { 'feed-options': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (str,str,int))}
 
-    def __init__(self):
-        GObject.GObject.__init__(self)
+    def __init__(self, app):
+        View.__init__(self, app)
+
+        self.app_window.feedhandler.connect(
+            "feed-add-exception",
+            self.exception_handling
+        )
 
         listbox_entries = Gtk.ListBox()
         listbox_entries.set_selection_mode(Gtk.SelectionMode.NONE)
@@ -77,12 +82,13 @@ class FeedOptionsView(GObject.GObject):
         listbox_label_options.set_margin_bottom(15)
         listbox_label_options.set_margin_top(30)
 
-        self.container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        self.container.add(listbox_label_entries)
-        self.container.add(frame_entries)
-        self.container.add(listbox_label_options)
-        self.container.add(frame_options)
-        self.container.set_border_width(50)
+        self._container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self._container.add(listbox_label_entries)
+        self._container.add(frame_entries)
+        self._container.add(listbox_label_options)
+        self._container.add(frame_options)
+        self._container.set_border_width(50)
+        self.add(self._container)
 
 
     def get_url(self):
@@ -107,5 +113,18 @@ class FeedOptionsView(GObject.GObject):
         self.url_entry.set_text("")
         self.naming_entry.set_text("")
 
+    def on_view_enter(self):
+        self.app_window.set_title("Feed Options")
+        self.app_window.button_search.set_sensitive(False)
 
+        self.app_window.button_suggest.show()
+        self.app_window.button_discard.show()
 
+    def on_view_leave(self):
+        self.app_window.button_suggest.hide()
+        self.app_window.button_discard.hide()
+
+    def exception_handling(self, feedhandler, exception):
+        self.app_window.infobar_label.set_text(exception)
+        self.app_window.infobar_label.show()
+        self.app_window.infobar.show()
