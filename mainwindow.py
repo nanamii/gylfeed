@@ -124,15 +124,6 @@ class MainWindow(Gtk.ApplicationWindow):
         self.stack.set_transition_type(Gtk.StackTransitionType.SLIDE_LEFT_RIGHT)
         self.stack.set_transition_duration(300)
 
-        # headerbar-buttons
-        self.button_left = Gtk.Button()
-        self.button_left.add(Gtk.Arrow(Gtk.ArrowType.LEFT, Gtk.ShadowType.NONE))
-        #box.add(self.button_left)
-
-        self.button_right = Gtk.Button()
-        self.button_right.add(Gtk.Arrow(Gtk.ArrowType.RIGHT, Gtk.ShadowType.NONE))
-        #box.add(self.button_right)
-
         ######### only shown in feed_options_view ##################################
         self.button_suggest = Gtk.Button("Add Feed")
         self.button_suggest.get_style_context().add_class(Gtk.STYLE_CLASS_SUGGESTED_ACTION)
@@ -361,6 +352,7 @@ class MainWindow(Gtk.ApplicationWindow):
         self.entrylist.clear_listbox()
         self.feedview.action_bar.hide()
 
+    # geplant:function zum Ändern der settings in feed
     def change_data(self, button):
         print("change button pressed")
 
