@@ -66,7 +66,7 @@ class Feed(GObject.GObject):
                 self.compare_entries(new_raw_feed)
             else:
                 print("keine neuen entries")
-            self.emit('updated')
+            self.emit('updated') # TODO: warum immer update?
 
         except IOError as error:
             print(error)

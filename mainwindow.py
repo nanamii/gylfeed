@@ -1,7 +1,7 @@
 #!usr/bin/env python3
 # encoding:utf8
 
-from gi.repository import Gtk, Gio, GLib, GdkPixbuf, GObject
+from gi.repository import Gtk, Gio, GLib, GdkPixbuf, GObject, Gdk
 from feedhandler import Feedhandler, load_from_disk
 from feed import Feed
 from feedview import Feedview
@@ -157,13 +157,13 @@ class MainWindow(Gtk.ApplicationWindow):
         vis_child = self.stack.get_visible_child()
         child_name = self.stack.get_visible_child_name()
 
-        if (key == 65363):
+        if key == Gdk.KEY_Right:
             if (child_name == "entrylist"):
                 print("right-key pressed to open entry-details")
                 self.show_entry_details(self.entrylist.listbox, self.entrylist.listbox.get_selected_row())
             else:
                 self.show_entries(self.feedview.listbox, self.feedview.listbox.get_selected_row())
-        if key == 65361:
+        if key == Gdk.KEY_Left:
             if (child_name == "entrydetails"):
                 self.show_entries(self.feedview.listbox, self.feedview.listbox.get_selected_row())
                 for row in self.entrylist.listbox:
@@ -265,23 +265,15 @@ class MainWindow(Gtk.ApplicationWindow):
         self.headerbar.set_subtitle(subtitle)
 
     def set_disc_sugg_button(self, disc_show, sug_show):
-        if disc_show:
-            self.button_discard.show()
-        else:
-            self.button_discard.hide()
+        self.button_discard.set_visible(disc_show)
+        self.button_suggest.set_visible(sug_show)
 
-        if sug_show:
-            self.button_suggest.show()
-        else:
-            self.button_suggest.hide()
+    def manage_searchbar(self, _):
+        self.searchbar.set_search_mode(
+            not self.searchbar.get_search_mode()
+        )
 
-    def manage_searchbar(self, button_search):
-        if self.searchbar.get_search_mode():
-            self.searchbar.set_search_mode(False)
-        else:
-            self.searchbar.set_search_mode(True)
-
-    def open_settingsmenu(self, button_settings):
+    def open_settingsmenu(self, _):
         self.popover.show_all()
 
     # callback-function für update-button
@@ -383,10 +375,6 @@ class MainWindow(Gtk.ApplicationWindow):
 
     def change_data(self, button):
         print("change button pressed")
-
-    def init_main_window(self):
-        self.connect("delete-event", Gtk.main_quit)
-        self.show_all()
 
 
 class MainApplication(Gtk.Application):
