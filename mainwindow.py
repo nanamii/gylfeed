@@ -172,7 +172,6 @@ class MainWindow(Gtk.ApplicationWindow):
             else:
                 self.switch_child(self.button_left)
 
-
             #self.is_focus()
             #print(self.has_focus())
             #self.entrylist.listbox.set_can_focus(True)

@@ -16,7 +16,11 @@ class EntryRow(Gtk.ListBoxRow):
         self.container_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         headline_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
 
+        if self._feed.has_icon == True:
+            logo = self._feed.icon
+
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(logo)
+        pixbuf = pixbuf.scale_simple(20, 20, GdkPixbuf.InterpType.HYPER)
         image = Gtk.Image()
         image.set_from_pixbuf(pixbuf)
 
@@ -82,6 +86,3 @@ class EntryListView():
             if id == entry.id:
                 if entry.read == True:
                     row.container_box.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(.5,.5,.5,.5))
-
-
-

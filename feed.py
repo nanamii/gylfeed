@@ -9,15 +9,15 @@ import urllib.request
 class Feed(GObject.GObject):
     __gsignals__ = {'updated' : (GObject.SIGNAL_RUN_FIRST, None, ())}
 
-    def __init__(self, url, name, automatic_update=True, notifications=True, raw_feed=None):
+    def __init__(self, url, name, automatic_update=True, notifications=True, raw_feed=None, has_icon=None, icon=None):
         GObject.GObject.__init__(self)
         self.url = url
         self.name = name
         self.automatic_update = automatic_update
         self.notifications = notifications
         self.new_entries = []
-        self.has_icon = False
-        self.icon = None
+        self.has_icon = has_icon
+        self.icon = icon
         self.raw_feed = raw_feed
         if raw_feed is None:
             self.parse()
@@ -128,7 +128,7 @@ class Feed(GObject.GObject):
         return strftime("%a, %d.%b.%Y, %R", date_struct)
 
     def get_serializable_data(self):
-        return (self.url, self.name, self.automatic_update, self.notifications, self.raw_feed)
+        return (self.url, self.name, self.automatic_update, self.notifications, self.raw_feed, self.has_icon, self.icon)
 
     def set_readtag(self, feed):
         for entry in feed.entries:
