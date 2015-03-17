@@ -204,3 +204,18 @@ class Feedview(View):
 
     def on_view_leave(self):
         self.app_window.views.go_right.set_sensitive(True)
+
+    def show_feedview(self, feedlist):
+        self.clear_listbox()
+        for feed in feedlist:
+            if feed.raw_feed.bozo == 0:
+                self.new_listbox_row("./graphics/default_icon.png",  feed)
+                self.show_all()
+                self.app_window.views.switch("feedview")
+        #self.feedview.listbox.set_can_focus(True)
+        #self.feedview.listbox.get_row_at_index(0).set_can_focus(True)
+        #self.feedview.listbox.get_row_at_index(0).grab_focus()
+        #self.feedview.listbox.get_row_at_index(0).set_activatable(True)
+        self.listbox.select_row(self.feedview.listbox.get_row_at_index(0))
+
+

@@ -104,7 +104,6 @@ class MainWindow(Gtk.ApplicationWindow):
         app.win = self
         self.set_default_size(800, 600)
         self.feedhandler = feedhandler
-       #self.feedhandler.connect("feed-updated", self.update_entryview)
 
         self.headerbar = Gtk.HeaderBar()
         self.headerbar.set_show_close_button(True)
@@ -197,13 +196,11 @@ class MainWindow(Gtk.ApplicationWindow):
 
         self.feedview = Feedview(app)
         self.views.add_view(self.feedview, "feedview")
-        #self.feedview.listbox.connect('row-activated', self.show_entries)
         self.feedview.connect('preferences-clicked', self.show_options_filled)
         self.feedview.connect('ok-delete-clicked', self.delete_feed_actions)
 
         self.entrylist = EntryListView(app)
         self.views.add_view(self.entrylist, "entrylist")
-        self.entrylist.listbox.connect('row-activated', self.show_entry_details)
 
         self.entry_details = EntryDetailsView(app)
         self.views.add_view(self.entry_details, "entrydetails")
@@ -227,12 +224,12 @@ class MainWindow(Gtk.ApplicationWindow):
         if key == Gdk.KEY_Right:
             if (child_name == "entrylist"):
                 print("right-key pressed to open entry-details")
-                self.show_entry_details(self.entrylist.listbox, self.entrylist.listbox.get_selected_row())
+                self.entry_details.show_entry_details(self.entrylist.listbox, self.entrylist.listbox.get_selected_row())
             else:
-                self.show_entries(self.feedview.listbox, self.feedview.listbox.get_selected_row())
+                self.entrylist.show_entries(self.feedview.listbox, self.feedview.listbox.get_selected_row())
         if key == Gdk.KEY_Left:
             if (child_name == "entrydetails"):
-                self.show_entries(self.feedview.listbox, self.feedview.listbox.get_selected_row())
+                self.entrylist.show_entries(self.feedview.listbox, self.feedview.listbox.get_selected_row())
                 for row in self.entrylist.listbox:
                     if row.get_id() == self.entry_details.get_entry_id():
                         self.entrylist.listbox.select_row(row)
@@ -299,47 +296,9 @@ class MainWindow(Gtk.ApplicationWindow):
             self.feedview.new_listbox_row("./graphics/default_icon.png", new_feed)
             self.show_all()
             self.views.switch("feedview")
+
             self.infobar.hide()
             self.feed_options.empty_form()
-
-    def show_feedview(self, feedlist):
-        self.feedview.clear_listbox()
-        for feed in feedlist:
-            if feed.raw_feed.bozo == 0:
-                self.feedview.new_listbox_row("./graphics/default_icon.png",  feed)
-                self.show_all()
-                self.views.switch("feedview")
-        #self.feedview.listbox.set_can_focus(True)
-        #self.feedview.listbox.get_row_at_index(0).set_can_focus(True)
-        #self.feedview.listbox.get_row_at_index(0).grab_focus()
-        #self.feedview.listbox.get_row_at_index(0).set_activatable(True)
-        self.feedview.listbox.select_row(self.feedview.listbox.get_row_at_index(0))
-
-    # callback-function um feedentries darzustellen, nach update; Hilfsfunktion
-    # für show_entries
-    """def update_entryview(self, feedhandler, feed):
-        self.entrylist.clear_listbox()
-        entries = feed.get_entries()
-        print(len(entries))
-        feed_name = feed.get_name()
-        for title,plot,time,id,feed in entries:
-            self.entrylist.new_ListBoxRow("./graphics/default_icon.png", title, time, plot, id, feed, feed_name)
-
-    # i.O. callback-function für listbox in feedview, Row=feed gewählt
-    def show_entries(self, listbox, row):
-        print("selected_row")
-        selected_row = listbox.get_selected_row()
-        selected_row.get_feed().update()
-        self.views.switch("entrylist")"""
-
-    # i.O. call-back-function für listbox in entryview, Row=entry gewählt
-    def show_entry_details(self, listbox, row):
-        selected_row = listbox.get_selected_row()
-        self.entry_details.load_headline(selected_row.get_title(),selected_row.get_time(), selected_row.get_plot())
-        self.views.switch("entrydetails")
-        selected_row.get_feed().set_entry_is_read(selected_row.get_id())
-        self.entry_details.set_prev_listbox(listbox)
-        self.entry_details.set_entry_id(selected_row.get_id())
 
     # i.O. call-back-function für feed-optionen-gewählt
     def show_options_filled(self, feedview, feed):
@@ -350,7 +309,7 @@ class MainWindow(Gtk.ApplicationWindow):
     #callback-function für delete-feed, ok-button in ActionBar gewählt
     def delete_feed_actions(self, feedview, feed):
         self.feedhandler.delete_feed(feed)
-        self.show_feedview(self.feedhandler.feeds)
+        self.feedview.show_feedview(self.feedhandler.feeds)
         self.entrylist.clear_listbox()
         self.feedview.action_bar.hide()
 
@@ -404,7 +363,7 @@ class MainApplication(Gtk.Application):
         self.set_accels_for_action('app.quit', ['<Ctrl>Q'])
 
         self.win.show_all()
-        self.win.show_feedview(fh.feeds)
+        self.win.feedview.show_feedview(fh.feeds)
 
 
     def action_clicked(self, *args):

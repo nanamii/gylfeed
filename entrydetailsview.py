@@ -8,6 +8,7 @@ from view import View
 class EntryDetailsView(View):
     def __init__(self, app):
         View.__init__(self, app)
+        self.app_window.entrylist.listbox.connect('row-activated', self.show_entry_details)
 
         self.web = WebKit.WebView()
         self.web.grab_focus()
@@ -34,3 +35,14 @@ class EntryDetailsView(View):
 
     def get_entry_id(self):
         return self.entry_id
+
+    # i.O. call-back-function für listbox in entryview, Row=entry gewählt
+    def show_entry_details(self, listbox, row):
+        selected_row = listbox.get_selected_row()
+        self.load_headline(selected_row.get_title(),selected_row.get_time(), selected_row.get_plot())
+        self.app_window.views.switch("entrydetails")
+        selected_row.get_feed().set_entry_is_read(selected_row.get_id())
+        self.set_prev_listbox(listbox)
+        self.set_entry_id(selected_row.get_id())
+
+
