@@ -5,6 +5,7 @@ from gi.repository import GObject
 from time import strftime
 import feedparser
 import urllib.request
+from downloader import Downloader
 
 class Feed(GObject.GObject):
     __gsignals__ = {'updated' : (GObject.SIGNAL_RUN_FIRST, None, ())}
@@ -20,11 +21,18 @@ class Feed(GObject.GObject):
         self.icon = icon
         self.raw_feed = raw_feed
         if raw_feed is None:
-            self.parse()
+            self.download_data()
 
-    def parse(self):
-        print("parse_def in Feed")
-        self.raw_feed = feedparser.parse(self.url)
+    def download_data(self):
+        downloader = Downloader()
+        document = downloader.download(self.url)
+        document.connect('finish', self.parse)
+
+    def parse(self, document):
+        # document.connect('finish', self.parse, document)
+        self.raw_feed = feedparser.parse(document.data)
+        print(self.raw_feed.bozo)
+        print(self.raw_feed)
         if self.raw_feed.bozo == 0:
             self.set_readtag(self.raw_feed)
             print(self.raw_feed.entries[0].read)
@@ -37,6 +45,7 @@ class Feed(GObject.GObject):
                     url = self.raw_feed.feed.icon
                     print(url)
                     logo_raw = urllib.request.urlretrieve(url)
+                    print(logo_raw)
                     logo = logo_raw[0]
                     self.icon = logo
             except AttributeError as aerr:

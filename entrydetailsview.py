@@ -30,7 +30,7 @@ class EntryDetailsView(View):
     def set_prev_listbox(self, prev_listbox):
         self.prev_listbox = prev_listbox
 
-    def set_entry_id(self, entry_id):
+    def set_entry_id(self, entry_id): 
         self.entry_id = entry_id
 
     def get_entry_id(self):

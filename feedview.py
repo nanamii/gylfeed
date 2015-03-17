@@ -201,6 +201,9 @@ class Feedview(View):
         GLib.idle_add(
             lambda: self.app_window.views.go_right.set_sensitive(False)
         )
+        GLib.idle_add(
+            lambda: self.app_window.views.go_left.set_sensitive(False)
+        )
 
     def on_view_leave(self):
         self.app_window.views.go_right.set_sensitive(True)

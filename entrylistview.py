@@ -116,5 +116,7 @@ class EntryListView(View):
         selected_row = listbox.get_selected_row()
         selected_row.get_feed().update()
         self.app_window.views.switch("entrylist")
+        self.listbox.select_row(self.entrylist.listbox.get_row_at_index(0))
+
 
 
