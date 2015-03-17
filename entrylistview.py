@@ -65,6 +65,9 @@ class EntryRow(Gtk.ListBoxRow):
 class EntryListView(View):
     def __init__(self, app):
         View.__init__(self, app)
+        self.app_window.feedview.listbox.connect('row-activated', self.show_entries)
+        self.app_window.feedhandler.connect("feed-updated", self.update_entryview)
+
         self.listbox = Gtk.ListBox()
         self.add(self.listbox)
 
@@ -97,4 +100,21 @@ class EntryListView(View):
             self.app_window.set_title("{feed_name}".format(
                 feed_name=selected_row.get_feed().get_name())
             )
+
+    # callback-function um feedentries darzustellen, nach update; Hilfsfunktion
+    # für show_entries
+    def update_entryview(self, feedhandler, feed):
+        self.clear_listbox()
+        entries = feed.get_entries()
+        print(len(entries))
+        feed_name = feed.get_name()
+        for title,plot,time,id,feed in entries:
+            self.new_ListBoxRow("./graphics/default_icon.png", title, time, plot, id, feed, feed_name)
+
+    # i.O. callback-function für listbox in feedview, Row=feed gewählt
+    def show_entries(self, listbox, row):
+        selected_row = listbox.get_selected_row()
+        selected_row.get_feed().update()
+        self.app_window.views.switch("entrylist")
+
 

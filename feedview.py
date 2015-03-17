@@ -21,6 +21,8 @@ class FeedRow(Gtk.ListBoxRow):
         info_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
 
         if feed.has_icon is True:
+            print("HAS ICON, in FeedRow_function")
+            print(feed.icon)
             logo = feed.icon
 
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(logo)

@@ -67,6 +67,7 @@ class ViewSwitcher(Gtk.Box):
         except TypeError:
             pass
 
+        # setzt aktuelle prev als neue prev
         if update_prev:
             self._prev = prev
 
@@ -103,7 +104,7 @@ class MainWindow(Gtk.ApplicationWindow):
         app.win = self
         self.set_default_size(800, 600)
         self.feedhandler = feedhandler
-        self.feedhandler.connect("feed-updated", self.update_entryview)
+       #self.feedhandler.connect("feed-updated", self.update_entryview)
 
         self.headerbar = Gtk.HeaderBar()
         self.headerbar.set_show_close_button(True)
@@ -191,12 +192,12 @@ class MainWindow(Gtk.ApplicationWindow):
         vbox.add(searchbox)
         vbox.pack_start(self.stack, True, True, 0)
 
-        self.feedview = Feedview(app)
         self.feed_options = FeedOptionsView(app)
         self.views.add_view(self.feed_options, "feedoptions")
 
+        self.feedview = Feedview(app)
         self.views.add_view(self.feedview, "feedview")
-        self.feedview.listbox.connect('row-activated', self.show_entries)
+        #self.feedview.listbox.connect('row-activated', self.show_entries)
         self.feedview.connect('preferences-clicked', self.show_options_filled)
         self.feedview.connect('ok-delete-clicked', self.delete_feed_actions)
 
@@ -316,7 +317,7 @@ class MainWindow(Gtk.ApplicationWindow):
 
     # callback-function um feedentries darzustellen, nach update; Hilfsfunktion
     # für show_entries
-    def update_entryview(self, feedhandler, feed):
+    """def update_entryview(self, feedhandler, feed):
         self.entrylist.clear_listbox()
         entries = feed.get_entries()
         print(len(entries))
@@ -326,9 +327,10 @@ class MainWindow(Gtk.ApplicationWindow):
 
     # i.O. callback-function für listbox in feedview, Row=feed gewählt
     def show_entries(self, listbox, row):
+        print("selected_row")
         selected_row = listbox.get_selected_row()
         selected_row.get_feed().update()
-        self.views.switch("entrylist")
+        self.views.switch("entrylist")"""
 
     # i.O. call-back-function für listbox in entryview, Row=entry gewählt
     def show_entry_details(self, listbox, row):
