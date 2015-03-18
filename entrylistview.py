@@ -18,8 +18,8 @@ class EntryRow(Gtk.ListBoxRow):
         self.container_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         headline_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
 
-        if self._feed.has_icon == True:
-            logo = self._feed.icon
+        #if self._feed.has_icon == True:
+         #   logo = self._feed.icon
 
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(logo)
         pixbuf = pixbuf.scale_simple(20, 20, GdkPixbuf.InterpType.HYPER)

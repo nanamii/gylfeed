@@ -6,9 +6,16 @@ from time import strftime
 import feedparser
 import urllib.request
 from downloader import Downloader
+import tempfile
+
+DOWNLOADER = Downloader()
+
 
 class Feed(GObject.GObject):
-    __gsignals__ = {'updated' : (GObject.SIGNAL_RUN_FIRST, None, ())}
+    __gsignals__ = {
+        'created' : (GObject.SIGNAL_RUN_FIRST, None, ()),
+        'updated' : (GObject.SIGNAL_RUN_FIRST, None, ())
+    }
 
     def __init__(self, url, name, automatic_update=True, notifications=True, raw_feed=None, has_icon=None, icon=None):
         GObject.GObject.__init__(self)
@@ -23,9 +30,21 @@ class Feed(GObject.GObject):
         if raw_feed is None:
             self.download_data()
 
+    def load_icon(self, url):
+        document = DOWNLOADER.download(url, check_if_needed=False)
+        document.connect('finish', self._load_icon_deferred)
+
+    def _load_icon_deferred(self, document):
+        temp_path = tempfile.mktemp(".icon", "gylfeed-")
+        with open(temp_path, "wb") as handle:
+            handle.write(document.data)
+
+        print(temp_path)
+        self.icon = temp_path
+        self.emit('created')
+
     def download_data(self):
-        downloader = Downloader()
-        document = downloader.download(self.url)
+        document = DOWNLOADER.download(self.url, check_if_needed=False)
         document.connect('finish', self.parse)
 
     def parse(self, document):
@@ -36,19 +55,24 @@ class Feed(GObject.GObject):
 
             try:
                 if self.raw_feed.feed.icon:
+                    self.load_icon(self.raw_feed.feed.icon)
                     self.has_icon = True
-                    url = self.raw_feed.feed.icon
-                    logo_raw = urllib.request.urlretrieve(url)
-                    logo = logo_raw[0]
-                    self.icon = logo
+                    # url = self.raw_feed.feed.icon
+                    # logo_raw = urllib.request.urlretrieve(url)
+                    # logo = logo_raw[0]
+                    # self.icon = logo
             except AttributeError as aerr:
                 print(aerr)
 
+        if not self.has_icon:
+            self.emit('created')
 
     def update(self):
-        downloader = Downloader()
-        document = downloader.download(self.url)
-        document.connect('finish', self.parse_update)
+        document = DOWNLOADER.download(self.url)
+        if document is not None:
+            document.connect('finish', self.parse_update)
+        else:
+            self.emit("updated")
 
     def parse_update(self, document):
         print("parse_update in feed")

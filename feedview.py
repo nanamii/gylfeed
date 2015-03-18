@@ -216,6 +216,6 @@ class Feedview(View):
         #self.feedview.listbox.get_row_at_index(0).set_can_focus(True)
         #self.feedview.listbox.get_row_at_index(0).grab_focus()
         #self.feedview.listbox.get_row_at_index(0).set_activatable(True)
-        self.listbox.select_row(self.feedview.listbox.get_row_at_index(0))
+        self.listbox.select_row(self.listbox.get_row_at_index(0))
 
 

@@ -105,6 +105,8 @@ class MainWindow(Gtk.ApplicationWindow):
         self.set_default_size(800, 600)
         self.feedhandler = feedhandler
 
+        feedhandler.connect('feed-created', self.on_feed_created)
+
         self.headerbar = Gtk.HeaderBar()
         self.headerbar.set_show_close_button(True)
         self.headerbar.props.title = "gylfeed"
@@ -290,15 +292,17 @@ class MainWindow(Gtk.ApplicationWindow):
         notify_switch = self.feed_options.get_nswitch_state()
         new_entries = 0
 
-        new_feed = self.feedhandler.create_feed(url, feed_name, update_switch, notify_switch)
-        if new_feed is not None:
-            new_entries = len(new_feed.get_entries())
-            self.feedview.new_listbox_row("./graphics/default_icon.png", new_feed)
-            self.show_all()
-            self.views.switch("feedview")
+        self.feedhandler.create_feed(url, feed_name, update_switch, notify_switch)
 
-            self.infobar.hide()
-            self.feed_options.empty_form()
+    def on_feed_created(self, feed_handler, new_feed):
+        new_entries = len(new_feed.get_entries())
+        self.feedview.new_listbox_row(
+            "./graphics/default_icon.png", new_feed
+        )
+        self.show_all()
+        self.views.switch("feedview")
+        self.infobar.hide()
+        self.feed_options.empty_form()
 
     # i.O. call-back-function für feed-optionen-gewählt
     def show_options_filled(self, feedview, feed):
