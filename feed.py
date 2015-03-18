@@ -29,10 +29,7 @@ class Feed(GObject.GObject):
         document.connect('finish', self.parse)
 
     def parse(self, document):
-        # document.connect('finish', self.parse, document)
         self.raw_feed = feedparser.parse(document.data)
-        print(self.raw_feed.bozo)
-        print(self.raw_feed)
         if self.raw_feed.bozo == 0:
             self.set_readtag(self.raw_feed)
             print(self.raw_feed.entries[0].read)
@@ -53,6 +50,7 @@ class Feed(GObject.GObject):
 
 
     def update(self):
+
         print("update function in feed")
         if self.raw_feed:
             try:
