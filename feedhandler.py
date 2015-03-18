@@ -83,10 +83,7 @@ class Feedhandler(GObject.GObject):
     def delete_feed(self, feed):
         for f in self.feeds:
             if f.get_url() == feed.get_url():
-                print(self.feeds.index(f))
                 self.feeds.pop(self.feeds.index(f))
-                print("Feed gelöscht!!!!!")
-                print(len(self.feeds))
 
     def save_to_disk(self):
         try:

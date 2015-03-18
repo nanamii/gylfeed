@@ -36,13 +36,9 @@ class Feed(GObject.GObject):
 
             try:
                 if self.raw_feed.feed.icon:
-                    print("Feed has icon")
-                    print(self.raw_feed.feed.icon)
                     self.has_icon = True
                     url = self.raw_feed.feed.icon
-                    print(url)
                     logo_raw = urllib.request.urlretrieve(url)
-                    print(logo_raw)
                     logo = logo_raw[0]
                     self.icon = logo
             except AttributeError as aerr:
@@ -50,35 +46,23 @@ class Feed(GObject.GObject):
 
 
     def update(self):
+        downloader = Downloader()
+        document = downloader.download(self.url)
+        document.connect('finish', self.parse_update)
 
-        print("update function in feed")
+    def parse_update(self, document):
+        print("parse_update in feed")
         if self.raw_feed:
-            try:
-                new_raw_feed = feedparser.parse(self.url, self.raw_feed.etag)
-                if self._is_modified(new_raw_feed):
+            if document:
+                try:
+                    new_raw_feed = feedparser.parse(document.data)
                     self.compare_entries(new_raw_feed)
-                #hier noch überlegen, in welchem Fall signal abgesetzt wird !!!
-                self.emit('updated')
-            except AttributeError as aerror:
-                print(aerror)
-                self.update_no_etag()
+                    #hier noch überlegen, in welchem Fall signal abgesetzt wird !!!
+                    self.emit('updated')
+                except AttributeError as aerror:
+                    print(aerror)
 
-    def update_no_etag(self):
-        try:
-            new_raw_feed = feedparser.parse(self.url)
-            #print(new_raw_feed)
-            # Achtung!! Hier noch Vergleichsoperator anpassen, eigentlich >
-            if new_raw_feed.feed.published_parsed > self.raw_feed.entries[0].published_parsed:
-                print("neue entries!!!")
-                self.compare_entries(new_raw_feed)
-            else:
-                print("keine neuen entries")
-            self.emit('updated') # TODO: warum immer update?
-
-        except IOError as error:
-            print(error)
-
-    # wird durch update und update_no_etag aufgerufen
+    # wird durch update aufgerufen
     def compare_entries(self, new_raw_feed):
 
         self.new_entries = []

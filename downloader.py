@@ -42,7 +42,8 @@ class Downloader():
                 self.dict_etag[url] = etag
                 return self.get_data(url)
             else:
-                return None  
+                print("None in download")
+                return None
 
         lastmodi = self.get_lastmodified(header)
         if lastmodi:
@@ -50,6 +51,7 @@ class Downloader():
                 self.dict_lastmodi[url] = lastmodi
                 return self.get_data(url)
             else:
+                print("None in download")
                 return None
 
         return self.get_data(url)
