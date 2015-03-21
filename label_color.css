@@ -12,6 +12,14 @@ GtkLabel#new_entries_label {
     font-size: 50%
 }
 
+#GylfeedEntryRow {
+    font-weight: bold;
+}
+
+#GylfeedEntryRow.read {
+    background-color: alpha(black, 0.2);
+    font-weight: normal;
+}
 
 
 /* Support for colored labels.

@@ -3,12 +3,19 @@
 
 """ Testmodule for parsing feeds. """
 
-
-from gi.repository import Gtk, GObject, GLib
-import feedparser
+# Stdlib:
 import pprint
 import pickle
+
+from functools import partial
+
+# Internal:
 from feed import Feed
+
+# External:
+import feedparser
+
+from gi.repository import Gtk, GObject, GLib
 
 
 class Feedhandler(GObject.GObject):
@@ -31,11 +38,12 @@ class Feedhandler(GObject.GObject):
             return True
 
         GLib.timeout_add(
-            1 * 60 * 1000, _update_recurring
+            5 * 60 * 1000, _update_recurring
 
         )
 
     def create_feed(self, url, feed_name, update_switch, notify_switch):
+        print("create_feed in Feedhandler:")
         print(len(self.feeds))
         feed = Feed(url, feed_name, update_switch, notify_switch)
         feed.connect(
@@ -74,7 +82,7 @@ class Feedhandler(GObject.GObject):
         self.feeds.append(feed)
 
         # TODO: Fraglich ob update nötig ist.
-        # feed.update()
+        #feed.update()
 
         self.emit('feed-created', feed)
 
@@ -95,6 +103,9 @@ class Feedhandler(GObject.GObject):
             return True
         return False
 
+    def get_feed_list(self):
+        return self.feeds
+
     def count_feeds(self):
         return len(self.feeds)
 
@@ -102,8 +113,11 @@ class Feedhandler(GObject.GObject):
         print("UPDATE")
         # TODO: save after update done.
         self.save_to_disk()
+        print(self.feeds)
         for feed in self.feeds:
-            GLib.idle_add(lambda: feed.update())
+            print(feed.get_name(), "feedprint in update_all_feeds, feedhanlder")
+
+            GLib.idle_add(partial(Feed.update, self=feed))
 
 
     # TODO: warum so gelöst?

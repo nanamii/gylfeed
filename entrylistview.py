@@ -6,6 +6,9 @@ from view import View
 
 class EntryRow(Gtk.ListBoxRow):
     def __init__(self, logo, title, time, plot, id, feed, feed_name):
+        Gtk.ListBoxRow.__init__(self)
+
+        self.set_name("GylfeedEntryRow")
 
         self._plot = plot
         self._time = time
@@ -13,13 +16,11 @@ class EntryRow(Gtk.ListBoxRow):
         self._id = id
         self._feed = feed
 
-        Gtk.ListBoxRow.__init__(self)
-
         self.container_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         headline_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
 
-        #if self._feed.has_icon == True:
-         #   logo = self._feed.icon
+        if self._feed.has_icon == True:
+            logo = self._feed.icon
 
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(logo)
         pixbuf = pixbuf.scale_simple(20, 20, GdkPixbuf.InterpType.HYPER)
@@ -90,7 +91,8 @@ class EntryListView(View):
         for entry in feed.raw_feed.entries:
             if id == entry.id:
                 if entry.read == True:
-                    row.container_box.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(.5,.5,.5,.5))
+                    row.get_style_context().add_class("read")
+                    # row.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(.5,.5,.5,.5))
 
     def on_view_enter(self):
         # hier auf None prüfen, wenn von details-Seite aus aufgerufen,
@@ -101,12 +103,21 @@ class EntryListView(View):
                 feed_name=selected_row.get_feed().get_name())
             )
 
+        GLib.idle_add(
+            lambda: self.app_window.views.go_right.set_sensitive(False))
+
+        # gelesene entries anders darstellen lassen
+        for row in self.listbox:
+            self.mark_read_entries(row.get_feed(), row, row.get_id())
+
     # callback-function um feedentries darzustellen, nach update; Hilfsfunktion
     # für show_entries
-    def update_entryview(self, feedhandler, feed):
+    def update_entryview(self, feedhandler=None, feed=None):
         self.clear_listbox()
         entries = feed.get_entries()
-        print(len(entries))
+        print("update_entryview in entrylistview, Anzahl Entries:", len(entries))
+        print(feed.get_name())
+        print("\n\n")
         feed_name = feed.get_name()
         for title,plot,time,id,feed in entries:
             self.new_ListBoxRow("./graphics/default_icon.png", title, time, plot, id, feed, feed_name)
@@ -114,7 +125,9 @@ class EntryListView(View):
     # i.O. callback-function für listbox in feedview, Row=feed gewählt
     def show_entries(self, listbox, row):
         selected_row = listbox.get_selected_row()
-        selected_row.get_feed().update()
+        # durch update wird mit callback update_entryview aufgerufen
+        #selected_row.get_feed().update()
+        self.update_entryview(None, selected_row.get_feed())
         self.app_window.views.switch("entrylist")
         self.listbox.select_row(self.listbox.get_row_at_index(0))
 

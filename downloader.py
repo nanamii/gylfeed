@@ -35,27 +35,25 @@ class Downloader():
 
     def download(self, url, check_if_needed=True):
         if check_if_needed:
+            # TODO: Async header check.
             header = Soup.Message.new("HEAD", url)
             stream = self._session.send(header)
             stream.read_bytes(self.CHUNK_SIZE)
 
             etag = self.get_etag(header)
-            if etag:
-                if etag != self.dict_etag.get(url):
-                    self.dict_etag[url] = etag
-                    return self.get_data(url)
-                else:
-                    print("None in download")
-                    return None
+            print("checking etag for ", url)
+            if etag and etag == self.dict_etag.get(url):
+                return None
 
+            self.dict_etag[url] = etag
+
+            print("checking lastmodi for ", url)
             lastmodi = self.get_lastmodified(header)
-            if lastmodi:
-                if lastmodi != self.dict_lastmodi.get(url):
-                    self.dict_lastmodi[url] = lastmodi
-                    return self.get_data(url)
-                else:
-                    print("None in download")
-                    return None
+            if lastmodi and lastmodi == self.dict_lastmodi.get(url):
+                return None
+
+            print("Okay, fucked up.")
+            self.dict_lastmodi[url] = lastmodi
 
         return self.get_data(url)
 

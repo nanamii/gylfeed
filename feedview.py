@@ -55,27 +55,36 @@ class FeedRow(Gtk.ListBoxRow):
         style_context.add_provider_for_screen(screen, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
         #######################################################
 
-        new_entries_label = IndicatorLabel(" {num_new} ★".format(num_new=self._num_of_new_entries))
-        new_entries_label.set_color(IndicatorLabel.SUCCESS)
-        new_entries_label.set_margin_left(35)
-        new_entries_label.set_margin_right(5)
-        new_entries_label.set_margin_bottom(10)
+        self.new_entries_label = IndicatorLabel()
+        print("Neu hinzugekommene entries: {}".format(self._num_of_new_entries))
+        print("Hochgezählter entries counter: {}".format(self._feed.count_new_entries))
 
-        self.indi_label = IndicatorLabel("<b> all {num_all} </b>  ∑".format(num_all=self._num_of_entries))
-        self.indi_label.set_color(IndicatorLabel.THEME)
-        self.indi_label.set_margin_right(5)
-        self.indi_label.set_no_show_all(True)
-        self.indi_label.set_margin_bottom(10)
+        if self._feed.count_new_entries and (self._feed.is_clicked is False):
+            self.new_entries_label.set_color(IndicatorLabel.SUCCESS)
+            self.new_entries_label.set_text(" {num_new} ★".format(num_new=self._feed.count_new_entries))
+        else:
+            self.new_entries_label.set_color(IndicatorLabel.THEME)
+            self.new_entries_label.set_text("0")
+
+        self.new_entries_label.set_margin_left(35)
+        self.new_entries_label.set_margin_right(5)
+        self.new_entries_label.set_margin_bottom(10)
+
+        self.all_label = IndicatorLabel("<b> all {num_all} </b>".format(num_all=self._num_of_entries))
+        self.all_label.set_color(IndicatorLabel.WARNING)
+        self.all_label.set_margin_right(5)
+        self.all_label.set_no_show_all(True)
+        self.all_label.set_margin_bottom(10)
 
         self.unread_label = IndicatorLabel(" unread {num_unread} ".format(num_unread=self._num_of_unread_entries))
-        self.unread_label.set_color(IndicatorLabel.THEME)
+        self.unread_label.set_color(IndicatorLabel.WARNING)
         self.unread_label.set_margin_right(5)
         self.unread_label.set_no_show_all(True)
         self.unread_label.set_margin_bottom(10)
 
-        info_box.add(new_entries_label)
+        info_box.add(self.new_entries_label)
         info_box.add(self.unread_label)
-        info_box.add(self.indi_label)
+        info_box.add(self.all_label)
         container_box.add(info_box)
 
         self.delete_button = Gtk.Button.new_from_icon_name('window-close-symbolic', Gtk.IconSize.BUTTON)
@@ -101,7 +110,7 @@ class FeedRow(Gtk.ListBoxRow):
 
     def _on_state_flags_changed(self, _, prev_state_flags):
         state_flags = self.get_state_flags()
-        self.indi_label.set_visible(state_flags & (Gtk.StateFlags.PRELIGHT |
+        self.all_label.set_visible(state_flags & (Gtk.StateFlags.PRELIGHT |
         Gtk.StateFlags.SELECTED))
         self.unread_label.set_visible(state_flags & (Gtk.StateFlags.PRELIGHT |
         Gtk.StateFlags.SELECTED))
@@ -118,6 +127,20 @@ class FeedRow(Gtk.ListBoxRow):
     def get_feed(self):
         return self._feed
 
+    def get_new_entries_label(self):
+        return self.new_entries_label
+
+    def redraw_labels(self):
+        if self._feed.count_new_entries and (self._feed.is_clicked is False):
+            self.new_entries_label.set_color(IndicatorLabel.SUCCESS)
+            self.new_entries_label.set_text(" {num_new} ★".format(num_new=self._feed.get_num_of_counted()))
+            self.all_label.set_text("all {num_all} ".format(num_all=len(self._feed.get_entries())))
+        else:
+            self.new_entries_label.set_color(IndicatorLabel.THEME)
+            self.new_entries_label.set_text("0 ★")
+            self.unread_label.set_text(" unread {num_unread} ".format(num_unread=self._feed.get_num_of_unread()))
+
+
     def show_revealer(self, button):
         if self.revealer.get_reveal_child():
             self.revealer.set_reveal_child(False)
@@ -132,11 +155,16 @@ class Feedview(View):
     def __init__(self, app):
         View.__init__(self, app)
 
+        self.feed_list = self.app_window.feedhandler.get_feed_list()
+        for feed in self.feed_list:
+            feed.connect("updated", self.redraw_num_labels)
+
         # TODO: long time todo: remove .container in favour of View.
         self._container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.scr_window = Gtk.ScrolledWindow()
         self.box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.listbox = Gtk.ListBox()
+        self.listbox.connect("row-activated", self.set_row_clicked)
         self.listbox.set_border_width(0)
         self.listbox.set_vexpand(True)
         self.box.pack_start(self.listbox, True, True, 0)
@@ -183,6 +211,9 @@ class Feedview(View):
     def ok_delete_clicked(self, button):
         self.emit('ok-delete-clicked', self.temp_row.get_feed())
 
+    def set_row_clicked(self, listbox, _):
+        listbox.get_selected_row().get_feed().set_is_clicked(True)
+
     def clear_listbox(self):
         for feed in self.listbox:
             self.listbox.remove(feed)
@@ -191,10 +222,15 @@ class Feedview(View):
         self.action_bar.hide()
 
     def on_view_enter(self):
+        for feed in self.app_window.feedhandler.get_feed_list():
+            self.redraw_num_labels(feed)
+
         self.app_window.set_title("{num_feeds} Feeds".format(
             num_feeds=self.app_window.feedhandler.count_feeds())
         )
+        
         self.app_window.button_search.set_sensitive(True)
+        
         GLib.idle_add(
             lambda: self.app_window.views.go_right.set_sensitive(False)
         )
@@ -209,7 +245,7 @@ class Feedview(View):
         self.clear_listbox()
         for feed in feedlist:
             if feed.raw_feed.bozo == 0:
-                self.new_listbox_row("./graphics/default_icon.png",  feed)
+                self.new_listbox_row("./graphics/default_icon.png", feed)
                 self.show_all()
                 self.app_window.views.switch("feedview")
         #self.feedview.listbox.set_can_focus(True)
@@ -218,4 +254,9 @@ class Feedview(View):
         #self.feedview.listbox.get_row_at_index(0).set_activatable(True)
         self.listbox.select_row(self.listbox.get_row_at_index(0))
 
+    def redraw_num_labels(self, feed):
+        for row in self.listbox:
+            if row.get_feed() == feed:
+                sel_row = self.listbox.get_row_at_index(row.get_index())
+                sel_row.redraw_labels()
 

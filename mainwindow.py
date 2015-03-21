@@ -226,15 +226,22 @@ class MainWindow(Gtk.ApplicationWindow):
         if key == Gdk.KEY_Right:
             if (child_name == "entrylist"):
                 print("right-key pressed to open entry-details")
-                self.entry_details.show_entry_details(self.entrylist.listbox, self.entrylist.listbox.get_selected_row())
+                self.entry_details.show_entry_details(self.entrylist.listbox, 
+                self.entrylist.listbox.get_selected_row() 
+                )
             else:
-                self.entrylist.show_entries(self.feedview.listbox, self.feedview.listbox.get_selected_row())
+                self.entrylist.show_entries(self.feedview.listbox, 
+                self.feedview.listbox.get_selected_row()
+                )
         if key == Gdk.KEY_Left:
             if (child_name == "entrydetails"):
                 self.entrylist.show_entries(self.feedview.listbox, self.feedview.listbox.get_selected_row())
                 for row in self.entrylist.listbox:
                     if row.get_id() == self.entry_details.get_entry_id():
                         self.entrylist.listbox.select_row(row)
+
+            elif (child_name == "feedview"):
+                return
             else:
                 self.views.go_left.emit("clicked")
             #self.is_focus()
