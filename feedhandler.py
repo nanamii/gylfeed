@@ -32,13 +32,13 @@ class Feedhandler(GObject.GObject):
         self.feeds = []
 
         def _update_recurring():
-            self.update_all_feeds()
+            self.update_all_feeds(None, None, True)
 
             # TODO: Return settings.do_auto_update
             return True
 
         GLib.timeout_add(
-            5 * 60 * 1000, _update_recurring
+            1 * 60 * 1000, _update_recurring
 
         )
 
@@ -109,12 +109,22 @@ class Feedhandler(GObject.GObject):
     def count_feeds(self):
         return len(self.feeds)
 
-    def update_all_feeds(self, btn=None, action=None):
+    def update_all_feeds(self, btn=None, action=None, automatic_update=None):
         print("UPDATE")
         # TODO: save after update done.
         self.save_to_disk()
         print(self.feeds)
-        for feed in self.feeds:
+
+        feed_list = self.feeds
+        if automatic_update:
+            feed_list = []
+            for feed in self.feeds:
+                if feed.automatic_update:
+                    print("automatic_update is false for:", feed.get_name())
+                    feed_list.append(feed)
+
+
+        for feed in feed_list:
             print(feed.get_name(), "feedprint in update_all_feeds, feedhanlder")
 
             GLib.idle_add(partial(Feed.update, self=feed))
