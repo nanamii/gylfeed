@@ -148,6 +148,7 @@ class FeedRow(Gtk.ListBoxRow):
             self.revealer.set_reveal_child(True)
 
 
+
 class Feedview(View):
     __gsignals__ = { 'preferences-clicked': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.GObject,)),
                     'ok-delete-clicked': (GObject.SIGNAL_RUN_FIRST, GObject.TYPE_NONE, (GObject.GObject,))}
@@ -228,9 +229,12 @@ class Feedview(View):
         self.app_window.set_title("{num_feeds} Feeds".format(
             num_feeds=self.app_window.feedhandler.count_feeds())
         )
-        
+
         self.app_window.button_search.set_sensitive(True)
-        
+
+        for row in self.listbox:
+            row.revealer.set_reveal_child(False)
+
         GLib.idle_add(
             lambda: self.app_window.views.go_right.set_sensitive(False)
         )

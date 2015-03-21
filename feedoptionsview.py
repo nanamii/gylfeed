@@ -25,6 +25,8 @@ class FeedOptionsView(View):
         listbox_options.set_selection_mode(Gtk.SelectionMode.NONE)
         frame_options = Gtk.Frame()
         frame_options.add(listbox_options)
+        self.change_mode = False
+        self.current_feed = None
 
         def build_listbox_row(start_element, end_element):
             box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
@@ -109,6 +111,18 @@ class FeedOptionsView(View):
     def get_nswitch_state(self):
         return self.notify_switch.get_active()
 
+    def set_uswitch_state(self, state):
+        self.update_switch.set_active(state)
+
+    def set_nswitch_state(self, state):
+        self.notify_switch.set_active(state)
+
+    def set_change_mode(self, change):
+        self.change_mode = change
+
+    def set_current_feed(self, feed):
+        self.current_feed = feed
+
     def empty_form(self):
         self.url_entry.set_text("")
         self.naming_entry.set_text("")
@@ -117,12 +131,27 @@ class FeedOptionsView(View):
         self.app_window.set_title("Feed Options")
         self.app_window.button_search.set_sensitive(False)
 
-        self.app_window.button_suggest.show()
         self.app_window.button_discard.show()
+
+        if self.change_mode is True:
+            print("on_view_enter in feedoptionsview, change mode:", self.change_mode)
+            #button_apply_changes = Gtk.Button()
+            #self.app_window.add_widget(button_discard, start)
+            #self.app_window.add_widget(button_apply_changes, end)
+            self.app_window.button_apply_changes.show()
+            self.naming_entry.set_editable(False)
+            self.url_entry.set_editable(False)
+        else:
+            print("on_view_enter in feedoptionsview, show_suggest")
+            self.app_window.button_suggest.show()
 
     def on_view_leave(self):
         self.app_window.button_suggest.hide()
         self.app_window.button_discard.hide()
+        self.app_window.button_apply_changes.hide()
+        self.change_mode = False
+        self.naming_entry.set_editable(True)
+        self.url_entry.set_editable(True)
 
     def exception_handling(self, feedhandler, exception):
         self.app_window.infobar_label.set_text(exception)

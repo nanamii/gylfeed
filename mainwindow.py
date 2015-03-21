@@ -135,9 +135,9 @@ class MainWindow(Gtk.ApplicationWindow):
         self.button_discard.get_style_context().add_class(Gtk.STYLE_CLASS_DESTRUCTIVE_ACTION)
         self.button_discard.set_no_show_all(True)
 
-        self.button_edit = Gtk.Button("Change Data")
-        self.button_edit.get_style_context().add_class(Gtk.STYLE_CLASS_SUGGESTED_ACTION)
-        self.button_edit.set_no_show_all(True)
+        self.button_apply_changes = Gtk.Button("Change Data")
+        self.button_apply_changes.get_style_context().add_class(Gtk.STYLE_CLASS_SUGGESTED_ACTION)
+        self.button_apply_changes.set_no_show_all(True)
 
         ##############################################################################
 
@@ -171,7 +171,7 @@ class MainWindow(Gtk.ApplicationWindow):
         self.headerbar.pack_end(self.button_settings)
         self.headerbar.pack_end(self.button_search)
         self.headerbar.pack_end(self.button_suggest)
-        self.headerbar.pack_end(self.button_edit)
+        self.headerbar.pack_end(self.button_apply_changes)
 
         self.infobar = Gtk.InfoBar()
         self.infobar.set_message_type(Gtk.MessageType.ERROR)
@@ -211,7 +211,7 @@ class MainWindow(Gtk.ApplicationWindow):
 
         self.button_suggest.connect("clicked", self.set_feedview)
         self.button_discard.connect("clicked", self.discard_action)
-        self.button_edit.connect("clicked", self.change_data)
+        self.button_apply_changes.connect("clicked", self.change_data)
 
         self.connect("key_press_event", self.key_navigation)
 
@@ -226,11 +226,11 @@ class MainWindow(Gtk.ApplicationWindow):
         if key == Gdk.KEY_Right:
             if (child_name == "entrylist"):
                 print("right-key pressed to open entry-details")
-                self.entry_details.show_entry_details(self.entrylist.listbox, 
-                self.entrylist.listbox.get_selected_row() 
+                self.entry_details.show_entry_details(self.entrylist.listbox,
+                self.entrylist.listbox.get_selected_row()
                 )
             else:
-                self.entrylist.show_entries(self.feedview.listbox, 
+                self.entrylist.show_entries(self.feedview.listbox,
                 self.feedview.listbox.get_selected_row()
                 )
         if key == Gdk.KEY_Left:
@@ -313,9 +313,13 @@ class MainWindow(Gtk.ApplicationWindow):
 
     # i.O. call-back-function für feed-optionen-gewählt
     def show_options_filled(self, feedview, feed):
+        self.feed_options.set_change_mode(True)
+        self.feed_options.set_current_feed(feed)
         self.views.switch("feedoptions")
         self.feed_options.set_url(feed.get_url())
         self.feed_options.set_name(feed.get_name())
+        self.feed_options.set_uswitch_state(feed.automatic_update)
+        self.feed_options.set_nswitch_state(feed.notifications)
 
     #callback-function für delete-feed, ok-button in ActionBar gewählt
     def delete_feed_actions(self, feedview, feed):
@@ -324,9 +328,23 @@ class MainWindow(Gtk.ApplicationWindow):
         self.entrylist.clear_listbox()
         self.feedview.action_bar.hide()
 
-    # geplant:function zum Ändern der settings in feed
+    # callback_function für button_apply_changes; zum Ändern der settings im feed
     def change_data(self, button):
         print("change button pressed")
+        update_switch = self.feed_options.get_uswitch_state()
+        notify_switch = self.feed_options.get_nswitch_state()
+        feed_to_change = self.feed_options.current_feed
+        print(feed_to_change.notifications)
+        print(feed_to_change.automatic_update)
+        feed_to_change.automatic_update = update_switch
+        feed_to_change.notifications = notify_switch
+        print(feed_to_change.notifications)
+        print(feed_to_change.automatic_update)
+        self.views.switch("feedview")
+        self.infobar.hide()
+        self.feed_options.empty_form()
+
+
 
 
 class MainApplication(Gtk.Application):
