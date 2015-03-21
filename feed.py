@@ -56,7 +56,8 @@ class Feed(GObject.GObject):
     def parse(self, document):
         self.raw_feed = feedparser.parse(document.data)
         if self.raw_feed.bozo == 0:
-            self.set_readtag(self.raw_feed)
+            self.set_read_tag(self.raw_feed)
+            self.set_delete_tag(self.raw_feed)
             print(self.raw_feed.entries[0].read)
 
             try:
@@ -124,9 +125,10 @@ class Feed(GObject.GObject):
             self.count_new_entries += len(self.new_entries)
             print("COUNT new entries nach Hochsetzen:", self.count_new_entries)
 
-        # getestet, i.O.
+        #getestet, i.O.
         for entry in self.new_entries:
             entry["read"] = False
+            entry["deleted"] = False
 
     def get_entries(self):
         if self.raw_feed:
@@ -135,7 +137,7 @@ class Feed(GObject.GObject):
                 stamp = mktime(entry.updated_parsed) - timezone
                 dt = datetime.fromtimestamp(stamp)
                 date_string = self._date_to_string(dt.timetuple())
-                entries.append((entry.title, entry.summary, date_string, entry.id, self))
+                entries.append((entry.title, entry.summary, date_string, entry.id, entry.deleted, self))
             return entries
 
     def get_name(self):
@@ -173,9 +175,22 @@ class Feed(GObject.GObject):
     def get_serializable_data(self):
         return (self.url, self.name, self.automatic_update, self.notifications, self.raw_feed, self.has_icon, self.icon)
 
-    def set_readtag(self, feed):
+    def set_read_tag(self, feed):
         for entry in feed.entries:
             entry["read"] = False
+
+    def set_delete_tag(self, feed):
+        for entry in feed.entries:
+            entry["deleted"] = False
+
+    def delete_old_entries(self):
+        DAY_RANGE = 30
+
+        for entry in self.raw_feed.entries:
+            #    if current_time - entry.published_parsed > DAY_RANGE:
+            #        entry["delelted"] = True
+            print("deleted? ", entry.deleted)
+
 
     def set_entry_is_read(self, entry_id):
         for entry in self.raw_feed.entries:

@@ -369,6 +369,7 @@ class MainApplication(Gtk.Application):
             print("pickle vorhanden")
             fh.feeds = [Feed(*ftuple) for ftuple in load_from_disk()]
             fh.connect_feeds()
+            fh.delete_old_entries()
 
         print(fh.feeds)
         self.win = MainWindow(self, fh)

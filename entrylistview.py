@@ -119,8 +119,11 @@ class EntryListView(View):
         print(feed.get_name())
         print("\n\n")
         feed_name = feed.get_name()
-        for title,plot,time,id,feed in entries:
-            self.new_ListBoxRow("./graphics/default_icon.png", title, time, plot, id, feed, feed_name)
+        for title,plot,time,id,deleted,feed in entries:
+            if deleted is False:
+                self.new_ListBoxRow("./graphics/default_icon.png",
+                    title, time, plot, id, feed, feed_name
+                    )
 
     # i.O. callback-function für listbox in feedview, Row=feed gewählt
     def show_entries(self, listbox, row):

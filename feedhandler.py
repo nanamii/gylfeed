@@ -140,6 +140,10 @@ class Feedhandler(GObject.GObject):
             if f.get_url() == feed.get_url():
                 self.feeds.pop(self.feeds.index(f))
 
+    def delete_old_entries(self):
+        for feed in self.feeds:
+            feed.delete_old_entries()
+
     def save_to_disk(self):
         try:
             with open ('feeds.pickle', 'wb') as fp:
