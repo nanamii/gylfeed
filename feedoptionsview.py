@@ -58,6 +58,7 @@ class FeedOptionsView(View):
         update_label = Gtk.Label("Update feed automatic")
         self.update_switch = Gtk.Switch()
         self.update_switch.set_active(True)
+        self.update_switch.connect('notify::active', self.set_update_spin_state)
         update_listbox_row = build_listbox_row(update_label, self.update_switch)
 
         update_interval_label = Gtk.Label("Choose update-intervall")
@@ -156,6 +157,12 @@ class FeedOptionsView(View):
     def empty_form(self):
         self.url_entry.set_text("")
         self.naming_entry.set_text("")
+
+    def set_update_spin_state(self, update_switcher, _):
+        if update_switcher.get_state():
+            self.update_spin.set_sensitive(False)
+        else:
+            self.update_spin.set_sensitive(True)
 
     def on_view_enter(self):
         self.app_window.set_title("Feed Options")
