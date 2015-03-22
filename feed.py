@@ -43,17 +43,26 @@ class Feed(GObject.GObject):
         print("update_interval:", update_interval)
         print("delete_interval:", delete_interval)
 
+        self.update_id = None
+        self.add_updater(self.update_interval)
 
-        def _update_recurring():
-            if self.automatic_update:
-                print("automatic update für Feed:", self.name)
-                self.update()
-            # TODO: Return settings.do_auto_update
-            return True
+    def add_updater(self, new_update_interval=None):
+        if self.update_id is not None:
+            GLib.source_remove(self.update_id)
+            self.update_id = None
 
-        interval = self.update_interval*60*1000
-        print(interval)
-        GLib.timeout_add(interval, _update_recurring)
+        if new_update_interval:
+            interval = self.update_interval*60*1000
+            self.update_id = GLib.timeout_add(
+                interval, self._update_recurring
+            )
+
+    def _update_recurring(self):
+        if self.automatic_update:
+            print("automatic update für Feed:", self.name)
+            self.update()
+        # TODO: Return settings.do_auto_update
+        return True
 
     def load_icon(self, url):
         document = DOWNLOADER.download(url, check_if_needed=False)

@@ -265,7 +265,7 @@ class MainWindow(Gtk.ApplicationWindow):
         about.set_copyright("by Sue Key")
         about.show()
 
-    def set_title(self, title, subtitle = None):
+    def set_title(self, title=None, subtitle=None):
         self.headerbar.set_title(title)
         self.headerbar.set_subtitle(subtitle)
 
@@ -322,6 +322,8 @@ class MainWindow(Gtk.ApplicationWindow):
         self.feed_options.set_name(feed.get_name())
         self.feed_options.set_uswitch_state(feed.automatic_update)
         self.feed_options.set_nswitch_state(feed.notifications)
+        self.feed_options.set_update_interval(feed.update_interval)
+        self.feed_options.set_delete_interval(feed.delete_interval)
 
     #callback-function für delete-feed, ok-button in ActionBar gewählt
     def delete_feed_actions(self, feedview, feed):
@@ -343,6 +345,8 @@ class MainWindow(Gtk.ApplicationWindow):
         feed_to_change.automatic_update = update_switch
         feed_to_change.notifications = notify_switch
         feed_to_change.update_interval = update_spin
+        feed_to_change.add_updater(update_spin)
+
         feed_to_change.delete_interval = delete_spin
         print(feed_to_change.notifications)
         print(feed_to_change.automatic_update)

@@ -29,7 +29,7 @@ class View(Gtk.ScrolledWindow):
             self.on_view_enter()
 
         # Restore the sub_title.
-        self.sub_title = self._sub_title
+        # self.sub_title = self._sub_title
 
     def _on_view_leave(self, _):
         self._is_visible = False

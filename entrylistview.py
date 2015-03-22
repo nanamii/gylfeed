@@ -98,10 +98,12 @@ class EntryListView(View):
         # hier auf None prüfen, wenn von details-Seite aus aufgerufen,
         # nichts an feed_name ändern
         selected_row = self.app_window.feedview.listbox.get_selected_row()
+        subtitle = str(selected_row.get_feed().get_num_of_entries()) + " Entries, "+ str(selected_row.get_feed().get_num_of_unread()) + " unread"
+
         if selected_row is not None:
             self.app_window.set_title("{feed_name}".format(
-                feed_name=selected_row.get_feed().get_name())
-            )
+                feed_name=selected_row.get_feed().get_name()), subtitle
+                )
 
         GLib.idle_add(
             lambda: self.app_window.views.go_right.set_sensitive(False))
