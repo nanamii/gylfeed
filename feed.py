@@ -1,8 +1,9 @@
 # usr/bin/env python3
 # encoding:utf8
 
-from gi.repository import GObject
-from time import strftime, tzset, mktime, timezone
+from gi.repository import GObject, GLib
+from time import strftime, tzset, mktime, timezone, time
+import time
 from datetime import datetime
 import feedparser
 import urllib.request
@@ -18,7 +19,8 @@ class Feed(GObject.GObject):
         'updated' : (GObject.SIGNAL_RUN_FIRST, None, ())
     }
 
-    def __init__(self, url, name, automatic_update=True, notifications=True, raw_feed=None, has_icon=None, icon=None):
+    def __init__(self, url, name, update_interval, delete_interval, automatic_update=True,
+                 notifications=True, raw_feed=None, has_icon=None, icon=None):
         GObject.GObject.__init__(self)
 
         tzset()
@@ -27,6 +29,8 @@ class Feed(GObject.GObject):
         self.name = name
         self.automatic_update = automatic_update
         self.notifications = notifications
+        self.update_interval = update_interval
+        self.delete_interval = delete_interval
         self.new_entries = []
         self.has_icon = has_icon
         self.icon = icon
@@ -35,6 +39,21 @@ class Feed(GObject.GObject):
         self.raw_feed = raw_feed
         if raw_feed is None:
             self.download_data()
+
+        print("update_interval:", update_interval)
+        print("delete_interval:", delete_interval)
+
+
+        def _update_recurring():
+            if self.automatic_update:
+                print("automatic update für Feed:", self.name)
+                self.update()
+            # TODO: Return settings.do_auto_update
+            return True
+
+        interval = self.update_interval*60*1000
+        print(interval)
+        GLib.timeout_add(interval, _update_recurring)
 
     def load_icon(self, url):
         document = DOWNLOADER.download(url, check_if_needed=False)
@@ -140,6 +159,14 @@ class Feed(GObject.GObject):
                 entries.append((entry.title, entry.summary, date_string, entry.id, entry.deleted, self))
             return entries
 
+    def get_num_of_entries(self):
+        num_of_entries = 0
+
+        for entry in self.raw_feed.entries:
+            if entry.deleted is False:
+                num_of_entries += 1
+        return num_of_entries
+
     def get_name(self):
         return self.name
 
@@ -150,11 +177,11 @@ class Feed(GObject.GObject):
         return len(self.new_entries)
 
     def get_num_of_unread(self):
-        num=0
+        num_of_unread = 0
         for entry in self.raw_feed.entries:
-            if entry.read == False:
-                num = num+1
-        return num
+            if entry.read == False and entry.deleted == False:
+                num_of_unread += 1
+        return num_of_unread
 
     def get_num_of_counted(self):
         return self.count_new_entries
@@ -167,13 +194,13 @@ class Feed(GObject.GObject):
         if clicked:
             self.count_new_entries = 0
 
-
     def _date_to_string(self, date_struct):
         #return strftime("%FT%T%z", date_struct)
         return strftime("%a, %d.%b.%Y, %R", date_struct)
 
     def get_serializable_data(self):
-        return (self.url, self.name, self.automatic_update, self.notifications, self.raw_feed, self.has_icon, self.icon)
+        return (self.url, self.name, self.update_interval, self.delete_interval,
+                self.automatic_update, self.notifications, self.raw_feed, self.has_icon, self.icon)
 
     def set_read_tag(self, feed):
         for entry in feed.entries:
@@ -183,17 +210,28 @@ class Feed(GObject.GObject):
         for entry in feed.entries:
             entry["deleted"] = False
 
-    def delete_old_entries(self):
-        DAY_RANGE = 30
+    def delete_old_entries(self, day_range=None):
+        if day_range:
+            DAY_RANGE = day_range
+        else:
+            DAY_RANGE = 30*24*60*60
+
+        min_local_time = time.gmtime(time.time() - DAY_RANGE)
 
         for entry in self.raw_feed.entries:
-            #    if current_time - entry.published_parsed > DAY_RANGE:
-            #        entry["delelted"] = True
-            print("deleted? ", entry.deleted)
-
+            try:
+                if entry.published_parsed < min_local_time:
+                    entry["deleted"] = True
+                else:
+                    entry["deleted"] = False
+                print("deleted? ", entry.deleted)
+            except:
+                print("delete_old_entries, except")
 
     def set_entry_is_read(self, entry_id):
         for entry in self.raw_feed.entries:
             if entry.id == entry_id:
                 entry["read"] = True
                 print("in Feed auf TRUE gesetzt!!")
+
+

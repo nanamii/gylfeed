@@ -60,6 +60,20 @@ class FeedOptionsView(View):
         self.update_switch.set_active(True)
         update_listbox_row = build_listbox_row(update_label, self.update_switch)
 
+        update_interval_label = Gtk.Label("Choose update-intervall")
+        self.update_spin = Gtk.SpinButton()
+        adjust_interval = Gtk.Adjustment(0, 1, 60, 1, 0, 0)
+        self.update_spin.set_adjustment(adjust_interval)
+        self.update_spin.set_value(10) # default update-intervall
+        update_interval_listbox_row = build_listbox_row(update_interval_label, self.update_spin)
+
+        delete_label = Gtk.Label("Days, after Messages will be deleted")
+        self.delete_spin = Gtk.SpinButton()
+        adjust_delete = Gtk.Adjustment(0, 1, 120, 1, 10, 0)
+        self.delete_spin.set_adjustment(adjust_delete)
+        self.delete_spin.set_value(30) # default delete-value
+        delete_listbox_row = build_listbox_row(delete_label, self.delete_spin)
+
         notify_label = Gtk.Label("Enable system-notifications")
         self.notify_switch = Gtk.Switch()
         self.notify_switch.set_active(True)
@@ -69,6 +83,10 @@ class FeedOptionsView(View):
         listbox_entries.add(build_separator_row())
         listbox_entries.add(name_listbox_row)
         listbox_options.add(update_listbox_row)
+        listbox_options.add(build_separator_row())
+        listbox_options.add(update_interval_listbox_row)
+        listbox_options.add(build_separator_row())
+        listbox_options.add(delete_listbox_row)
         listbox_options.add(build_separator_row())
         listbox_options.add(notify_listbox_row)
 
@@ -111,11 +129,23 @@ class FeedOptionsView(View):
     def get_nswitch_state(self):
         return self.notify_switch.get_active()
 
+    def get_update_interval(self):
+        return self.update_spin.get_value()
+
+    def get_delete_interval(self):
+        return self.delete_spin.get_value()
+
     def set_uswitch_state(self, state):
         self.update_switch.set_active(state)
 
     def set_nswitch_state(self, state):
         self.notify_switch.set_active(state)
+
+    def set_update_interval(self, interval):
+        self.update_spin.set_value(interval)
+
+    def set_delete_interval(self, interval):
+        self.delete_spin.set_value(interval)
 
     def set_change_mode(self, change):
         self.change_mode = change

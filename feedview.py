@@ -10,7 +10,7 @@ class FeedRow(Gtk.ListBoxRow):
     def __init__(self, logo, feed):
         Gtk.ListBoxRow.__init__(self)
         self._feed = feed
-        self._num_of_entries = len(feed.get_entries())
+        self._num_of_entries = feed.get_num_of_entries()
         self._num_of_new_entries = feed.get_num_of_new_entries()
         self._num_of_unread_entries = feed.get_num_of_unread()
         self._feed_name = feed.get_name()
@@ -134,7 +134,7 @@ class FeedRow(Gtk.ListBoxRow):
         if self._feed.count_new_entries and (self._feed.is_clicked is False):
             self.new_entries_label.set_color(IndicatorLabel.SUCCESS)
             self.new_entries_label.set_text(" {num_new} ★".format(num_new=self._feed.get_num_of_counted()))
-            self.all_label.set_text("all {num_all} ".format(num_all=len(self._feed.get_entries())))
+            self.all_label.set_text("all {num_all} ".format(num_all=self._feed.get_num_of_entries()))
         else:
             self.new_entries_label.set_color(IndicatorLabel.THEME)
             self.new_entries_label.set_text("0 ★")

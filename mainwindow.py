@@ -297,9 +297,11 @@ class MainWindow(Gtk.ApplicationWindow):
         feed_name = self.feed_options.get_name()
         update_switch = self.feed_options.get_uswitch_state()
         notify_switch = self.feed_options.get_nswitch_state()
+        update_spin = self.feed_options.get_update_interval()
+        delete_spin = self.feed_options.get_delete_interval()
         new_entries = 0
 
-        self.feedhandler.create_feed(url, feed_name, update_switch, notify_switch)
+        self.feedhandler.create_feed(url, feed_name, update_spin, delete_spin, update_switch, notify_switch)
 
     def on_feed_created(self, feed_handler, new_feed):
         new_entries = len(new_feed.get_entries())
@@ -333,13 +335,19 @@ class MainWindow(Gtk.ApplicationWindow):
         print("change button pressed")
         update_switch = self.feed_options.get_uswitch_state()
         notify_switch = self.feed_options.get_nswitch_state()
+        update_spin = self.feed_options.get_update_interval()
+        delete_spin = self.feed_options.get_delete_interval()
         feed_to_change = self.feed_options.current_feed
         print(feed_to_change.notifications)
         print(feed_to_change.automatic_update)
         feed_to_change.automatic_update = update_switch
         feed_to_change.notifications = notify_switch
+        feed_to_change.update_interval = update_spin
+        feed_to_change.delete_interval = delete_spin
         print(feed_to_change.notifications)
         print(feed_to_change.automatic_update)
+        print("neuer update_spin Wert:", feed_to_change.update_interval)
+        print("neuer delete_spin Wert:", feed_to_change.delete_interval)
         self.views.switch("feedview")
         self.infobar.hide()
         self.feed_options.empty_form()
@@ -369,7 +377,7 @@ class MainApplication(Gtk.Application):
             print("pickle vorhanden")
             fh.feeds = [Feed(*ftuple) for ftuple in load_from_disk()]
             fh.connect_feeds()
-            fh.delete_old_entries()
+            #fh.delete_old_entries()
 
         print(fh.feeds)
         self.win = MainWindow(self, fh)

@@ -31,7 +31,7 @@ class Feedhandler(GObject.GObject):
         GObject.GObject.__init__(self)
         self.feeds = []
 
-        def _update_recurring():
+        """def _update_recurring():
             self.update_all_feeds(None, None, True)
 
             # TODO: Return settings.do_auto_update
@@ -40,12 +40,12 @@ class Feedhandler(GObject.GObject):
         GLib.timeout_add(
             1 * 60 * 1000, _update_recurring
 
-        )
+        )"""
 
-    def create_feed(self, url, feed_name, update_switch, notify_switch):
+    def create_feed(self, url, feed_name, update_spin, delete_spin, update_switch, notify_switch):
         print("create_feed in Feedhandler:")
         print(len(self.feeds))
-        feed = Feed(url, feed_name, update_switch, notify_switch)
+        feed = Feed(url, feed_name, update_spin, delete_spin, update_switch, notify_switch)
         feed.connect(
             'created',
             self._create_feed_deferred,
