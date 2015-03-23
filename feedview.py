@@ -160,6 +160,8 @@ class Feedview(View):
         for feed in self.feed_list:
             feed.connect("updated", self.redraw_num_labels)
 
+        self.connect('preferences-clicked', self.app_window.feed_options.show_options_filled)
+
         # TODO: long time todo: remove .container in favour of View.
         self._container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.scr_window = Gtk.ScrolledWindow()
@@ -168,7 +170,15 @@ class Feedview(View):
         self.listbox.connect("row-activated", self.set_row_clicked)
         self.listbox.set_border_width(0)
         self.listbox.set_vexpand(True)
-        self.box.pack_start(self.listbox, True, True, 0)
+        #self.all_feeds_listbox = Gtk.ListBox()
+        #self.all_feeds_listbox.add(self.all_feeds_row())
+        #self.all_feeds_listbox.set_border_width(10)
+        #self.all_feeds_listbox.set_vexpand(False)
+        self.all_feeds_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        self.all_feeds_box.pack_start(self.all_feeds_row(), True, True, 0)
+        self.box.pack_start(self.all_feeds_box, False, False, 10)
+        self.box.pack_end(self.listbox, True, True, 0)
+
         self.scr_window.add(self.box)
         self._container.add(self.scr_window)
         self.add(self._container)
@@ -201,6 +211,55 @@ class Feedview(View):
         row.get_pref_button().connect("clicked", row.show_revealer)
         row.get_delete_button().connect("clicked", self.show_actionbar, row)
         self.listbox.add(row)
+
+    def all_feeds_row(self):
+        #all_feeds_row = Gtk.ListBoxRow()
+
+        container_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        label_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        #info_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file("./graphics/gylfeed_logo.png")
+        pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.HYPER)
+        image = Gtk.Image()
+        image.set_from_pixbuf(pixbuf)
+        #image.set_margin_left(15)
+        #image.set_margin_top(10)
+
+        button_grid = Gtk.Grid()
+
+        all_feeds_label = Gtk.Label("<b>All Feeds </b>")
+        new_entries_label = Gtk.Label(" X neue Entries")
+        last_update_label = Gtk.Label(" Last update at X")
+        label_box.add(all_feeds_label)
+        label_box.add(last_update_label)
+        label_box.add(new_entries_label)
+        label_box.set_margin_left(20)
+
+        button_grid.attach(image, 0, 0, 1, 1)
+        button_grid.attach(label_box, 1, 0, 10, 1)
+        button_grid.show_all()
+
+        all_feeds_button = Gtk.Button()
+        all_feeds_button.add(button_grid)
+
+        all_feeds_button.set_margin_left(10)
+        all_feeds_button.set_margin_bottom(0)
+        all_feeds_button.set_margin_top(5)
+        all_feeds_button.set_relief(Gtk.ReliefStyle.NONE)
+        all_feeds_button.set_vexpand(False)
+
+        #all_feeds_label.set_margin_left(20)
+        #all_feeds_label.set_margin_bottom(0)
+        #all_feeds_label.set_margin_top(0)
+
+        #feed_box.add(image)
+        container_box.pack_start(all_feeds_button, True, True, 10)
+
+        #container_box.pack_start(feed_box, True, True, 0)
+        #all_feeds_row.add(container_box)
+        return container_box
+
 
     def _on_options_clicked(self, button, feed):
         self.emit('preferences-clicked', feed)

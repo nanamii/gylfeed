@@ -126,19 +126,6 @@ class MainWindow(Gtk.ApplicationWindow):
         self.stack.set_transition_type(Gtk.StackTransitionType.SLIDE_LEFT_RIGHT)
         self.stack.set_transition_duration(300)
 
-        ######### only shown in feed_options_view ##################################
-        self.button_suggest = Gtk.Button("Add Feed")
-        self.button_suggest.get_style_context().add_class(Gtk.STYLE_CLASS_SUGGESTED_ACTION)
-        self.button_suggest.set_no_show_all(True)
-
-        self.button_discard = Gtk.Button("Discard")
-        self.button_discard.get_style_context().add_class(Gtk.STYLE_CLASS_DESTRUCTIVE_ACTION)
-        self.button_discard.set_no_show_all(True)
-
-        self.button_apply_changes = Gtk.Button("Change Data")
-        self.button_apply_changes.get_style_context().add_class(Gtk.STYLE_CLASS_SUGGESTED_ACTION)
-        self.button_apply_changes.set_no_show_all(True)
-
         ##############################################################################
 
         self.button_settings = Gtk.Button.new_from_icon_name('view-sidebar-symbolic', Gtk.IconSize.BUTTON)
@@ -167,11 +154,8 @@ class MainWindow(Gtk.ApplicationWindow):
 
         self.views = ViewSwitcher(self.stack)
         self.headerbar.pack_start(self.views)
-        self.headerbar.pack_start(self.button_discard)
         self.headerbar.pack_end(self.button_settings)
         self.headerbar.pack_end(self.button_search)
-        self.headerbar.pack_end(self.button_suggest)
-        self.headerbar.pack_end(self.button_apply_changes)
 
         self.infobar = Gtk.InfoBar()
         self.infobar.set_message_type(Gtk.MessageType.ERROR)
@@ -198,7 +182,6 @@ class MainWindow(Gtk.ApplicationWindow):
 
         self.feedview = Feedview(app)
         self.views.add_view(self.feedview, "feedview")
-        self.feedview.connect('preferences-clicked', self.show_options_filled)
         self.feedview.connect('ok-delete-clicked', self.delete_feed_actions)
 
         self.entrylist = EntryListView(app)
@@ -208,10 +191,6 @@ class MainWindow(Gtk.ApplicationWindow):
         self.views.add_view(self.entry_details, "entrydetails")
 
         self.views.switch("feedview")
-
-        self.button_suggest.connect("clicked", self.set_feedview)
-        self.button_discard.connect("clicked", self.discard_action)
-        self.button_apply_changes.connect("clicked", self.change_data)
 
         self.connect("key_press_event", self.key_navigation)
 
@@ -313,18 +292,6 @@ class MainWindow(Gtk.ApplicationWindow):
         self.infobar.hide()
         self.feed_options.empty_form()
 
-    # i.O. call-back-function für feed-optionen-gewählt
-    def show_options_filled(self, feedview, feed):
-        self.feed_options.set_change_mode(True)
-        self.feed_options.set_current_feed(feed)
-        self.views.switch("feedoptions")
-        self.feed_options.set_url(feed.get_url())
-        self.feed_options.set_name(feed.get_name())
-        self.feed_options.set_uswitch_state(feed.automatic_update)
-        self.feed_options.set_nswitch_state(feed.notifications)
-        self.feed_options.set_update_interval(feed.update_interval)
-        self.feed_options.set_delete_interval(feed.delete_interval)
-
     #callback-function für delete-feed, ok-button in ActionBar gewählt
     def delete_feed_actions(self, feedview, feed):
         self.feedhandler.delete_feed(feed)
@@ -332,31 +299,14 @@ class MainWindow(Gtk.ApplicationWindow):
         self.entrylist.clear_listbox()
         self.feedview.action_bar.hide()
 
-    # callback_function für button_apply_changes; zum Ändern der settings im feed
-    def change_data(self, button):
-        print("change button pressed")
-        update_switch = self.feed_options.get_uswitch_state()
-        notify_switch = self.feed_options.get_nswitch_state()
-        update_spin = self.feed_options.get_update_interval()
-        delete_spin = self.feed_options.get_delete_interval()
-        feed_to_change = self.feed_options.current_feed
-        print(feed_to_change.notifications)
-        print(feed_to_change.automatic_update)
-        feed_to_change.automatic_update = update_switch
-        feed_to_change.notifications = notify_switch
-        feed_to_change.update_interval = update_spin
-        feed_to_change.add_updater(update_spin)
+    def add_widget_to_headerbar(self, widget, start_or_end):
+        if start_or_end == "start":
+            self.headerbar.pack_start(widget)
+        else:
+            self.headerbar.pack_end(widget)
 
-        feed_to_change.delete_interval = delete_spin
-        print(feed_to_change.notifications)
-        print(feed_to_change.automatic_update)
-        print("neuer update_spin Wert:", feed_to_change.update_interval)
-        print("neuer delete_spin Wert:", feed_to_change.delete_interval)
-        self.views.switch("feedview")
-        self.infobar.hide()
-        self.feed_options.empty_form()
-
-
+    def remove_widget_from_headerbar(self, widget):
+        widget.destroy()
 
 
 class MainApplication(Gtk.Application):

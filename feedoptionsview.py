@@ -27,6 +27,9 @@ class FeedOptionsView(View):
         frame_options.add(listbox_options)
         self.change_mode = False
         self.current_feed = None
+        self.button_apply_changes = None
+        self.button_discard = None
+        self.button_suggest = None
 
         def build_listbox_row(start_element, end_element):
             box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
@@ -61,14 +64,14 @@ class FeedOptionsView(View):
         self.update_switch.connect('notify::active', self.set_update_spin_state)
         update_listbox_row = build_listbox_row(update_label, self.update_switch)
 
-        update_interval_label = Gtk.Label("Choose update-intervall")
+        update_interval_label = Gtk.Label("Choose update-interval")
         self.update_spin = Gtk.SpinButton()
         adjust_interval = Gtk.Adjustment(0, 1, 60, 1, 0, 0)
         self.update_spin.set_adjustment(adjust_interval)
         self.update_spin.set_value(10) # default update-intervall
         update_interval_listbox_row = build_listbox_row(update_interval_label, self.update_spin)
 
-        delete_label = Gtk.Label("Days, after Messages will be deleted")
+        delete_label = Gtk.Label("Days, after messages will be deleted")
         self.delete_spin = Gtk.SpinButton()
         adjust_delete = Gtk.Adjustment(0, 1, 120, 1, 10, 0)
         self.delete_spin.set_adjustment(adjust_delete)
@@ -168,27 +171,74 @@ class FeedOptionsView(View):
         self.app_window.set_title("Feed Options")
         self.app_window.button_search.set_sensitive(False)
 
-        self.app_window.button_discard.show()
+        self.button_apply_changes = Gtk.Button("Apply Changes")
+        self.button_apply_changes.get_style_context().add_class(Gtk.STYLE_CLASS_SUGGESTED_ACTION)
+
+        self.button_suggest = Gtk.Button("Add Feed")
+        self.button_suggest.get_style_context().add_class(Gtk.STYLE_CLASS_SUGGESTED_ACTION)
+
+        self.button_discard = Gtk.Button("Discard")
+        self.button_discard.get_style_context().add_class(Gtk.STYLE_CLASS_DESTRUCTIVE_ACTION)
+
+        self.button_suggest.connect("clicked", self.app_window.set_feedview)
+        self.button_discard.connect("clicked", self.app_window.discard_action)
+        self.button_apply_changes.connect("clicked", self.change_data)
+
+        self.app_window.add_widget_to_headerbar(self.button_discard, "start")
+        self.button_discard.show()
 
         if self.change_mode is True:
             print("on_view_enter in feedoptionsview, change mode:", self.change_mode)
-            #button_apply_changes = Gtk.Button()
-            #self.app_window.add_widget(button_discard, start)
-            #self.app_window.add_widget(button_apply_changes, end)
-            self.app_window.button_apply_changes.show()
+            self.app_window.add_widget_to_headerbar(self.button_apply_changes, "end")
+            self.button_apply_changes.show()
             self.naming_entry.set_editable(False)
             self.url_entry.set_editable(False)
         else:
             print("on_view_enter in feedoptionsview, show_suggest")
-            self.app_window.button_suggest.show()
+            self.app_window.add_widget_to_headerbar(self.button_suggest, "end")
+            self.button_suggest.show()
 
     def on_view_leave(self):
-        self.app_window.button_suggest.hide()
-        self.app_window.button_discard.hide()
-        self.app_window.button_apply_changes.hide()
+        if self.button_suggest and self.button_apply_changes and self.button_discard:
+            self.app_window.remove_widget_from_headerbar(self.button_suggest)
+            self.app_window.remove_widget_from_headerbar(self.button_apply_changes)
+            self.app_window.remove_widget_from_headerbar(self.button_discard)
         self.change_mode = False
         self.naming_entry.set_editable(True)
         self.url_entry.set_editable(True)
+
+    # callback_function für button_apply_changes; zum Ändern der settings im feed
+    def change_data(self, button):
+        print("change button pressed")
+        feed_to_change = self.current_feed
+        print(feed_to_change.notifications)
+        print(feed_to_change.automatic_update)
+
+        feed_to_change.automatic_update = self.get_uswitch_state()
+        feed_to_change.notifications = self.get_nswitch_state()
+        feed_to_change.update_interval = self.get_update_interval()
+        feed_to_change.add_updater(self.get_update_interval())
+        feed_to_change.delete_interval = self.get_delete_interval()
+
+        print(feed_to_change.notifications)
+        print(feed_to_change.automatic_update)
+        print("neuer update_spin Wert:", feed_to_change.update_interval)
+        print("neuer delete_spin Wert:", feed_to_change.delete_interval)
+        self.app_window.views.switch("feedview")
+        self.app_window.infobar.hide()
+        self.empty_form()
+
+    # i.O. call-back-function für feed-optionen-gewählt
+    def show_options_filled(self, feedview, feed):
+        self.set_change_mode(True)
+        self.set_current_feed(feed)
+        self.app_window.views.switch("feedoptions")
+        self.set_url(feed.get_url())
+        self.set_name(feed.get_name())
+        self.set_uswitch_state(feed.automatic_update)
+        self.set_nswitch_state(feed.notifications)
+        self.set_update_interval(feed.update_interval)
+        self.set_delete_interval(feed.delete_interval)
 
     def exception_handling(self, feedhandler, exception):
         self.app_window.infobar_label.set_text(exception)
