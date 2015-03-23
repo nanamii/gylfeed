@@ -11,6 +11,7 @@ from functools import partial
 
 # Internal:
 from feed import Feed
+from feed import SumFeed
 
 # External:
 import feedparser
@@ -45,7 +46,8 @@ class Feedhandler(GObject.GObject):
     def create_feed(self, url, feed_name, update_spin, delete_spin, update_switch, notify_switch):
         print("create_feed in Feedhandler:")
         print(len(self.feeds))
-        feed = Feed(url, feed_name, update_spin, delete_spin, update_switch, notify_switch)
+        feed = Feed(url=url, name=feed_name, update_interval=update_spin, delete_interval=delete_spin,
+                   automatic_update=update_switch, notifications=notify_switch, feedhandler=self)
         feed.connect(
             'created',
             self._create_feed_deferred,
@@ -115,10 +117,13 @@ class Feedhandler(GObject.GObject):
         self.save_to_disk()
         print(self.feeds)
 
-        feed_list = self.feeds
+
+        feeds = [f for f in self.feeds if f.feedtype == 'usual']
+
+        feed_list = feeds
         if automatic_update:
             feed_list = []
-            for feed in self.feeds:
+            for feed in feeds:
                 if feed.automatic_update:
                     print("automatic_update is false for:", feed.get_name())
                     feed_list.append(feed)
@@ -145,9 +150,12 @@ class Feedhandler(GObject.GObject):
             feed.delete_old_entries()
 
     def save_to_disk(self):
+
+        feeds = [f for f in self.feeds if f.feedtype == 'usual']
+
         try:
             with open ('feeds.pickle', 'wb') as fp:
-                pickle.dump([f.get_serializable_data() for f in self.feeds], fp)
+                pickle.dump([f.get_serializable_data() for f in feeds], fp)
                 print("Saving data to disk")
         except IOError as ie:
             print("Fail to save data {ie}".format(ie=ie))

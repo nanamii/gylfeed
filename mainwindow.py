@@ -4,6 +4,7 @@
 from gi.repository import Gtk, Gio, GLib, GdkPixbuf, GObject, Gdk
 from feedhandler import Feedhandler, load_from_disk
 from feed import Feed
+from feed import SumFeed
 from feedview import Feedview
 from feedoptionsview import FeedOptionsView
 from entrylistview import EntryListView
@@ -280,7 +281,8 @@ class MainWindow(Gtk.ApplicationWindow):
         delete_spin = self.feed_options.get_delete_interval()
         new_entries = 0
 
-        self.feedhandler.create_feed(url, feed_name, update_spin, delete_spin, update_switch, notify_switch)
+        self.feedhandler.create_feed(url, feed_name, update_spin,
+            delete_spin, update_switch, notify_switch)
 
     def on_feed_created(self, feed_handler, new_feed):
         new_entries = len(new_feed.get_entries())
@@ -332,6 +334,8 @@ class MainApplication(Gtk.Application):
             fh.feeds = [Feed(*ftuple) for ftuple in load_from_disk()]
             fh.connect_feeds()
             #fh.delete_old_entries()
+        sumFeed = SumFeed(fh)
+        fh.feeds.insert(0, sumFeed)
 
         print(fh.feeds)
         self.win = MainWindow(self, fh)

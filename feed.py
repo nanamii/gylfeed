@@ -1,4 +1,4 @@
-# usr/bin/env python3
+#!/usr/bin/env python3
 # encoding:utf8
 
 from gi.repository import GObject, GLib
@@ -19,8 +19,10 @@ class Feed(GObject.GObject):
         'updated' : (GObject.SIGNAL_RUN_FIRST, None, ())
     }
 
-    def __init__(self, url, name, update_interval, delete_interval, automatic_update=True,
-                 notifications=True, raw_feed=None, has_icon=None, icon=None):
+    def __init__(self, url=None, name=None, update_interval=None,
+        delete_interval=None, automatic_update=True, notifications=True,
+        raw_feed=None, has_icon=None, icon=None, feedhandler=None,
+        feedtype='usual'):
         GObject.GObject.__init__(self)
 
         tzset()
@@ -34,6 +36,7 @@ class Feed(GObject.GObject):
         self.new_entries = []
         self.has_icon = has_icon
         self.icon = icon
+        self.feedtype = feedtype
         self.is_clicked = False
         self.count_new_entries = 0
         self.raw_feed = raw_feed
@@ -243,4 +246,63 @@ class Feed(GObject.GObject):
                 entry["read"] = True
                 print("in Feed auf TRUE gesetzt!!")
 
+class SumFeed(Feed):
+    def __init__(self, feedhandler):
+        Feed.__init__(self, feedhandler=feedhandler, feedtype="summarized")
+        self.feedhandler = feedhandler
+        print("SumFeed erstellt")
 
+    def get_entries(self):
+        entries = []
+        feeds = [f for f in self.feedhandler.feeds if f.feedtype == 'usual']
+        for feed in feeds:
+            if feed.raw_feed:
+                for entry in feed.raw_feed.entries:
+                    stamp = mktime(entry.updated_parsed) - timezone
+                    dt = datetime.fromtimestamp(stamp)
+                    date_string = feed._date_to_string(dt.timetuple())
+                    entries.append((entry.title, entry.summary, date_string, entry.id, entry.deleted, feed))
+        return entries
+
+    def get_num_of_entries(self):
+        num_of_entries = 0
+
+        feeds = [f for f in self.feedhandler.feeds if f.feedtype == 'usual']
+        for feed in feeds:
+            for entry in feed.raw_feed.entries:
+                if entry.deleted is False:
+                    num_of_entries += 1
+        return num_of_entries
+
+    def get_num_of_new_entries(self):
+        new_entries = 0
+        feeds = [f for f in self.feedhandler.feeds if f.feedtype == 'usual']
+        for feed in feeds:
+            new_entries += len(feed.new_entries)
+        return new_entries
+
+    def get_num_of_unread(self):
+        num_of_unread = 0
+        feeds = [f for f in self.feedhandler.feeds if f.feedtype == 'usual']
+        for feed in feeds:
+            for entry in feed.raw_feed.entries:
+                if entry.read == False and entry.deleted == False:
+                    num_of_unread += 1
+        return num_of_unread
+
+    def get_num_of_counted(self):
+        counted = 0
+        feeds = [f for f in self.feedhandler.feeds if f.feedtype == 'usual']
+        for feed in feeds:
+            counted += feed.count_new_entries
+        return counted
+
+
+    def _update_recurring(self):
+        return True
+
+    def download_data(self):
+        pass
+
+    def get_name(self):
+        return "All Feeds"

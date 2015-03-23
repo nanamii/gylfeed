@@ -9,6 +9,7 @@ from view import View
 class FeedRow(Gtk.ListBoxRow):
     def __init__(self, logo, feed):
         Gtk.ListBoxRow.__init__(self)
+        print("Feedrow erstellt")
         self._feed = feed
         self._num_of_entries = feed.get_num_of_entries()
         self._num_of_new_entries = feed.get_num_of_new_entries()
@@ -170,14 +171,16 @@ class Feedview(View):
         self.listbox.connect("row-activated", self.set_row_clicked)
         self.listbox.set_border_width(0)
         self.listbox.set_vexpand(True)
-        #self.all_feeds_listbox = Gtk.ListBox()
-        #self.all_feeds_listbox.add(self.all_feeds_row())
-        #self.all_feeds_listbox.set_border_width(10)
-        #self.all_feeds_listbox.set_vexpand(False)
-        self.all_feeds_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        self.all_feeds_box.pack_start(self.all_feeds_row(), True, True, 0)
-        self.box.pack_start(self.all_feeds_box, False, False, 10)
+        #self.all_feeds_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        #self.all_feeds_box.pack_start(self.all_feeds_row(), True, True, 0)
+        #self.box.pack_start(self.all_feeds_box, False, False, 10)
         self.box.pack_end(self.listbox, True, True, 0)
+
+        sumfeed = self.app_window.feedhandler.feeds[0]
+        print(self.app_window.feedhandler.feeds[0].get_name())
+        print(sumfeed.get_name())
+        self.sum_row = FeedRow("./graphics/default_icon.png", sumfeed)
+        self.listbox.add(self.sum_row)
 
         self.scr_window.add(self.box)
         self._container.add(self.scr_window)
@@ -282,7 +285,11 @@ class Feedview(View):
         self.action_bar.hide()
 
     def on_view_enter(self):
-        for feed in self.app_window.feedhandler.get_feed_list():
+
+        feeds = [f for f in self.app_window.feedhandler.feeds if f.feedtype == 'usual']
+
+        #for feed in self.app_window.feedhandler.get_feed_list():
+        for feed in feeds:
             self.redraw_num_labels(feed)
 
         self.app_window.set_title("{num_feeds} Feeds".format(
@@ -305,9 +312,11 @@ class Feedview(View):
         self.app_window.views.go_right.set_sensitive(True)
 
     def show_feedview(self, feedlist):
-        self.clear_listbox()
-        for feed in feedlist:
-            if feed.raw_feed.bozo == 0:
+        #self.clear_listbox()
+
+        feeds = [f for f in self.app_window.feedhandler.feeds if f.feedtype == 'usual']
+        for feed in feeds:
+            if feed.raw_feed and feed.raw_feed.bozo == 0:
                 self.new_listbox_row("./graphics/default_icon.png", feed)
                 self.show_all()
                 self.app_window.views.switch("feedview")
