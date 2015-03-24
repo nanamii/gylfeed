@@ -296,8 +296,10 @@ class MainWindow(Gtk.ApplicationWindow):
 
     #callback-function für delete-feed, ok-button in ActionBar gewählt
     def delete_feed_actions(self, feedview, feed):
+        print(feed)
         self.feedhandler.delete_feed(feed)
-        self.feedview.show_feedview(self.feedhandler.feeds)
+        #self.feedview.show_feedview(self.feedhandler.feeds, init=True)
+        self.feedview.remove_feedrow(feed)
         self.entrylist.clear_listbox()
         self.feedview.action_bar.hide()
 
@@ -359,7 +361,7 @@ class MainApplication(Gtk.Application):
         self.set_accels_for_action('app.quit', ['<Ctrl>Q'])
 
         self.win.show_all()
-        self.win.feedview.show_feedview(fh.feeds)
+        self.win.feedview.show_feedview(fh.feeds, init=True)
 
 
     def action_clicked(self, *args):

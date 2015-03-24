@@ -108,8 +108,11 @@ class Feedhandler(GObject.GObject):
     def get_feed_list(self):
         return self.feeds
 
+    def get_usual_feed_list(self):
+        return [f for f in self.feeds if f.feedtype == 'usual']
+
     def count_feeds(self):
-        return len(self.feeds)
+        return len(self.feeds)-1
 
     def update_all_feeds(self, btn=None, action=None, automatic_update=None):
         print("UPDATE")
@@ -117,8 +120,7 @@ class Feedhandler(GObject.GObject):
         self.save_to_disk()
         print(self.feeds)
 
-
-        feeds = [f for f in self.feeds if f.feedtype == 'usual']
+        feeds = self.get_usual_feed_list()
 
         feed_list = feeds
         if automatic_update:
@@ -151,7 +153,7 @@ class Feedhandler(GObject.GObject):
 
     def save_to_disk(self):
 
-        feeds = [f for f in self.feeds if f.feedtype == 'usual']
+        feeds = self.get_usual_feed_list()
 
         try:
             with open ('feeds.pickle', 'wb') as fp:

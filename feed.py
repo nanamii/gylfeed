@@ -23,6 +23,7 @@ class Feed(GObject.GObject):
         delete_interval=None, automatic_update=True, notifications=True,
         raw_feed=None, has_icon=None, icon=None, feedhandler=None,
         feedtype='usual'):
+
         GObject.GObject.__init__(self)
 
         tzset()
@@ -246,6 +247,7 @@ class Feed(GObject.GObject):
                 entry["read"] = True
                 print("in Feed auf TRUE gesetzt!!")
 
+
 class SumFeed(Feed):
     def __init__(self, feedhandler):
         Feed.__init__(self, feedhandler=feedhandler, feedtype="summarized")
@@ -254,7 +256,8 @@ class SumFeed(Feed):
 
     def get_entries(self):
         entries = []
-        feeds = [f for f in self.feedhandler.feeds if f.feedtype == 'usual']
+        feeds = self.feedhandler.get_usual_feed_list()
+
         for feed in feeds:
             if feed.raw_feed:
                 for entry in feed.raw_feed.entries:
@@ -267,7 +270,8 @@ class SumFeed(Feed):
     def get_num_of_entries(self):
         num_of_entries = 0
 
-        feeds = [f for f in self.feedhandler.feeds if f.feedtype == 'usual']
+        feeds = self.feedhandler.get_usual_feed_list()
+
         for feed in feeds:
             for entry in feed.raw_feed.entries:
                 if entry.deleted is False:
@@ -276,14 +280,14 @@ class SumFeed(Feed):
 
     def get_num_of_new_entries(self):
         new_entries = 0
-        feeds = [f for f in self.feedhandler.feeds if f.feedtype == 'usual']
+        feeds = self.feedhandler.get_usual_feed_list()
         for feed in feeds:
             new_entries += len(feed.new_entries)
         return new_entries
 
     def get_num_of_unread(self):
         num_of_unread = 0
-        feeds = [f for f in self.feedhandler.feeds if f.feedtype == 'usual']
+        feeds = self.feedhandler.get_usual_feed_list()
         for feed in feeds:
             for entry in feed.raw_feed.entries:
                 if entry.read == False and entry.deleted == False:
@@ -292,11 +296,10 @@ class SumFeed(Feed):
 
     def get_num_of_counted(self):
         counted = 0
-        feeds = [f for f in self.feedhandler.feeds if f.feedtype == 'usual']
+        feeds = self.feedhandler.get_usual_feed_list()
         for feed in feeds:
-            counted += feed.count_new_entries
+            counted += feed.get_num_of_counted()
         return counted
-
 
     def _update_recurring(self):
         return True
