@@ -169,7 +169,7 @@ class Feed(GObject.GObject):
                 stamp = mktime(entry.updated_parsed) - timezone
                 dt = datetime.fromtimestamp(stamp)
                 date_string = self._date_to_string(dt.timetuple())
-                entries.append((entry.title, entry.summary, date_string, entry.id, entry.deleted, self))
+                entries.append((entry.title, entry.summary, date_string, entry.id, entry.deleted, self, entry.updated_parsed))
             return entries
 
     def get_num_of_entries(self):
@@ -259,44 +259,40 @@ class SumFeed(Feed):
         feeds = self.feedhandler.get_usual_feed_list()
 
         for feed in feeds:
-            if feed.raw_feed:
-                for entry in feed.raw_feed.entries:
-                    stamp = mktime(entry.updated_parsed) - timezone
-                    dt = datetime.fromtimestamp(stamp)
-                    date_string = feed._date_to_string(dt.timetuple())
-                    entries.append((entry.title, entry.summary, date_string, entry.id, entry.deleted, feed))
+            entries.extend(Feed.get_entries(feed))
+
         return entries
 
     def get_num_of_entries(self):
         num_of_entries = 0
-
         feeds = self.feedhandler.get_usual_feed_list()
 
         for feed in feeds:
-            for entry in feed.raw_feed.entries:
-                if entry.deleted is False:
-                    num_of_entries += 1
+            num_of_entries += Feed.get_num_of_entries(feed)
+
         return num_of_entries
 
     def get_num_of_new_entries(self):
         new_entries = 0
         feeds = self.feedhandler.get_usual_feed_list()
         for feed in feeds:
-            new_entries += len(feed.new_entries)
+            new_entries += Feed.get_num_of_new_entries(feed)
+
         return new_entries
 
     def get_num_of_unread(self):
         num_of_unread = 0
         feeds = self.feedhandler.get_usual_feed_list()
+
         for feed in feeds:
-            for entry in feed.raw_feed.entries:
-                if entry.read == False and entry.deleted == False:
-                    num_of_unread += 1
+            num_of_unread += Feed.get_num_of_unread(feed)
+
         return num_of_unread
 
     def get_num_of_counted(self):
         counted = 0
         feeds = self.feedhandler.get_usual_feed_list()
+
         for feed in feeds:
             counted += feed.get_num_of_counted()
         return counted

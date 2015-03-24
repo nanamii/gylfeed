@@ -30,11 +30,17 @@ class EntryDetailsView(View):
     def set_prev_listbox(self, prev_listbox):
         self.prev_listbox = prev_listbox
 
-    def set_entry_id(self, entry_id): 
+    def set_entry_id(self, entry_id):
         self.entry_id = entry_id
 
     def get_entry_id(self):
         return self.entry_id
+
+    def on_view_enter(self):
+        self.app_window.button_search.set_sensitive(False)
+
+    def on_view_leave(self):
+        self.app_window.button_search.set_sensitive(True)
 
     # i.O. call-back-function für listbox in entryview, Row=entry gewählt
     def show_entry_details(self, listbox, row):

@@ -25,7 +25,11 @@ class FeedRow(Gtk.ListBoxRow):
             logo = feed.icon
 
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(logo)
-        pixbuf = pixbuf.scale_simple(20, 20, GdkPixbuf.InterpType.HYPER)
+        if feed.feedtype == "summarized":
+            pixbuf = pixbuf.scale_simple(30, 30, GdkPixbuf.InterpType.HYPER)
+        else:
+            pixbuf = pixbuf.scale_simple(20, 20, GdkPixbuf.InterpType.HYPER)
+
         image = Gtk.Image()
         image.set_from_pixbuf(pixbuf)
 
@@ -38,7 +42,8 @@ class FeedRow(Gtk.ListBoxRow):
 
         feed_box.pack_start(image, False, False, 10)
         feed_box.add(feed_label)
-        feed_box.pack_end(self._opt_button, False, False, 10)
+        if feed.feedtype == "usual":
+            feed_box.pack_end(self._opt_button, False, False, 10)
         container_box.add(feed_box)
 
 
@@ -131,11 +136,23 @@ class FeedRow(Gtk.ListBoxRow):
     def get_new_entries_label(self):
         return self.new_entries_label
 
-    def redraw_labels(self):
+    def redraw_labels(self, sum_row):
+        if sum_row._feed.get_num_of_counted():
+            sum_row.new_entries_label.set_color(IndicatorLabel.SUCCESS)
+            sum_row.new_entries_label.set_text(" {num_new} ★".format(num_new=sum_row._feed.get_num_of_counted()))
+        else:
+            sum_row.new_entries_label.set_color(IndicatorLabel.THEME)
+            sum_row.new_entries_label.set_text("0 ★")
+
+        sum_row.all_label.set_text("all {num_all} ".format(num_all=sum_row._feed.get_num_of_entries()))
+        sum_row.unread_label.set_text(" unread {num_unread} ".format(num_unread=sum_row._feed.get_num_of_unread()))
+
+
         if self._feed.count_new_entries and (self._feed.is_clicked is False):
             self.new_entries_label.set_color(IndicatorLabel.SUCCESS)
             self.new_entries_label.set_text(" {num_new} ★".format(num_new=self._feed.get_num_of_counted()))
             self.all_label.set_text("all {num_all} ".format(num_all=self._feed.get_num_of_entries()))
+            self.unread_label.set_text(" unread {num_unread} ".format(num_unread=self._feed.get_num_of_unread()))
         else:
             self.new_entries_label.set_color(IndicatorLabel.THEME)
             self.new_entries_label.set_text("0 ★")
@@ -171,15 +188,15 @@ class Feedview(View):
         self.listbox.connect("row-activated", self.set_row_clicked)
         self.listbox.set_border_width(0)
         self.listbox.set_vexpand(True)
-        #self.all_feeds_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        #self.all_feeds_box.pack_start(self.all_feeds_row(), True, True, 0)
-        #self.box.pack_start(self.all_feeds_box, False, False, 10)
         self.box.pack_end(self.listbox, True, True, 0)
 
         sumfeed = self.app_window.feedhandler.feeds[0]
         print(self.app_window.feedhandler.feeds[0].get_name())
         print(sumfeed.get_name())
-        self.sum_row = FeedRow("./graphics/default_icon.png", sumfeed)
+
+
+
+        self.sum_row = FeedRow("./graphics/gylfeed_logo.png", sumfeed)
         self.listbox.add(self.sum_row)
 
         self.scr_window.add(self.box)
@@ -215,55 +232,6 @@ class Feedview(View):
         row.get_delete_button().connect("clicked", self.show_actionbar, row)
         self.listbox.add(row)
 
-    def all_feeds_row(self):
-        #all_feeds_row = Gtk.ListBoxRow()
-
-        container_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        label_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        #info_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file("./graphics/gylfeed_logo.png")
-        pixbuf = pixbuf.scale_simple(50, 50, GdkPixbuf.InterpType.HYPER)
-        image = Gtk.Image()
-        image.set_from_pixbuf(pixbuf)
-        #image.set_margin_left(15)
-        #image.set_margin_top(10)
-
-        button_grid = Gtk.Grid()
-
-        all_feeds_label = Gtk.Label("<b>All Feeds </b>")
-        new_entries_label = Gtk.Label(" X neue Entries")
-        last_update_label = Gtk.Label(" Last update at X")
-        label_box.add(all_feeds_label)
-        label_box.add(last_update_label)
-        label_box.add(new_entries_label)
-        label_box.set_margin_left(20)
-
-        button_grid.attach(image, 0, 0, 1, 1)
-        button_grid.attach(label_box, 1, 0, 10, 1)
-        button_grid.show_all()
-
-        all_feeds_button = Gtk.Button()
-        all_feeds_button.add(button_grid)
-
-        all_feeds_button.set_margin_left(10)
-        all_feeds_button.set_margin_bottom(0)
-        all_feeds_button.set_margin_top(5)
-        all_feeds_button.set_relief(Gtk.ReliefStyle.NONE)
-        all_feeds_button.set_vexpand(False)
-
-        #all_feeds_label.set_margin_left(20)
-        #all_feeds_label.set_margin_bottom(0)
-        #all_feeds_label.set_margin_top(0)
-
-        #feed_box.add(image)
-        container_box.pack_start(all_feeds_button, True, True, 10)
-
-        #container_box.pack_start(feed_box, True, True, 0)
-        #all_feeds_row.add(container_box)
-        return container_box
-
-
     def _on_options_clicked(self, button, feed):
         self.emit('preferences-clicked', feed)
 
@@ -286,9 +254,8 @@ class Feedview(View):
 
     def on_view_enter(self):
 
-        feeds = [f for f in self.app_window.feedhandler.feeds if f.feedtype == 'usual']
+        feeds = self.app_window.feedhandler.get_usual_feed_list()
 
-        #for feed in self.app_window.feedhandler.get_feed_list():
         for feed in feeds:
             self.redraw_num_labels(feed)
 
@@ -311,10 +278,18 @@ class Feedview(View):
     def on_view_leave(self):
         self.app_window.views.go_right.set_sensitive(True)
 
-    def show_feedview(self, feedlist):
-        #self.clear_listbox()
+    def remove_feedrow(self, feed):
+        for row in self.listbox:
+            if row.get_feed() == feed:
+                sel_row = self.listbox.get_row_at_index(row.get_index())
+                self.listbox.remove(sel_row)
 
-        feeds = [f for f in self.app_window.feedhandler.feeds if f.feedtype == 'usual']
+    def show_feedview(self, feedlist, init=False):
+        if init is False:
+            self.clear_listbox()
+
+        feeds = self.app_window.feedhandler.get_usual_feed_list()
+
         for feed in feeds:
             if feed.raw_feed and feed.raw_feed.bozo == 0:
                 self.new_listbox_row("./graphics/default_icon.png", feed)
@@ -327,8 +302,9 @@ class Feedview(View):
         self.listbox.select_row(self.listbox.get_row_at_index(0))
 
     def redraw_num_labels(self, feed):
+        sum_row = self.listbox.get_row_at_index(0)
+
         for row in self.listbox:
             if row.get_feed() == feed:
                 sel_row = self.listbox.get_row_at_index(row.get_index())
-                sel_row.redraw_labels()
-
+                sel_row.redraw_labels(sum_row)

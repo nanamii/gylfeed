@@ -5,7 +5,7 @@ from gi.repository import GLib, Gtk, Gio, GdkPixbuf, Gdk
 from view import View
 
 class EntryRow(Gtk.ListBoxRow):
-    def __init__(self, logo, title, time, plot, id, feed, feed_name):
+    def __init__(self, logo, title, time, plot, id, feed, updated_parsed, feed_name="FeedName"):
         Gtk.ListBoxRow.__init__(self)
 
         self.set_name("GylfeedEntryRow")
@@ -15,6 +15,7 @@ class EntryRow(Gtk.ListBoxRow):
         self._title = title
         self._id = id
         self._feed = feed
+        self._updated_parsed = updated_parsed
 
         self.container_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         headline_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
@@ -33,7 +34,7 @@ class EntryRow(Gtk.ListBoxRow):
         headline_box.pack_start(image, False, False, 10)
         headline_box.add(headline)
 
-        feed_name = Gtk.Label(feed_name)
+        feed_name = Gtk.Label(feed.get_name())
         feed_name_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         feed_name_box.pack_start(feed_name, False, False, 35)
 
@@ -54,6 +55,7 @@ class EntryRow(Gtk.ListBoxRow):
         return self._title
 
     def get_time(self):
+        print ("Time: ", self._time)
         return self._time
 
     def get_id(self):
@@ -62,23 +64,48 @@ class EntryRow(Gtk.ListBoxRow):
     def get_feed(self):
         return self._feed
 
+    def get_updated_parsed(self):
+        return self._updated_parsed
+
 
 class EntryListView(View):
     def __init__(self, app):
         View.__init__(self, app)
         self.app_window.feedview.listbox.connect('row-activated', self.show_entries)
         self.app_window.feedhandler.connect("feed-updated", self.update_entryview)
+        self.app_window.searchentry.connect('search-changed', self.get_search_entry)
 
         self.listbox = Gtk.ListBox()
         self.add(self.listbox)
+        self.search_term = ""
 
-    def new_ListBoxRow(self, logo, title, time, plot, id, feed, feed_name="FeedName"):
-        row = EntryRow(logo, title, time, plot, id, feed, feed_name)
+    def new_ListBoxRow(self, logo, title, time, plot, id, feed, updated_parsed,feed_name):
+        row = EntryRow(logo, title, time, plot, id, feed, updated_parsed, feed_name)
         row.set_margin_top(10)
         row.set_margin_bottom(10)
         self.mark_read_entries(feed, row, id)
         self.listbox.add(row)
+        self.listbox.set_sort_func(self.sort_function)
+        self.listbox.set_filter_func(self.filter_function)
         row.show_all()
+
+    def sort_function(self, row_1, row_2):
+        if row_1.get_updated_parsed() > row_2.get_updated_parsed():
+            return -1
+        elif row_1.get_updated_parsed() == row_2.get_updated_parsed():
+            return 0
+        else:
+            return 1
+
+    def filter_function(self, row):
+        query = self.search_term.lower()
+        if not query:
+            return True
+        return query in row.get_title().lower()
+
+    def get_search_entry(self, search_entry):
+        self.search_term = search_entry.get_text()
+        self.listbox.invalidate_filter()
 
     def clear_listbox(self):
         for entry in self.listbox:
@@ -98,7 +125,7 @@ class EntryListView(View):
         # hier auf None prüfen, wenn von details-Seite aus aufgerufen,
         # nichts an feed_name ändern
         selected_row = self.app_window.feedview.listbox.get_selected_row()
-        subtitle = str(selected_row.get_feed().get_num_of_entries()) + " Entries, "+ str(selected_row.get_feed().get_num_of_unread()) + " unread"
+        subtitle = str(selected_row.get_feed().get_num_of_entries())+ "Entries, "+ str(selected_row.get_feed().get_num_of_unread()) + " unread"
 
         if selected_row is not None:
             self.app_window.set_title("{feed_name}".format(
@@ -121,20 +148,16 @@ class EntryListView(View):
         print(feed.get_name())
         print("\n\n")
         feed_name = feed.get_name()
-        for title,plot,time,id,deleted,feed in entries:
+        print(len(entries[0]))
+        for title,plot,time,id,deleted,feed,updated_parsed in entries:
             if deleted is False:
                 self.new_ListBoxRow("./graphics/default_icon.png",
-                    title, time, plot, id, feed, feed_name
+                    title, time, plot, id, feed, updated_parsed, feed_name
                     )
 
     # i.O. callback-function für listbox in feedview, Row=feed gewählt
     def show_entries(self, listbox, row):
         selected_row = listbox.get_selected_row()
-        # durch update wird mit callback update_entryview aufgerufen
-        #selected_row.get_feed().update()
         self.update_entryview(None, selected_row.get_feed())
         self.app_window.views.switch("entrylist")
         self.listbox.select_row(self.listbox.get_row_at_index(0))
-
-
-
