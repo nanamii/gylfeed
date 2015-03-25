@@ -167,9 +167,9 @@ class MainWindow(Gtk.ApplicationWindow):
         infobox.add(self.infobar)
 
         self.searchbar = Gtk.SearchBar()
-        self.searchentry = Gtk.SearchEntry()
-        self.searchbar.connect_entry(self.searchentry)
-        self.searchbar.add(self.searchentry)
+        #self.searchentry = Gtk.SearchEntry()
+        #self.searchbar.connect_entry(self.searchentry)
+        #self.searchbar.add(self.searchentry)
         self.searchbar.set_hexpand(True)
         searchbox.add(self.searchbar)
         self.searchbar.set_search_mode(False)

@@ -188,13 +188,17 @@ class Feedview(View):
         self.listbox.connect("row-activated", self.set_row_clicked)
         self.listbox.set_border_width(0)
         self.listbox.set_vexpand(True)
+        self.listbox.set_filter_func(self.filter_function)
         self.box.pack_end(self.listbox, True, True, 0)
+
+        self.search_entry = None
+        #self.search_entry = Gtk.SearchEntry()
+        #self.search_entry.connect('search-changed', self.get_search_entry)
+        self.search_term = ""
 
         sumfeed = self.app_window.feedhandler.feeds[0]
         print(self.app_window.feedhandler.feeds[0].get_name())
         print(sumfeed.get_name())
-
-
 
         self.sum_row = FeedRow("./graphics/gylfeed_logo.png", sumfeed)
         self.listbox.add(self.sum_row)
@@ -252,7 +256,24 @@ class Feedview(View):
     def hide_action_bar(self, discard_button):
         self.action_bar.hide()
 
+    def filter_function(self, row):
+        query = self.search_term.lower()
+        if not query:
+            return True
+        return query in row.get_feed().get_name().lower()
+
+    def get_search_entry(self, search_entry):
+        self.search_term = search_entry.get_text()
+        self.listbox.invalidate_filter()
+
+
     def on_view_enter(self):
+        self.search_entry = Gtk.SearchEntry()
+        self.search_entry.connect('search-changed', self.get_search_entry)
+
+        self.app_window.searchbar.connect_entry(self.search_entry)
+        self.app_window.searchbar.add(self.search_entry)
+        self.search_entry.show()
 
         feeds = self.app_window.feedhandler.get_usual_feed_list()
 
@@ -276,7 +297,10 @@ class Feedview(View):
         )
 
     def on_view_leave(self):
+        self.app_window.searchbar.remove(self.search_entry)
+        #self.search_entry.destroy()
         self.app_window.views.go_right.set_sensitive(True)
+        self.app_window.searchbar.set_search_mode(False)
 
     def remove_feedrow(self, feed):
         for row in self.listbox:
