@@ -117,7 +117,7 @@ class MainWindow(Gtk.ApplicationWindow):
         box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         Gtk.StyleContext.add_class(box.get_style_context(), "linked")
 
-        searchbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        #searchbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         infobox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
@@ -133,7 +133,7 @@ class MainWindow(Gtk.ApplicationWindow):
         self.button_settings.connect("clicked", self.open_settingsmenu)
 
         self.button_search = Gtk.Button.new_from_icon_name('system-search', Gtk.IconSize.BUTTON)
-        self.button_search.connect("clicked", self.manage_searchbar)
+        #self.button_search.connect("clicked", self.manage_searchbar)
         self.button_search.set_tooltip_text("search for content")
 
         ########################################################################
@@ -166,16 +166,7 @@ class MainWindow(Gtk.ApplicationWindow):
         self.infobar.set_no_show_all(True)
         infobox.add(self.infobar)
 
-        self.searchbar = Gtk.SearchBar()
-        #self.searchentry = Gtk.SearchEntry()
-        #self.searchbar.connect_entry(self.searchentry)
-        #self.searchbar.add(self.searchentry)
-        self.searchbar.set_hexpand(True)
-        searchbox.add(self.searchbar)
-        self.searchbar.set_search_mode(False)
-
         vbox.add(infobox)
-        vbox.add(searchbox)
         vbox.pack_start(self.stack, True, True, 0)
 
         self.feed_options = FeedOptionsView(app)
@@ -326,9 +317,6 @@ class MainApplication(Gtk.Application):
 
     def do_startup(self):
         Gtk.Application.do_startup(self)
-
-        # Aktion automatisch nach x time durchfuehren
-        #GLib.timeout_add(1 * 1000, lambda: print("Tick!") or 1)
 
         fh = Feedhandler()
         if os.path.exists('feeds.pickle'):

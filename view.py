@@ -4,7 +4,7 @@
 from gi.repository import Gtk, GObject
 
 
-class View(Gtk.ScrolledWindow):
+class View(Gtk.Grid):
     """Default View class that has some utility extras.
     """
 
@@ -14,7 +14,7 @@ class View(Gtk.ScrolledWindow):
     }
 
     def __init__(self, app, sub_title=None):
-        Gtk.ScrolledWindow.__init__(self)
+        Gtk.Grid.__init__(self)
         self._app = app
         self._sub_title = sub_title or View.sub_title.default
         self._is_visible = False
@@ -22,8 +22,31 @@ class View(Gtk.ScrolledWindow):
         self.connect('view-enter', self._on_view_enter)
         self.connect('view-leave', self._on_view_leave)
 
+        self.app_window.button_search.connect('clicked', self.manage_searchbar)
+
+        self.searchbar = Gtk.SearchBar()
+        self.searchentry = Gtk.SearchEntry()
+        self.searchentry.connect('search-changed', self.invalidate_filter)
+        self.searchbar.connect_entry(self.searchentry)
+        self.searchbar.add(self.searchentry)
+        self.searchbar.set_hexpand(True)
+        self.searchbar.set_search_mode(False)
+
+        self.scrolled_window = Gtk.ScrolledWindow()
+        self.scrolled_window.props.expand = True
+        self.attach(self.searchbar, 1, 0, 1, 1)
+        self.attach(self.scrolled_window, 1, 1, 1, 1)
+
+    def add(self, widget):
+        self.scrolled_window.add(widget)
+
+    def invalidate_filter(self, searchentry):
+        if hasattr(self, 'on_invalidate_filter'):
+            self.on_invalidate_filter(searchentry)
+
     def _on_view_enter(self, _):
         self._is_visible = True
+        self.searchbar.set_search_mode(False)
 
         if hasattr(self, 'on_view_enter'):
             self.on_view_enter()
@@ -32,9 +55,17 @@ class View(Gtk.ScrolledWindow):
         # self.sub_title = self._sub_title
 
     def _on_view_leave(self, _):
+        self.searchentry.set_text("")
+        self.searchbar.set_search_mode(False)
         self._is_visible = False
+
         if hasattr(self, 'on_view_leave'):
             self.on_view_leave()
+
+    def manage_searchbar(self, _):
+        self.searchbar.set_search_mode(
+            not self.searchbar.get_search_mode()
+        )
 
     @property
     def app_window(self):
@@ -56,3 +87,7 @@ class View(Gtk.ScrolledWindow):
     @property
     def is_visible(self):
         return self._is_visible
+
+    @property
+    def search_term(self):
+        return self.searchentry.get_text()

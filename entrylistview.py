@@ -73,14 +73,9 @@ class EntryListView(View):
         View.__init__(self, app)
         self.app_window.feedview.listbox.connect('row-activated', self.show_entries)
         self.app_window.feedhandler.connect("feed-updated", self.update_entryview)
-        #self.app_window.searchentry.connect('search-changed', self.get_search_entry)
 
         self.listbox = Gtk.ListBox()
         self.add(self.listbox)
-        self.search_term = ""
-        self.search_entry = None
-        #self.search_entry = Gtk.SearchEntry()
-        #self.search_entry.connect('search-changed', self.get_search_entry)
 
     def new_ListBoxRow(self, logo, title, time, plot, id, feed, updated_parsed,feed_name):
         row = EntryRow(logo, title, time, plot, id, feed, updated_parsed, feed_name)
@@ -106,8 +101,7 @@ class EntryListView(View):
             return True
         return query in row.get_title().lower()
 
-    def get_search_entry(self, search_entry):
-        self.search_term = search_entry.get_text()
+    def on_invalidate_filter(self, searchentry):
         self.listbox.invalidate_filter()
 
     def clear_listbox(self):
@@ -127,12 +121,6 @@ class EntryListView(View):
     def on_view_enter(self):
         # hier auf None prüfen, wenn von details-Seite aus aufgerufen,
         # nichts an feed_name ändern
-        self.search_entry = Gtk.SearchEntry()
-        self.search_entry.connect('search-changed', self.get_search_entry)
-
-        self.app_window.searchbar.connect_entry(self.search_entry)
-        self.app_window.searchbar.add(self.search_entry)
-        self.search_entry.show()
 
         selected_row = self.app_window.feedview.listbox.get_selected_row()
         subtitle = str(selected_row.get_feed().get_num_of_entries())+ "Entries, "+ str(selected_row.get_feed().get_num_of_unread()) + " unread"
@@ -148,11 +136,6 @@ class EntryListView(View):
         # gelesene entries anders darstellen lassen
         for row in self.listbox:
             self.mark_read_entries(row.get_feed(), row, row.get_id())
-
-    def on_view_leave(self):
-        #self.search_entry.destroy()
-        self.app_window.searchbar.remove(self.search_entry)
-        self.app_window.searchbar.set_search_mode(False)
 
     # callback-function um feedentries darzustellen, nach update; Hilfsfunktion
     # für show_entries

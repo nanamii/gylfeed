@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # encoding:utf8
 
-from gi.repository import GObject, GLib
+from gi.repository import GObject, GLib, Notify, GdkPixbuf
 from time import strftime, tzset, mktime, timezone, time
 import time
 from datetime import datetime
@@ -155,6 +155,7 @@ class Feed(GObject.GObject):
         if len(self.new_entries) > 0:
             self.set_is_clicked(False)
             self.count_new_entries += len(self.new_entries)
+            self.send_notification()
             print("COUNT new entries nach Hochsetzen:", self.count_new_entries)
 
         #getestet, i.O.
@@ -222,6 +223,14 @@ class Feed(GObject.GObject):
     def set_delete_tag(self, feed):
         for entry in feed.entries:
             entry["deleted"] = False
+
+    def send_notification(self):
+        Notify.init("gylfeed")
+        msg=Notify.Notification.new(self.get_name(), "   "+ str(self.get_num_of_new_entries())+" new Feed-Messages")
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file("./graphics/default_icon.png")
+        msg.set_image_from_pixbuf(pixbuf)
+        msg.set_app_name("Gylfees")
+        msg.show()
 
     def delete_old_entries(self, day_range=None):
         if day_range:
