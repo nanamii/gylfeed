@@ -117,7 +117,6 @@ class MainWindow(Gtk.ApplicationWindow):
         box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         Gtk.StyleContext.add_class(box.get_style_context(), "linked")
 
-        #searchbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         infobox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
@@ -133,7 +132,6 @@ class MainWindow(Gtk.ApplicationWindow):
         self.button_settings.connect("clicked", self.open_settingsmenu)
 
         self.button_search = Gtk.Button.new_from_icon_name('system-search', Gtk.IconSize.BUTTON)
-        #self.button_search.connect("clicked", self.manage_searchbar)
         self.button_search.set_tooltip_text("search for content")
 
         ########################################################################
@@ -226,14 +224,14 @@ class MainWindow(Gtk.ApplicationWindow):
         about = Gtk.AboutDialog()
         about.set_modal(True)
         about.set_transient_for(self)
-        about.set_authors(["Sue Key <lalala@lululu.com>"])
+        about.set_authors(["Susanne Kießling <susanne.kiessling@nullcat.de>"])
         about.set_logo(pixbuf)
         about.set_program_name("gylfeed")
-        about.set_version("0.0")
+        about.set_version("1.0")
         about.set_license_type(Gtk.License.GPL_3_0)
         about.set_wrap_license(True)
         about.set_comments("gylfeed is a simple to use Feedreader")
-        about.set_copyright("by Sue Key")
+        about.set_copyright("by S. Kießling")
         about.show()
 
     def set_title(self, title=None, subtitle=None):

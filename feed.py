@@ -209,7 +209,6 @@ class Feed(GObject.GObject):
             self.count_new_entries = 0
 
     def _date_to_string(self, date_struct):
-        #return strftime("%FT%T%z", date_struct)
         return strftime("%a, %d.%b.%Y, %R", date_struct)
 
     def get_serializable_data(self):
@@ -229,7 +228,7 @@ class Feed(GObject.GObject):
         msg=Notify.Notification.new(self.get_name(), "   "+ str(self.get_num_of_new_entries())+" new Feed-Messages")
         pixbuf = GdkPixbuf.Pixbuf.new_from_file("./graphics/default_icon.png")
         msg.set_image_from_pixbuf(pixbuf)
-        msg.set_app_name("Gylfees")
+        msg.set_app_name("gylfeed")
         msg.show()
 
     def delete_old_entries(self, day_range=None):

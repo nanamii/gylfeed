@@ -195,7 +195,7 @@ class Feedview(View):
         print(self.app_window.feedhandler.feeds[0].get_name())
         print(sumfeed.get_name())
 
-        self.sum_row = FeedRow("./graphics/gylfeed_logo.png", sumfeed)
+        self.sum_row = FeedRow("./graphics/gylfeed_logo_blank.png", sumfeed)
         self.listbox.add(self.sum_row)
 
         self.scr_window.add(self.box)
