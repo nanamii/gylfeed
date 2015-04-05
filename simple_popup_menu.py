@@ -9,6 +9,7 @@ class SimplePopupMenu(Gtk.Menu):
     '''
     def __init__(self):
         Gtk.Menu.__init__(self)
+        print("SimplePOOOOOOOPup!!!!!!!!!")
 
     def _add_item(self, item):
         self.append(item)

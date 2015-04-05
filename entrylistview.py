@@ -77,17 +77,17 @@ class EntryListView(View):
         self.listbox = Gtk.ListBox()
         self.add(self.listbox)
 
-    def new_ListBoxRow(self, logo, title, time, plot, id, feed, updated_parsed,feed_name):
+    def _new_listboxrow(self, logo, title, time, plot, id, feed, updated_parsed,feed_name):
         row = EntryRow(logo, title, time, plot, id, feed, updated_parsed, feed_name)
         row.set_margin_top(10)
         row.set_margin_bottom(10)
-        self.mark_read_entries(feed, row, id)
+        self._mark_read_entries(feed, row, id)
         self.listbox.add(row)
-        self.listbox.set_sort_func(self.sort_function)
-        self.listbox.set_filter_func(self.filter_function)
+        self.listbox.set_sort_func(self._sort_function)
+        self.listbox.set_filter_func(self._filter_function)
         row.show_all()
 
-    def sort_function(self, row_1, row_2):
+    def _sort_function(self, row_1, row_2):
         if row_1.get_updated_parsed() > row_2.get_updated_parsed():
             return -1
         elif row_1.get_updated_parsed() == row_2.get_updated_parsed():
@@ -95,7 +95,7 @@ class EntryListView(View):
         else:
             return 1
 
-    def filter_function(self, row):
+    def _filter_function(self, row):
         query = self.search_term.lower()
         if not query:
             return True
@@ -111,7 +111,7 @@ class EntryListView(View):
     def get_listbox(self):
         return self.listbox
 
-    def mark_read_entries(self, feed, row, id):
+    def _mark_read_entries(self, feed, row, id):
         for entry in feed.raw_feed.entries:
             if id == entry.id:
                 if entry.read == True:
@@ -135,7 +135,7 @@ class EntryListView(View):
 
         # gelesene entries anders darstellen lassen
         for row in self.listbox:
-            self.mark_read_entries(row.get_feed(), row, row.get_id())
+            self._mark_read_entries(row.get_feed(), row, row.get_id())
 
     # callback-function um feedentries darzustellen, nach update; Hilfsfunktion
     # für show_entries
@@ -149,7 +149,7 @@ class EntryListView(View):
         print(len(entries[0]))
         for title,plot,time,id,deleted,feed,updated_parsed in entries:
             if deleted is False:
-                self.new_ListBoxRow("./graphics/default_icon.png",
+                self._new_listboxrow("./graphics/default_icon.png",
                     title, time, plot, id, feed, updated_parsed, feed_name
                     )
 
