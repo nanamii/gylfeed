@@ -262,16 +262,25 @@ class MainWindow(Gtk.ApplicationWindow):
 
     # callback-function für feedview_add_feed(durch OK-Button ausgelöst)
     def set_feedview(self, ok_button):
-        url = self.feed_options.get_url()
-        feed_name = self.feed_options.get_name()
-        update_switch = self.feed_options.get_uswitch_state()
-        notify_switch = self.feed_options.get_nswitch_state()
-        update_spin = self.feed_options.get_update_interval()
-        delete_spin = self.feed_options.get_delete_interval()
-        new_entries = 0
+        #url = self.feed_options.get_url()
+        #feed_name = self.feed_options.get_name()
+        #update_switch = self.feed_options.get_uswitch_state()
+        #notify_switch = self.feed_options.get_nswitch_state()
+        #update_spin = self.feed_options.get_update_interval()
+        #delete_spin = self.feed_options.get_delete_interval()
 
-        self.feedhandler.create_feed(url, feed_name, update_spin,
-            delete_spin, update_switch, notify_switch)
+        init_data = {"url":self.feed_options.get_url(),
+                     "feed_name":self.feed_options.get_name(),
+                     "update_spin":self.feed_options.get_update_interval(),
+                     "delete_spin":self.feed_options.get_delete_interval(),
+                     "update_switch":self.feed_options.get_uswitch_state(),
+                     "notify_switch":self.feed_options.get_nswitch_state()
+                     }
+
+        self.feedhandler.create_feed(init_data)
+
+        #self.feedhandler.create_feed(url, feed_name, update_spin,
+        #   delete_spin, update_switch, notify_switch)
 
     def on_feed_created(self, feed_handler, new_feed):
         new_entries = len(new_feed.get_entries())
@@ -320,8 +329,7 @@ class MainApplication(Gtk.Application):
         if os.path.exists('feeds.pickle'):
             print("pickle vorhanden")
             fh.feeds = [Feed(*ftuple) for ftuple in load_from_disk()]
-            #fh.connect_feeds()
-            #fh.delete_old_entries()
+            fh.delete_old_entries()
         sumFeed = SumFeed(fh)
         fh.feeds.insert(0, sumFeed)
 

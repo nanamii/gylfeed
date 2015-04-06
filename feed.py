@@ -19,21 +19,25 @@ class Feed(GObject.GObject):
         'updated' : (GObject.SIGNAL_RUN_FIRST, None, ())
     }
 
-    def __init__(self, url=None, name=None, update_interval=None,
-        delete_interval=None, automatic_update=True, notifications=True,
+    def __init__(self, init_data,
         raw_feed=None, has_icon=None, icon=None, feedhandler=None,
         feedtype='usual'):
+
+        #(self, url=None, name=None, update_interval=None,
+        #delete_interval=None, automatic_update=True, notifications=True,
+        #raw_feed=None, has_icon=None, icon=None, feedhandler=None,
+        #feedtype='usual'):
 
         GObject.GObject.__init__(self)
 
         tzset()
 
-        self.url = url
-        self.name = name
-        self.automatic_update = automatic_update
-        self.notifications = notifications
-        self.update_interval = update_interval
-        self.delete_interval = delete_interval
+        self.url = init_data["url"]
+        self.name = init_data["feed_name"]
+        self.automatic_update = init_data["update_switch"]
+        self.notifications = init_data["notify_switch"]
+        self.update_interval = init_data["update_spin"]
+        self.delete_interval = init_data["delete_spin"]
         self.new_entries = []
         self.has_icon = has_icon
         self.icon = icon
@@ -251,8 +255,17 @@ class Feed(GObject.GObject):
 
 
 class SumFeed(Feed):
+
+    init_data = {"url":"sumFeed",
+                "feed_name":"sumFeed",
+                "update_spin":10,
+                "delete_spin":30,
+                "update_switch":True,
+                "notify_switch":True
+                }
+
     def __init__(self, feedhandler):
-        Feed.__init__(self, feedhandler=feedhandler, feedtype="summarized")
+        Feed.__init__(self, type(self).init_data, feedhandler=feedhandler, feedtype="summarized")
         self.feedhandler = feedhandler
         print("SumFeed erstellt")
 
