@@ -188,7 +188,7 @@ class Feedview(View):
         self.listbox.connect("row-activated", self.set_row_clicked)
         self.listbox.set_border_width(0)
         self.listbox.set_vexpand(True)
-        self.listbox.set_filter_func(self.filter_function)
+        self.listbox.set_filter_func(self._filter_function)
         self.box.pack_end(self.listbox, True, True, 0)
 
         sumfeed = self.app_window.feedhandler.feeds[0]
@@ -244,20 +244,20 @@ class Feedview(View):
     def set_row_clicked(self, listbox, _):
         listbox.get_selected_row().get_feed().set_is_clicked(True)
 
-    def clear_listbox(self):
+    def _clear_listbox(self):
         for feed in self.listbox:
             self.listbox.remove(feed)
 
     def hide_action_bar(self, discard_button):
         self.action_bar.hide()
 
-    def filter_function(self, row):
+    def _filter_function(self, row):
         query = self.search_term.lower()
         if not query:
             return True
         return query in row.get_feed().get_name().lower()
 
-    def on_invalidate_filter(self, searchentry):
+    def _on_invalidate_filter(self, searchentry):
         self.listbox.invalidate_filter()
 
     def on_view_enter(self):
@@ -293,7 +293,7 @@ class Feedview(View):
 
     def show_feedview(self, feedlist, init=False):
         if init is False:
-            self.clear_listbox()
+            self._clear_listbox()
 
         feeds = self.app_window.feedhandler.get_usual_feed_list()
 

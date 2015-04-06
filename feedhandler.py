@@ -15,7 +15,6 @@ from feed import SumFeed
 
 # External:
 import feedparser
-
 from gi.repository import Gtk, GObject, GLib
 
 
@@ -32,17 +31,6 @@ class Feedhandler(GObject.GObject):
         GObject.GObject.__init__(self)
         self.feeds = []
 
-        """def _update_recurring():
-            self.update_all_feeds(None, None, True)
-
-            # TODO: Return settings.do_auto_update
-            return True
-
-        GLib.timeout_add(
-            1 * 60 * 1000, _update_recurring
-
-        )"""
-
     def create_feed(self, url, feed_name, update_spin, delete_spin, update_switch, notify_switch):
         print("create_feed in Feedhandler:")
         print(len(self.feeds))
@@ -55,11 +43,7 @@ class Feedhandler(GObject.GObject):
         )
 
     def _create_feed_deferred(self, feed, url, feed_name):
-        import pprint
-        print('rawfeed ppritn')
-        pprint.pprint(feed)
-
-        if self.no_entry_text(url, feed_name):
+        if self._no_entry_text(url, feed_name):
             if len(feed_name) == 0:
                 self.emit('feed-add-exception', "Keinen Feednamen eingetragen, bitte eintragen!")
             if len(url) == 0:
@@ -70,12 +54,12 @@ class Feedhandler(GObject.GObject):
             self.emit('feed-add-exception', "URL liefert kein Ergebnis, bitte erneut eingeben.")
             return
 
-        if self.feed_exists(url):
+        if self._feed_exists(url):
             print("Feed bereits vorhanden!!")
             self.emit('feed-add-exception', "Feed bereits vorhanden!")
             return
 
-        if self.feed_name_exists(feed_name):
+        if self._feed_name_exists(feed_name):
             print("Es ist bereits ein Feed mit diesem Namen vorhanden, bitte anderen Namen wählen!")
             self.emit('feed-add-exception', "Es ist bereits ein Feed mit diesem Namen vorhanden, bitte anderen Namen wählen!")
             return
@@ -88,19 +72,19 @@ class Feedhandler(GObject.GObject):
 
         self.emit('feed-created', feed)
 
-    def feed_exists(self, url):
+    def _feed_exists(self, url):
         for feed in self.feeds:
             if feed.get_url() == url:
                 return True
         return False
 
-    def feed_name_exists(self, feed_name):
+    def _feed_name_exists(self, feed_name):
         for feed in self.feeds:
             if feed.get_name() == feed_name:
                 return True
         return False
 
-    def no_entry_text(self, url, feed_name):
+    def _no_entry_text(self, url, feed_name):
         if len(url) == 0 or len(feed_name) == 0:
             return True
         return False
@@ -114,22 +98,14 @@ class Feedhandler(GObject.GObject):
     def count_feeds(self):
         return len(self.feeds)-1
 
-    def update_all_feeds(self, btn=None, action=None, automatic_update=None):
+    def update_all_feeds(self, btn=None, action=None):
         print("UPDATE")
         # TODO: save after update done.
         self.save_to_disk()
         print(self.feeds)
 
         feeds = self.get_usual_feed_list()
-
         feed_list = feeds
-        if automatic_update:
-            feed_list = []
-            for feed in feeds:
-                if feed.automatic_update:
-                    print("automatic_update is false for:", feed.get_name())
-                    feed_list.append(feed)
-
 
         for feed in feed_list:
             print(feed.get_name(), "feedprint in update_all_feeds, feedhandler")
@@ -138,9 +114,9 @@ class Feedhandler(GObject.GObject):
 
 
     # TODO: warum so gelöst?
-    def connect_feeds(self):
-        for feed in self.feeds:
-            feed.connect('updated', self.sig_feed_updated)
+    #def connect_feeds(self):
+     #   for feed in self.feeds:
+      #      feed.connect('updated', self.sig_feed_updated)
 
     def delete_feed(self, feed):
         for f in self.feeds:

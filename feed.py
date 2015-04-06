@@ -42,10 +42,7 @@ class Feed(GObject.GObject):
         self.count_new_entries = 0
         self.raw_feed = raw_feed
         if raw_feed is None:
-            self.download_data()
-
-        print("update_interval:", update_interval)
-        print("delete_interval:", delete_interval)
+            self._download_data()
 
         self.update_id = None
         self.add_updater(self.update_interval)
@@ -68,7 +65,7 @@ class Feed(GObject.GObject):
         # TODO: Return settings.do_auto_update
         return True
 
-    def load_icon(self, url):
+    def _load_icon(self, url):
         document = DOWNLOADER.download(url, check_if_needed=False)
         document.connect('finish', self._load_icon_deferred)
 
@@ -81,20 +78,20 @@ class Feed(GObject.GObject):
         self.icon = temp_path
         self.emit('created')
 
-    def download_data(self):
+    def _download_data(self):
         document = DOWNLOADER.download(self.url, check_if_needed=False)
-        document.connect('finish', self.parse)
+        document.connect('finish', self._parse)
 
-    def parse(self, document):
+    def _parse(self, document):
         self.raw_feed = feedparser.parse(document.data)
         if self.raw_feed.bozo == 0:
-            self.set_read_tag(self.raw_feed)
-            self.set_delete_tag(self.raw_feed)
+            self._set_read_tag(self.raw_feed)
+            self._set_delete_tag(self.raw_feed)
             print(self.raw_feed.entries[0].read)
 
             try:
                 if self.raw_feed.feed.icon:
-                    self.load_icon(self.raw_feed.feed.icon)
+                    self._load_icon(self.raw_feed.feed.icon)
                     self.has_icon = True
                     # url = self.raw_feed.feed.icon
                     # logo_raw = urllib.request.urlretrieve(url)
@@ -110,25 +107,25 @@ class Feed(GObject.GObject):
         print("update called", self.url)
         document = DOWNLOADER.download(self.url)
         if document is not None:
-            document.connect('finish', self.parse_update)
+            document.connect('finish', self._parse_update)
         else:
             self.emit("updated")
 
-    def parse_update(self, document):
+    def _parse_update(self, document):
         print("parse_update in feed")
         if self.raw_feed:
             if document:
                 try:
                     new_raw_feed = feedparser.parse(document.data)
                     print("before compare_entries Aufruf")
-                    self.compare_entries(new_raw_feed)
+                    self._compare_entries(new_raw_feed)
                     #hier noch überlegen, in welchem Fall signal abgesetzt wird !!!
                     self.emit('updated')
                 except AttributeError as aerror:
                     print(aerror)
 
     # wird durch update aufgerufen
-    def compare_entries(self, new_raw_feed):
+    def _compare_entries(self, new_raw_feed):
 
         self.new_entries = []
         for new_entry in new_raw_feed.entries:
@@ -155,7 +152,7 @@ class Feed(GObject.GObject):
         if len(self.new_entries) > 0:
             self.set_is_clicked(False)
             self.count_new_entries += len(self.new_entries)
-            self.send_notification()
+            self._send_notification()
             print("COUNT new entries nach Hochsetzen:", self.count_new_entries)
 
         #getestet, i.O.
@@ -200,9 +197,6 @@ class Feed(GObject.GObject):
     def get_num_of_counted(self):
         return self.count_new_entries
 
-    def _is_modified(self, feed):
-        return feed.status != '304' and feed.feed
-
     def set_is_clicked(self, clicked):
         self.is_clicked = clicked
         if clicked:
@@ -215,15 +209,15 @@ class Feed(GObject.GObject):
         return (self.url, self.name, self.update_interval, self.delete_interval,
                 self.automatic_update, self.notifications, self.raw_feed, self.has_icon, self.icon)
 
-    def set_read_tag(self, feed):
+    def _set_read_tag(self, feed):
         for entry in feed.entries:
             entry["read"] = False
 
-    def set_delete_tag(self, feed):
+    def _set_delete_tag(self, feed):
         for entry in feed.entries:
             entry["deleted"] = False
 
-    def send_notification(self):
+    def _send_notification(self):
         Notify.init("gylfeed")
         msg=Notify.Notification.new(self.get_name(), "   "+ str(self.get_num_of_new_entries())+" new Feed-Messages")
         pixbuf = GdkPixbuf.Pixbuf.new_from_file("./graphics/default_icon.png")
@@ -308,7 +302,7 @@ class SumFeed(Feed):
     def _update_recurring(self):
         return True
 
-    def download_data(self):
+    def _download_data(self):
         pass
 
     def get_name(self):

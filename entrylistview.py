@@ -101,7 +101,7 @@ class EntryListView(View):
             return True
         return query in row.get_title().lower()
 
-    def on_invalidate_filter(self, searchentry):
+    def _on_invalidate_filter(self, searchentry):
         self.listbox.invalidate_filter()
 
     def clear_listbox(self):

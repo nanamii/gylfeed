@@ -42,7 +42,7 @@ class View(Gtk.Grid):
 
     def invalidate_filter(self, searchentry):
         if hasattr(self, 'on_invalidate_filter'):
-            self.on_invalidate_filter(searchentry)
+            self._on_invalidate_filter(searchentry)
 
     def _on_view_enter(self, _):
         self._is_visible = True

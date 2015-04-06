@@ -320,7 +320,7 @@ class MainApplication(Gtk.Application):
         if os.path.exists('feeds.pickle'):
             print("pickle vorhanden")
             fh.feeds = [Feed(*ftuple) for ftuple in load_from_disk()]
-            fh.connect_feeds()
+            #fh.connect_feeds()
             #fh.delete_old_entries()
         sumFeed = SumFeed(fh)
         fh.feeds.insert(0, sumFeed)
