@@ -33,16 +33,8 @@ class Feedhandler(GObject.GObject):
         self.feeds = []
 
     def create_feed(self, init_data):
-    #(self, url, feed_name, update_spin, delete_spin,
-    #                update_switch, notify_switch):
         """ Create a feed-object by given parameters. """
         feed = Feed(init_data, feedhandler=self)
-
-        #feed = Feed(
-        #    url=url, name=feed_name, update_interval=update_spin,
-        #    delete_interval=delete_spin, automatic_update=update_switch,
-        #    notifications=notify_switch, feedhandler=self
-        #)
 
         feed.connect(
             'created',

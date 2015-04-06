@@ -129,7 +129,7 @@ class MainWindow(Gtk.ApplicationWindow):
         ##############################################################################
 
         self.button_settings = Gtk.Button.new_from_icon_name('view-sidebar-symbolic', Gtk.IconSize.BUTTON)
-        self.button_settings.connect("clicked", self.open_settingsmenu)
+        self.button_settings.connect("clicked", self._open_settingsmenu)
 
         self.button_search = Gtk.Button.new_from_icon_name('system-search', Gtk.IconSize.BUTTON)
         self.button_search.set_tooltip_text("search for content")
@@ -182,9 +182,9 @@ class MainWindow(Gtk.ApplicationWindow):
 
         self.views.switch("feedview")
 
-        self.connect("key_press_event", self.key_navigation)
+        self.connect("key_press_event", self._key_navigation)
 
-    def key_navigation(self, window, event):
+    def _key_navigation(self, window, event):
         print("key clicked")
         print(event.keyval)
         key = event.keyval
@@ -243,11 +243,12 @@ class MainWindow(Gtk.ApplicationWindow):
             not self.searchbar.get_search_mode()
         )
 
-    def open_settingsmenu(self, _):
+    def _open_settingsmenu(self, _):
         self.popover.show_all()
 
     # callback-function für update-button
     def update_clicked(self, update):
+        print("Update_button pressed")
         self.feedhandler.update()
 
     # callback-function für add-feed im settings-menu
@@ -262,13 +263,6 @@ class MainWindow(Gtk.ApplicationWindow):
 
     # callback-function für feedview_add_feed(durch OK-Button ausgelöst)
     def set_feedview(self, ok_button):
-        #url = self.feed_options.get_url()
-        #feed_name = self.feed_options.get_name()
-        #update_switch = self.feed_options.get_uswitch_state()
-        #notify_switch = self.feed_options.get_nswitch_state()
-        #update_spin = self.feed_options.get_update_interval()
-        #delete_spin = self.feed_options.get_delete_interval()
-
         init_data = {"url":self.feed_options.get_url(),
                      "feed_name":self.feed_options.get_name(),
                      "update_spin":self.feed_options.get_update_interval(),
@@ -276,11 +270,7 @@ class MainWindow(Gtk.ApplicationWindow):
                      "update_switch":self.feed_options.get_uswitch_state(),
                      "notify_switch":self.feed_options.get_nswitch_state()
                      }
-
         self.feedhandler.create_feed(init_data)
-
-        #self.feedhandler.create_feed(url, feed_name, update_spin,
-        #   delete_spin, update_switch, notify_switch)
 
     def on_feed_created(self, feed_handler, new_feed):
         new_entries = len(new_feed.get_entries())

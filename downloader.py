@@ -40,7 +40,7 @@ class Downloader():
             stream = self._session.send(header)
             stream.read_bytes(self.CHUNK_SIZE)
 
-            etag = self.get_etag(header)
+            etag = self._get_etag(header)
             print("checking etag for ", url)
             if etag and etag == self.dict_etag.get(url):
                 return None
@@ -48,16 +48,16 @@ class Downloader():
             self.dict_etag[url] = etag
 
             print("checking lastmodi for ", url)
-            lastmodi = self.get_lastmodified(header)
+            lastmodi = self._get_lastmodified(header)
             if lastmodi and lastmodi == self.dict_lastmodi.get(url):
                 return None
 
             print("Okay, fucked up.")
             self.dict_lastmodi[url] = lastmodi
 
-        return self.get_data(url)
+        return self._get_data(url)
 
-    def get_data(self, url):
+    def _get_data(self, url):
         message = Soup.Message.new("GET", url)
         document = Document()
         stream = self._session.send_async(
@@ -69,10 +69,10 @@ class Downloader():
     def _get_data_deferred(self, session, result, document):
         stream = session.send_finish(result)
         stream.read_bytes_async(
-            self.CHUNK_SIZE, 0, callback=self.a_callback, user_data=document
+            self.CHUNK_SIZE, 0, callback=self._a_callback, user_data=document
         )
 
-    def a_callback(self, source, result, document):
+    def _a_callback(self, source, result, document):
         bytes_ =  source.read_bytes_finish(result)
         data = bytes_.get_data()
         if not data:
@@ -81,13 +81,13 @@ class Downloader():
 
         document._append(data)
         source.read_bytes_async(
-            self.CHUNK_SIZE, 0, callback=self.a_callback, user_data=document
+            self.CHUNK_SIZE, 0, callback=self._a_callback, user_data=document
         )
 
-    def get_etag(self, header):
+    def _get_etag(self, header):
         return header.response_headers.get("Etag")
 
-    def get_lastmodified(self, header):
+    def _get_lastmodified(self, header):
         return header.response_headers.get("Last-Modified")
 
 

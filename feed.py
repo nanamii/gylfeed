@@ -15,18 +15,12 @@ DOWNLOADER = Downloader()
 
 class Feed(GObject.GObject):
     __gsignals__ = {
-        'created' : (GObject.SIGNAL_RUN_FIRST, None, ()),
-        'updated' : (GObject.SIGNAL_RUN_FIRST, None, ())
+        'created': (GObject.SIGNAL_RUN_FIRST, None, ()),
+        'updated': (GObject.SIGNAL_RUN_FIRST, None, ())
     }
 
-    def __init__(self, init_data,
-        raw_feed=None, has_icon=None, icon=None, feedhandler=None,
-        feedtype='usual'):
-
-        #(self, url=None, name=None, update_interval=None,
-        #delete_interval=None, automatic_update=True, notifications=True,
-        #raw_feed=None, has_icon=None, icon=None, feedhandler=None,
-        #feedtype='usual'):
+    def __init__(self, init_data, raw_feed=None, has_icon=None,
+                 icon=None, feedhandler=None, feedtype='usual'):
 
         GObject.GObject.__init__(self)
 
@@ -210,8 +204,15 @@ class Feed(GObject.GObject):
         return strftime("%a, %d.%b.%Y, %R", date_struct)
 
     def get_serializable_data(self):
-        return (self.url, self.name, self.update_interval, self.delete_interval,
-                self.automatic_update, self.notifications, self.raw_feed, self.has_icon, self.icon)
+        save_data = {"url":self.url,
+                     "feed_name":self.name,
+                     "update_spin":self.update_interval,
+                     "delete_spin":self.delete_interval,
+                     "update_switch":self.automatic_update,
+                     "notify_switch":self.notifications
+                     }
+
+        return (save_data, self.raw_feed, self.has_icon, self.icon)
 
     def _set_read_tag(self, feed):
         for entry in feed.entries:
