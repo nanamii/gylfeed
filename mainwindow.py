@@ -91,6 +91,7 @@ class ViewSwitcher(Gtk.Box):
         self._set_visible_child(widget)
         self._update_sensitivness()
 
+    # wird aktuell nicht genutzt
     def switch_to_previous(self):
         if self._prev is None:
             return
@@ -238,18 +239,8 @@ class MainWindow(Gtk.ApplicationWindow):
         self.headerbar.set_title(title)
         self.headerbar.set_subtitle(subtitle)
 
-    def manage_searchbar(self, _):
-        self.searchbar.set_search_mode(
-            not self.searchbar.get_search_mode()
-        )
-
     def _open_settingsmenu(self, _):
         self.popover.show_all()
-
-    # callback-function für update-button
-    def update_clicked(self, update):
-        print("Update_button pressed")
-        self.feedhandler.update()
 
     # callback-function für add-feed im settings-menu
     def add_feed_clicked(self, add, name):
@@ -262,7 +253,7 @@ class MainWindow(Gtk.ApplicationWindow):
         self.feed_options.empty_form()
 
     # callback-function für feedview_add_feed(durch OK-Button ausgelöst)
-    def set_feedview(self, ok_button):
+     def set_feedview(self, ok_button):
         init_data = {"url":self.feed_options.get_url(),
                      "feed_name":self.feed_options.get_name(),
                      "update_spin":self.feed_options.get_update_interval(),
@@ -286,7 +277,6 @@ class MainWindow(Gtk.ApplicationWindow):
     def delete_feed_actions(self, feedview, feed):
         print(feed)
         self.feedhandler.delete_feed(feed)
-        #self.feedview.show_feedview(self.feedhandler.feeds, init=True)
         self.feedview.remove_feedrow(feed)
         self.entrylist.clear_listbox()
         self.feedview.action_bar.hide()
@@ -345,7 +335,7 @@ class MainApplication(Gtk.Application):
         self.set_accels_for_action('app.quit', ['<Ctrl>Q'])
 
         self.win.show_all()
-        self.win.feedview.show_feedview(fh.feeds, init=True)
+        self.win.feedview.show_feedview(fh.feeds)
 
 
     def action_clicked(self, *args):

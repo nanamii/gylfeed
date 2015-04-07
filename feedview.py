@@ -291,10 +291,7 @@ class Feedview(View):
                 sel_row = self.listbox.get_row_at_index(row.get_index())
                 self.listbox.remove(sel_row)
 
-    def show_feedview(self, feedlist, init=False):
-        if init is False:
-            self._clear_listbox()
-
+    def show_feedview(self, feedlist):
         feeds = self.app_window.feedhandler.get_usual_feed_list()
 
         for feed in feeds:
