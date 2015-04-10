@@ -253,7 +253,7 @@ class MainWindow(Gtk.ApplicationWindow):
         self.feed_options.empty_form()
 
     # callback-function für feedview_add_feed(durch OK-Button ausgelöst)
-     def set_feedview(self, ok_button):
+    def set_feedview(self, ok_button):
         init_data = {"url":self.feed_options.get_url(),
                      "feed_name":self.feed_options.get_name(),
                      "update_spin":self.feed_options.get_update_interval(),

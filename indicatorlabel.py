@@ -10,7 +10,7 @@ class IndicatorLabel(Gtk.Label):
     There are 3 colors available, plus a color derived from the
     theme's main color. In case of Adwaita blue.
     """
-    SUCCESS, WARNING, ERROR, THEME = range(1, 5)
+    SUCCESS, WARNING, ERROR, THEME, DEFAULT = range(1, 6)
 
     def __init__(self, *args):
         Gtk.Label.__init__(self, *args)
@@ -30,7 +30,8 @@ class IndicatorLabel(Gtk.Label):
             IndicatorLabel.ERROR: 'AppIndicatorLabelError',
             IndicatorLabel.SUCCESS: 'AppIndicatorLabelSuccess',
             IndicatorLabel.WARNING: 'AppIndicatorLabelWarning',
-            IndicatorLabel.THEME: 'AppIndicatorLabelTheme'
+            IndicatorLabel.THEME: 'AppIndicatorLabelTheme',
+            IndicatorLabel.DEFAULT: 'AppIndicatorLabelDefault'
         }
 
         # Will act as normal label for invalid states.

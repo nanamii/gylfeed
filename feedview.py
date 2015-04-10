@@ -28,10 +28,11 @@ class FeedRow(Gtk.ListBoxRow):
         if feed.feedtype == "summarized":
             pixbuf = pixbuf.scale_simple(30, 30, GdkPixbuf.InterpType.HYPER)
         else:
-            pixbuf = pixbuf.scale_simple(20, 20, GdkPixbuf.InterpType.HYPER)
+            pixbuf = pixbuf.scale_simple(30, 30, GdkPixbuf.InterpType.HYPER)
 
         image = Gtk.Image()
         image.set_from_pixbuf(pixbuf)
+        image.set_margin_top(10)
 
         feed_label_text = GLib.markup_escape_text(self._feed_name, -1)
         feed_label = Gtk.Label(feed_label_text)
@@ -67,23 +68,24 @@ class FeedRow(Gtk.ListBoxRow):
 
         if self._feed.count_new_entries and (self._feed.is_clicked is False):
             self.new_entries_label.set_color(IndicatorLabel.SUCCESS)
-            self.new_entries_label.set_text(" {num_new} ★".format(num_new=self._feed.count_new_entries))
+            self.new_entries_label.set_text("__ {num_new} ★".format(num_new=self._feed.count_new_entries))
         else:
             self.new_entries_label.set_color(IndicatorLabel.THEME)
             self.new_entries_label.set_text("0")
 
-        self.new_entries_label.set_margin_left(35)
+
+        self.new_entries_label.set_margin_left(48)
         self.new_entries_label.set_margin_right(5)
         self.new_entries_label.set_margin_bottom(10)
 
         self.all_label = IndicatorLabel("<b> all {num_all} </b>".format(num_all=self._num_of_entries))
-        self.all_label.set_color(IndicatorLabel.WARNING)
+        self.all_label.set_color(IndicatorLabel.DEFAULT)
         self.all_label.set_margin_right(5)
         self.all_label.set_no_show_all(True)
         self.all_label.set_margin_bottom(10)
 
         self.unread_label = IndicatorLabel(" unread {num_unread} ".format(num_unread=self._num_of_unread_entries))
-        self.unread_label.set_color(IndicatorLabel.WARNING)
+        self.unread_label.set_color(IndicatorLabel.DEFAULT)
         self.unread_label.set_margin_right(5)
         self.unread_label.set_no_show_all(True)
         self.unread_label.set_margin_bottom(10)
@@ -195,7 +197,7 @@ class Feedview(View):
         print(self.app_window.feedhandler.feeds[0].get_name())
         print(sumfeed.get_name())
 
-        self.sum_row = FeedRow("./graphics/gylfeed_logo_blank.png", sumfeed)
+        self.sum_row = FeedRow("./graphics/sum.png", sumfeed)
         self.listbox.add(self.sum_row)
 
         self.scr_window.add(self.box)
