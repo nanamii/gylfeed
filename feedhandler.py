@@ -36,6 +36,7 @@ class Feedhandler(GObject.GObject):
         """ Create a feed-object by given parameters. """
         feed = Feed(init_data, feedhandler=self)
 
+        feed.connect('updated', self.sig_feed_updated)
         feed.connect(
             'created',
             self._create_feed_deferred,
@@ -80,7 +81,6 @@ class Feedhandler(GObject.GObject):
             )
             return
 
-        feed.connect('updated', self.sig_feed_updated)
         self.feeds.append(feed)
         self.emit('feed-created', feed)
 
@@ -108,6 +108,11 @@ class Feedhandler(GObject.GObject):
             return True
         return False
 
+    def _connect_feeds(self):
+        feed_list = self.get_usual_feed_list()
+        for feed in feed_list:
+            feed.connect('updated', self.sig_feed_updated)
+
     def get_feed_list(self):
         """ Return list with feeds. """
         return self.feeds
@@ -122,8 +127,6 @@ class Feedhandler(GObject.GObject):
 
     def update_all_feeds(self, btn=None, action=None):
         """ Update all feeds, holding in feedlist. """
-        # TODO: save after update done.
-        self.save_to_disk()
 
         feeds = self.get_usual_feed_list()
         feed_list = feeds
@@ -163,6 +166,7 @@ class Feedhandler(GObject.GObject):
         """ Callback-function to signal 'updated' from class Feed.
             Emits signal 'feed-updated'.
         """
+        self.save_to_disk()
         self.emit('feed-updated', feed)
 
 

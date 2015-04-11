@@ -118,6 +118,7 @@ class Feed(GObject.GObject):
                     print("before compare_entries Aufruf")
                     self._compare_entries(new_raw_feed)
                     #hier noch überlegen, in welchem Fall signal abgesetzt wird !!!
+                    print("VOR self.emit in _parse_update")
                     self.emit('updated')
                 except AttributeError as aerror:
                     print(aerror)

@@ -27,20 +27,26 @@ class EntryRow(Gtk.ListBoxRow):
         pixbuf = pixbuf.scale_simple(20, 20, GdkPixbuf.InterpType.HYPER)
         image = Gtk.Image()
         image.set_from_pixbuf(pixbuf)
+        image.set_margin_top(10)
 
         headline_text = GLib.markup_escape_text(self._title, -1)
         headline = Gtk.Label(headline_text)
         headline.set_markup("<b>{htext}</b>".format(htext=headline_text))
         headline_box.pack_start(image, False, False, 10)
         headline_box.add(headline)
+        headline.set_margin_top(10)
+
+        self.check_read = Gtk.Label("✓")
+        self.check_read.set_no_show_all(True)
+        headline_box.pack_end(self.check_read, False, False, 10)
 
         feed_name = Gtk.Label(feed.get_name())
         feed_name_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        feed_name_box.pack_start(feed_name, False, False, 35)
+        feed_name_box.pack_start(feed_name, False, False, 40)
 
         time = Gtk.Label(self._time)
         time_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        time_box.pack_start(time, False, False, 35)
+        time_box.pack_start(time, False, False, 40)
 
         self.container_box.add(headline_box)
         self.container_box.add(feed_name_box)
@@ -79,8 +85,8 @@ class EntryListView(View):
 
     def _new_listboxrow(self, logo, title, time, plot, id, feed, updated_parsed,feed_name):
         row = EntryRow(logo, title, time, plot, id, feed, updated_parsed, feed_name)
-        row.set_margin_top(10)
-        row.set_margin_bottom(10)
+        #row.set_margin_top(2)
+        #row.set_margin_bottom(2)
         self._mark_read_entries(feed, row, id)
         self.listbox.add(row)
         self.listbox.set_sort_func(self._sort_function)
@@ -116,6 +122,7 @@ class EntryListView(View):
             if id == entry.id:
                 if entry.read == True:
                     row.get_style_context().add_class("read")
+                    row.check_read.show()
                     # row.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(.5,.5,.5,.5))
 
     def on_view_enter(self):

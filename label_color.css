@@ -13,12 +13,18 @@ GtkLabel#new_entries_label {
 }
 
 #GylfeedEntryRow {
-    font-weight: bold;
+    /*font-weight: bold;*/
 }
 
 #GylfeedEntryRow.read {
-    background-color: alpha(black, 0.2);
+    /*background-color: alpha(green, 0.2);*/
     font-weight: normal;
+    color: grey;
+    font-size: smaller;
+}
+
+#GylfeedEntryRow.read:selected{
+    color: white;
 }
 
 

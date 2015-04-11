@@ -227,6 +227,7 @@ class FeedOptionsView(View):
         self.app_window.views.switch("feedview")
         self.app_window.infobar.hide()
         self.empty_form()
+        self.app.fh.save_to_disk()
 
     # i.O. call-back-function für feed-optionen-gewählt
     def show_options_filled(self, feedview, feed):

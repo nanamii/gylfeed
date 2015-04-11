@@ -305,16 +305,18 @@ class MainApplication(Gtk.Application):
     def do_startup(self):
         Gtk.Application.do_startup(self)
 
-        fh = Feedhandler()
+        self.fh = Feedhandler()
         if os.path.exists('feeds.pickle'):
             print("pickle vorhanden")
-            fh.feeds = [Feed(*ftuple) for ftuple in load_from_disk()]
-            fh.delete_old_entries()
-        sumFeed = SumFeed(fh)
-        fh.feeds.insert(0, sumFeed)
+            self.fh.feeds = [Feed(*ftuple) for ftuple in load_from_disk()]
+            self.fh._connect_feeds()
+            self.fh.update_all_feeds()
+            self.fh.delete_old_entries()
+        sumFeed = SumFeed(self.fh)
+        self.fh.feeds.insert(0, sumFeed)
 
-        print(fh.feeds)
-        self.win = MainWindow(self, fh)
+        print(self.fh.feeds)
+        self.win = MainWindow(self, self.fh)
 
         def create_action(name, callback=None):
             action = Gio.SimpleAction.new(name, None)
@@ -326,17 +328,22 @@ class MainApplication(Gtk.Application):
             return action
 
         self.add_action(create_action("add", self.win.add_feed_clicked))
-        self.add_action(create_action("update", fh.update_all_feeds))
+        self.add_action(create_action("update", self.fh.update_all_feeds))
         self.add_action(create_action("about", self.win.show_about))
-        self.add_action(create_action("quit", callback=lambda *_: self.quit()))
+        self.add_action(create_action("quit", lambda *_: self.quit()))
         self.add_action(create_action("save"))
 
         self.set_accels_for_action('app.add', ['<Ctrl>A'])
         self.set_accels_for_action('app.quit', ['<Ctrl>Q'])
 
         self.win.show_all()
-        self.win.feedview.show_feedview(fh.feeds)
+        self.win.feedview.show_feedview(self.fh.feeds)
+        self.connect('shutdown', MainApplication.on_shutdown)
 
+    def on_shutdown(self):
+        print("quitting!")
+        self.fh.save_to_disk()
+        Gtk.Application.quit(self)
 
     def action_clicked(self, *args):
         print(args)
