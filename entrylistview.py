@@ -64,6 +64,9 @@ class EntryRow(Gtk.ListBoxRow):
         print ("Time: ", self._time)
         return self._time
 
+    def get_entrylink(self):
+        return self._entrylink
+
     def get_id(self):
         return self._id
 
@@ -130,7 +133,7 @@ class EntryListView(View):
         # nichts an feed_name ändern
 
         selected_row = self.app_window.feedview.listbox.get_selected_row()
-        subtitle = str(selected_row.get_feed().get_num_of_entries())+ "Entries, "+ str(selected_row.get_feed().get_num_of_unread()) + " unread"
+        subtitle = str(selected_row.get_feed().get_num_of_entries())+ " Entries, "+ str(selected_row.get_feed().get_num_of_unread()) + " unread"
 
         if selected_row is not None:
             self.app_window.set_title("{feed_name}".format(

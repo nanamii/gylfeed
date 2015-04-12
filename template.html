@@ -1,16 +1,17 @@
 <html>
     <style type="text/css">    
-    h2 {margin-top:30px;
-        margin-bottom:1px; 
+    h2 {margin-top:35px;
+        margin-bottom:5px; 
         padding-bottom:1px; 
-        padding-left:15px;
-        line-height:25px;}
-    h3 {margin-top:1px
-        padding-top:1px
+        padding-left:20px;
+        line-height:28px;}
+    t   {margin-top:10px
+        padding-top:5px
         margin-bottom:20px; 
         padding-bottom:1px; 
-        padding-left:15px; 
-        font-family:sans; 
+        padding-left:20px;
+        font-family:sans;
+        font-weight:bold;
         color:grey;
         font-size:10pt;}
     hr {width:400px; 
@@ -21,15 +22,20 @@
         text-align:left; 
         border:1px;}
     p   {font-family:serif;
-        padding-left:15px;
-        font-size:120%;
+        padding-left:20px;
+        font-size:130%;
         line-height:150%
         }
+
+    l {background-color:grey;
+
+    
+    }
     </style>
     <body>
         <h2>{{ headline }}</h2>
-        <h3>{{ author }}</h3>
-        <hr></hr>
+        <t>{{ time }}</t>
         <p>{{ plot }}</p>
+        <a href={{ link }}>{{ link }}</a>
     </body>
 </html>

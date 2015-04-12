@@ -20,11 +20,12 @@ class EntryDetailsView(View):
         self.prev_listbox = None
         self.entry_id = None
 
-    def load_headline(self, headline, author, plot):
+    def load_headline(self, headline, time, plot, link):
         with open("template.html", "r") as fd:
             text = fd.read()
         template = Template(text)
-        var = template.render(headline=headline, author=author, plot=plot)
+        var = template.render(headline=headline, time=time, plot=plot,
+            link=link)
         self.web.load_string(var, "text/html", "UTF-8", "/")
 
     def set_prev_listbox(self, prev_listbox):
@@ -45,7 +46,8 @@ class EntryDetailsView(View):
     # i.O. call-back-function für listbox in entryview, Row=entry gewählt
     def show_entry_details(self, listbox, row):
         selected_row = listbox.get_selected_row()
-        self.load_headline(selected_row.get_title(),selected_row.get_time(), selected_row.get_plot())
+        self.load_headline(selected_row.get_title(),selected_row.get_time(),
+            selected_row.get_plot(), selected_row.get_id())
         self.app_window.views.switch("entrydetails")
         selected_row.get_feed().set_entry_is_read(selected_row.get_id())
         self.set_prev_listbox(listbox)
