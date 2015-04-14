@@ -68,12 +68,12 @@ class Feed(GObject.GObject):
         document.connect('finish', self._load_icon_deferred)
 
     def _load_icon_deferred(self, document):
-        temp_path = tempfile.mktemp(".icon", "gylfeed-")
-        with open(temp_path, "wb") as handle:
+        path = "./feedicons/" + self.name + ".icon"
+        with open(path, "wb") as handle:
             handle.write(document.data)
 
-        print(temp_path)
-        self.icon = temp_path
+        print(path)
+        self.icon = path
         self.emit('created')
 
     def _download_data(self):

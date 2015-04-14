@@ -21,43 +21,76 @@
         margin-left:15px; 
         text-align:left; 
         border:1px;}
-    p   {font-family:serif;
+    p   {
+        font-family: "Vollkorn", Arial, sans-serif;
+        /*font-weight:light;*/
         padding-left:20px;
-        font-size:130%;
-        line-height:150%
+        font-size:120%;
+        line-height:140%
         }
 
     l {background-color:grey;}
 
-    .button {
-        background-color: #a8a8a8
-        border: solid 5px rgba(120,118,120,1);
+    /*.button {
+        background-color: rgba(196, 196, 191, 1);
+        border: solid 5px rgba(196,196,191,1);
         border-width: 5px 5px 5px 5px;
         -webkit-border-radius: 2px;
         -moz-border-radius: 2px;
         border-radius: 2px;
         width: 90px;
-        height: 18px;
-        padding: 6px;
+        height: 15px;
+        padding: 3px;
+        margin-left:15px;
         display: inline-block;
         color: rgba(255,255,255,1);
         font-weight: bold;
-        font-size: 10px
+        font-size: 12px;
+        font-family:sans
         }
     .button:hover {
-        background-color: rgba(120,110,120,1);
+        background-color: rgba(196,196,191,1);
+        margin-left:15px;
         width: 93px;
-        padding: 7px;
+        height:18;
+        padding: 3px;
         }
     .button:active {
         width: 65px;
-        }
+        margin-left:15px;
+        }*/
 
+    .button {
+        width:100px;
+        font-size:15px;
+        }
+    .container {
+	    top:110px;
+	    bottom:0;
+	    min-width:550px;
+        }
+    .button {
+        font-size:15px;
+        border-radius:4px;
+        background-color:#555555;
+        color:#ffffff;
+        border:1px solid #555555;
+        padding:4px 15px;
+        margin-left:15px;
+        width:auto;
+	    cursor:pointer;    
+        }
+    .button:hover {
+        background-color:#777777;
+        }
+    .button:active {
+        background-color:#222222;
+    }
     </style>
     <body>
         <h2>{{ headline }}</h2>
         <t>{{ time }}</t>
         <p>{{ plot }}</p>
-        <a class="button" href={{ link }}Browse Source</a>
+        <!-- <a class="button" href={{ link }}> Get Source </a> -->
     </body>
-</html>>
+</html>
