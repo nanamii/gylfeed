@@ -105,6 +105,7 @@ class MainWindow(Gtk.ApplicationWindow):
         Gtk.ApplicationWindow.__init__(self, title="gylfeed - Feedreader", application=app)
         app.win = self
         self.set_default_size(800, 600)
+        self.set_default_icon(self._load_application_icon())
         self.feedhandler = feedhandler
 
         feedhandler.connect('feed-created', self.on_feed_created)
@@ -184,6 +185,11 @@ class MainWindow(Gtk.ApplicationWindow):
         self.views.switch("feedview")
 
         self.connect("key_press_event", self._key_navigation)
+
+
+    def _load_application_icon(self):
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file("./graphics/gylfeed_logo_blank.png")
+        return pixbuf
 
     def _key_navigation(self, window, event):
         print("key clicked")

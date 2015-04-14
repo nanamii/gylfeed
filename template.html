@@ -27,15 +27,37 @@
         line-height:150%
         }
 
-    l {background-color:grey;
+    l {background-color:grey;}
 
-    
-    }
+    .button {
+        background-color: #a8a8a8
+        border: solid 5px rgba(120,118,120,1);
+        border-width: 5px 5px 5px 5px;
+        -webkit-border-radius: 2px;
+        -moz-border-radius: 2px;
+        border-radius: 2px;
+        width: 90px;
+        height: 18px;
+        padding: 6px;
+        display: inline-block;
+        color: rgba(255,255,255,1);
+        font-weight: bold;
+        font-size: 10px
+        }
+    .button:hover {
+        background-color: rgba(120,110,120,1);
+        width: 93px;
+        padding: 7px;
+        }
+    .button:active {
+        width: 65px;
+        }
+
     </style>
     <body>
         <h2>{{ headline }}</h2>
         <t>{{ time }}</t>
         <p>{{ plot }}</p>
-        <a href={{ link }}>{{ link }}</a>
+        <a class="button" href={{ link }}Browse Source</a>
     </body>
-</html>
+</html>>
