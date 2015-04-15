@@ -27,14 +27,17 @@ class EntryDetailsView(View):
         self.prev_listbox = None
         self.entry_id = None
 
-        self.browse_button = Gtk.Button("Browse Source")
+
+        image = Gtk.Image.new_from_icon_name('edit-redo-symbolic', Gtk.IconSize.BUTTON)
+        self.browse_button = Gtk.Button(label=" Show Article ", image=image)
+
         self.browse_button.set_valign(Gtk.Align.END)
         self.browse_button.set_halign(Gtk.Align.START)
-        self.browse_button.set_margin_start(15)
+        self.browse_button.set_margin_start(20)
         self.browse_button.set_margin_bottom(15)
         self.browse_button.set_relief(Gtk.ReliefStyle.NONE)
         self.browse_button.connect("clicked", self.browse_link)
-
+        self.browse_button.set_always_show_image (True)
         self.overlay.add_overlay(self.browse_button)
         self.overlay.show()
 

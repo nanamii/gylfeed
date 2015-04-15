@@ -226,9 +226,10 @@ class Feed(GObject.GObject):
     def _send_notification(self):
         Notify.init("gylfeed")
         msg=Notify.Notification.new(self.get_name(), "   "+ str(self.get_num_of_new_entries())+" new Feed-Messages")
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file("./graphics/default_icon.png")
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file("./graphics/gylfeed_logo_blank.png")
         msg.set_image_from_pixbuf(pixbuf)
         msg.set_app_name("gylfeed")
+        msg.set_timeout(60*1000)
         msg.show()
 
     def delete_old_entries(self, day_range=None):
