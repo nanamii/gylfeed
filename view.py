@@ -41,7 +41,7 @@ class View(Gtk.Grid):
         self.scrolled_window.add(widget)
 
     def invalidate_filter(self, searchentry):
-        if hasattr(self, 'on_invalidate_filter'):
+        if hasattr(self, '_on_invalidate_filter'):
             self._on_invalidate_filter(searchentry)
 
     def _on_view_enter(self, _):
@@ -66,6 +66,7 @@ class View(Gtk.Grid):
         self.searchbar.set_search_mode(
             not self.searchbar.get_search_mode()
         )
+        self.searchentry.grab_focus()
 
     @property
     def app_window(self):

@@ -227,7 +227,7 @@ class Feedview(View):
 
     def new_listbox_row(self, logo, feed):
         row = FeedRow(logo, feed)
-        row.grab_focus()
+        #row.grab_focus()
         row.get_set_button().connect("clicked", self._on_options_clicked, feed)
         row.get_pref_button().connect("clicked", row.show_revealer)
         row.get_delete_button().connect("clicked", self.show_actionbar, row)

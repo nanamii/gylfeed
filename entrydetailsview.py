@@ -14,7 +14,7 @@ class EntryDetailsView(View):
 
         self.overlay = Gtk.Overlay()
         self.web = WebKit.WebView()
-        self.web.grab_focus()
+        #self.web.grab_focus()
         self.web.set_size_request(300, 200)
 
         scw = Gtk.ScrolledWindow()

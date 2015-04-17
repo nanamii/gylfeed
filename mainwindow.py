@@ -132,21 +132,24 @@ class MainWindow(Gtk.ApplicationWindow):
 
         self.button_settings = Gtk.Button.new_from_icon_name('view-sidebar-symbolic', Gtk.IconSize.BUTTON)
         self.button_settings.connect("clicked", self._open_settingsmenu)
+        self.button_settings.set_tooltip_text("General Options \n -Add Feed \n -Update")
 
         self.button_search = Gtk.Button.new_from_icon_name('system-search', Gtk.IconSize.BUTTON)
-        self.button_search.set_tooltip_text("search for content")
+        self.button_search.set_tooltip_text("Search for Content")
 
         ########################################################################
         def create_item(name, action, icon):
             item = Gio.MenuItem.new(name, action)
             item.set_icon(Gio.ThemedIcon.new(icon))
+            item.set_attribute_value("accel", GLib.Variant("s","<F5>"))
             return item
 
+
         menu = Gio.Menu()
-        menu.append_item(create_item('Add Feed', 'app.add', 'add'))
-        menu.append_item(create_item('Update Feeds', 'app.update', 'reload'))
+        menu.append_item(create_item('Add Feed              <Ctrl>+A', 'app.add', 'add'))
+        menu.append_item(create_item('Update Feeds       <Ctrl>+R', 'app.update', 'reload'))
         menu.append_item(create_item('About gylfeed', 'app.about','help-about'))
-        menu.append_item(create_item('Quit', 'app.quit', 'window-close'))
+        menu.append_item(create_item('Quit                      <Ctrl>+Q', 'app.quit', 'window-close'))
 
         self.popover = Gtk.Popover.new_from_model(self.button_settings, menu)
         self.popover.get_preferred_size()
@@ -296,6 +299,10 @@ class MainWindow(Gtk.ApplicationWindow):
     def remove_widget_from_headerbar(self, widget):
         widget.destroy()
 
+    def emit_search_signal(self, _, __):
+        self.button_search.emit('clicked')
+
+
 
 class MainApplication(Gtk.Application):
     def __init__(self):
@@ -328,7 +335,7 @@ class MainApplication(Gtk.Application):
             action = Gio.SimpleAction.new(name, None)
 
             if callback is None:
-                action.connect('activate', self.action_clicked)
+                    action.connect('activate', self.action_clicked)
             else:
                 action.connect('activate', callback)
             return action
@@ -337,10 +344,14 @@ class MainApplication(Gtk.Application):
         self.add_action(create_action("update", self.fh.update_all_feeds))
         self.add_action(create_action("about", self.win.show_about))
         self.add_action(create_action("quit", lambda *_: self.quit()))
-        self.add_action(create_action("save"))
+        self.add_action(create_action("search", self.win.emit_search_signal))
+        #self.add_action(create_action("save" ))
 
         self.set_accels_for_action('app.add', ['<Ctrl>A'])
         self.set_accels_for_action('app.quit', ['<Ctrl>Q'])
+        self.set_accels_for_action('app.update', ['<Ctrl>R'])
+        self.set_accels_for_action('app.search', ['<Ctrl>F'])
+
 
         self.win.show_all()
         self.win.feedview.show_feedview(self.fh.feeds)
