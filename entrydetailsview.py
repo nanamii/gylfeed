@@ -14,7 +14,6 @@ class EntryDetailsView(View):
 
         self.overlay = Gtk.Overlay()
         self.web = WebKit.WebView()
-        #self.web.grab_focus()
         self.web.set_size_request(300, 200)
 
         scw = Gtk.ScrolledWindow()
@@ -26,7 +25,6 @@ class EntryDetailsView(View):
         self.author = ""
         self.prev_listbox = None
         self.entry_id = None
-
 
         image = Gtk.Image.new_from_icon_name('edit-redo-symbolic', Gtk.IconSize.BUTTON)
         self.browse_button = Gtk.Button(label=" Show Article ", image=image)

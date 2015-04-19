@@ -9,7 +9,6 @@ from view import View
 class FeedRow(Gtk.ListBoxRow):
     def __init__(self, logo, feed):
         Gtk.ListBoxRow.__init__(self)
-        print("Feedrow erstellt")
         self._feed = feed
         self._num_of_entries = feed.get_num_of_entries()
         self._num_of_new_entries = feed.get_num_of_new_entries()
@@ -26,9 +25,9 @@ class FeedRow(Gtk.ListBoxRow):
 
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(logo)
         if feed.feedtype == "summarized":
-            pixbuf = pixbuf.scale_simple(30, 30, GdkPixbuf.InterpType.HYPER)
+            pixbuf = pixbuf.scale_simple(25, 25, GdkPixbuf.InterpType.HYPER)
         else:
-            pixbuf = pixbuf.scale_simple(30, 30, GdkPixbuf.InterpType.HYPER)
+            pixbuf = pixbuf.scale_simple(25, 25, GdkPixbuf.InterpType.HYPER)
 
         image = Gtk.Image()
         image.set_from_pixbuf(pixbuf)
@@ -63,8 +62,6 @@ class FeedRow(Gtk.ListBoxRow):
         #######################################################
 
         self.new_entries_label = IndicatorLabel()
-        print("Neu hinzugekommene entries: {}".format(self._num_of_new_entries))
-        print("Hochgezählter entries counter: {}".format(self._feed.count_new_entries))
 
         if self._feed.count_new_entries and (self._feed.is_clicked is False):
             self.new_entries_label.set_color(IndicatorLabel.SUCCESS)
@@ -100,7 +97,7 @@ class FeedRow(Gtk.ListBoxRow):
         self.delete_button.set_relief(Gtk.ReliefStyle.NONE)
 
         self.settings_button = Gtk.Button.new_from_icon_name('view-more-symbolic', Gtk.IconSize.BUTTON)
-        self.settings_button.set_label("Settings")
+        self.settings_button.set_label("Options")
         self.settings_button.set_relief(Gtk.ReliefStyle.NONE)
 
         self.revealer = Gtk.Revealer()
@@ -194,8 +191,6 @@ class Feedview(View):
         self.box.pack_end(self.listbox, True, True, 0)
 
         sumfeed = self.app_window.feedhandler.feeds[0]
-        print(self.app_window.feedhandler.feeds[0].get_name())
-        print(sumfeed.get_name())
 
         self.sum_row = FeedRow("./graphics/sum.png", sumfeed)
         self.listbox.add(self.sum_row)
@@ -227,7 +222,6 @@ class Feedview(View):
 
     def new_listbox_row(self, logo, feed):
         row = FeedRow(logo, feed)
-        #row.grab_focus()
         row.get_set_button().connect("clicked", self._on_options_clicked, feed)
         row.get_pref_button().connect("clicked", row.show_revealer)
         row.get_delete_button().connect("clicked", self.show_actionbar, row)
@@ -301,10 +295,6 @@ class Feedview(View):
                 self.new_listbox_row("./graphics/default_icon.png", feed)
                 self.show_all()
                 self.app_window.views.switch("feedview")
-        #self.feedview.listbox.set_can_focus(True)
-        #self.feedview.listbox.get_row_at_index(0).set_can_focus(True)
-        #self.feedview.listbox.get_row_at_index(0).grab_focus()
-        #self.feedview.listbox.get_row_at_index(0).set_activatable(True)
         self.listbox.select_row(self.listbox.get_row_at_index(0))
 
     def redraw_num_labels(self, feed):

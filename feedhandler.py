@@ -132,8 +132,6 @@ class Feedhandler(GObject.GObject):
         feed_list = feeds
 
         for feed in feed_list:
-            print(feed.get_name(), "feedprint in update_all_feeds, feedhandler")
-
             GLib.idle_add(partial(Feed.update, self=feed))
 
     def delete_feed(self, feed):

@@ -223,11 +223,6 @@ class MainWindow(Gtk.ApplicationWindow):
                 return
             else:
                 self.views.go_left.emit("clicked")
-            #self.is_focus()
-            #print(self.has_focus())
-            #self.entrylist.listbox.set_can_focus(True)
-            #self.entrylist.listbox.get_row_at_index(0).set_can_focus(True)
-            #self.entrylist.listbox.get_row_at_index(0).grab_focus()
 
     def show_about(self, about_button, action):
         pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size("./graphics/gylfeed_logo.png", 120, 240)
@@ -284,7 +279,6 @@ class MainWindow(Gtk.ApplicationWindow):
 
     #callback-function für delete-feed, ok-button in ActionBar gewählt
     def delete_feed_actions(self, feedview, feed):
-        print(feed)
         self.feedhandler.delete_feed(feed)
         self.feedview.remove_feedrow(feed)
         self.entrylist.clear_listbox()
@@ -320,15 +314,13 @@ class MainApplication(Gtk.Application):
 
         self.fh = Feedhandler()
         if os.path.exists('feeds.pickle'):
-            print("pickle vorhanden")
             self.fh.feeds = [Feed(*ftuple) for ftuple in load_from_disk()]
             self.fh._connect_feeds()
             self.fh.update_all_feeds()
             self.fh.delete_old_entries()
+
         sumFeed = SumFeed(self.fh)
         self.fh.feeds.insert(0, sumFeed)
-
-        print(self.fh.feeds)
         self.win = MainWindow(self, self.fh)
 
         def create_action(name, callback=None):

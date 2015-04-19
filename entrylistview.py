@@ -61,7 +61,6 @@ class EntryRow(Gtk.ListBoxRow):
         return self._title
 
     def get_time(self):
-        print ("Time: ", self._time)
         return self._time
 
     def get_entrylink(self):
@@ -88,8 +87,6 @@ class EntryListView(View):
 
     def _new_listboxrow(self, logo, title, time, plot, id, feed, updated_parsed,feed_name):
         row = EntryRow(logo, title, time, plot, id, feed, updated_parsed, feed_name)
-        #row.set_margin_top(2)
-        #row.set_margin_bottom(2)
         self._mark_read_entries(feed, row, id)
         self.listbox.add(row)
         self.listbox.set_sort_func(self._sort_function)
@@ -129,9 +126,6 @@ class EntryListView(View):
                     # row.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(.5,.5,.5,.5))
 
     def on_view_enter(self):
-        # hier auf None prüfen, wenn von details-Seite aus aufgerufen,
-        # nichts an feed_name ändern
-
         selected_row = self.app_window.feedview.listbox.get_selected_row()
         subtitle = str(selected_row.get_feed().get_num_of_entries())+ " Entries, "+ str(selected_row.get_feed().get_num_of_unread()) + " unread"
 
@@ -152,11 +146,7 @@ class EntryListView(View):
     def update_entryview(self, feedhandler=None, feed=None):
         self.clear_listbox()
         entries = feed.get_entries()
-        print("update_entryview in entrylistview, Anzahl Entries:", len(entries))
-        print(feed.get_name())
-        print("\n\n")
         feed_name = feed.get_name()
-        print(len(entries[0]))
         for title,plot,time,id,deleted,feed,updated_parsed in entries:
             if deleted is False:
                 self._new_listboxrow("./graphics/default_icon.png",

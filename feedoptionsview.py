@@ -52,10 +52,10 @@ class FeedOptionsView(View):
         self.url_entry.set_placeholder_text("Type in the URL of Feed ...")
         url_listbox_row = build_listbox_row(url_label, self.url_entry)
 
-        naming_label = Gtk.Label("Set a feed name:")
+        naming_label = Gtk.Label("Set a Feed name:")
         self.naming_entry = Gtk.Entry()
         self.naming_entry.set_width_chars(40)
-        self.naming_entry.set_placeholder_text("Type in the name for Feed. max. 10 chars")
+        self.naming_entry.set_placeholder_text("Type in the name for Feed ...")
         name_listbox_row = build_listbox_row(naming_label, self.naming_entry)
 
         update_label = Gtk.Label("Update feed automatic")
@@ -64,16 +64,16 @@ class FeedOptionsView(View):
         self.update_switch.connect('notify::active', self.set_update_spin_state)
         update_listbox_row = build_listbox_row(update_label, self.update_switch)
 
-        update_interval_label = Gtk.Label("Choose update-interval")
+        update_interval_label = Gtk.Label("Choose update-interval, in minutes")
         self.update_spin = Gtk.SpinButton()
-        adjust_interval = Gtk.Adjustment(0, 1, 60, 1, 0, 0)
+        adjust_interval = Gtk.Adjustment(0, 1, 120, 1, 0, 0)
         self.update_spin.set_adjustment(adjust_interval)
         self.update_spin.set_value(10) # default update-intervall
         update_interval_listbox_row = build_listbox_row(update_interval_label, self.update_spin)
 
         delete_label = Gtk.Label("Days, after messages will be deleted")
         self.delete_spin = Gtk.SpinButton()
-        adjust_delete = Gtk.Adjustment(0, 1, 120, 1, 10, 0)
+        adjust_delete = Gtk.Adjustment(0, 1, 360, 1, 10, 0)
         self.delete_spin.set_adjustment(adjust_delete)
         self.delete_spin.set_value(30) # default delete-value
         delete_listbox_row = build_listbox_row(delete_label, self.delete_spin)
@@ -188,13 +188,11 @@ class FeedOptionsView(View):
         self.button_discard.show()
 
         if self.change_mode is True:
-            print("on_view_enter in feedoptionsview, change mode:", self.change_mode)
             self.app_window.add_widget_to_headerbar(self.button_apply_changes, "end")
             self.button_apply_changes.show()
             self.naming_entry.set_editable(False)
             self.url_entry.set_editable(False)
         else:
-            print("on_view_enter in feedoptionsview, show_suggest")
             self.app_window.add_widget_to_headerbar(self.button_suggest, "end")
             self.button_suggest.show()
 
@@ -209,21 +207,13 @@ class FeedOptionsView(View):
 
     # callback_function für button_apply_changes; zum Ändern der settings im feed
     def change_data(self, button):
-        print("change button pressed")
         feed_to_change = self.current_feed
-        print(feed_to_change.notifications)
-        print(feed_to_change.automatic_update)
-
         feed_to_change.automatic_update = self.get_uswitch_state()
         feed_to_change.notifications = self.get_nswitch_state()
         feed_to_change.update_interval = self.get_update_interval()
         feed_to_change.add_updater(self.get_update_interval())
         feed_to_change.delete_interval = self.get_delete_interval()
 
-        print(feed_to_change.notifications)
-        print(feed_to_change.automatic_update)
-        print("neuer update_spin Wert:", feed_to_change.update_interval)
-        print("neuer delete_spin Wert:", feed_to_change.delete_interval)
         self.app_window.views.switch("feedview")
         self.app_window.infobar.hide()
         self.empty_form()

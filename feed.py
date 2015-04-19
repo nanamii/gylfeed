@@ -72,7 +72,6 @@ class Feed(GObject.GObject):
         with open(path, "wb") as handle:
             handle.write(document.data)
 
-        print(path)
         self.icon = path
         self.emit('created')
 
@@ -85,16 +84,11 @@ class Feed(GObject.GObject):
         if self.raw_feed.bozo == 0:
             self._set_read_tag(self.raw_feed)
             self._set_delete_tag(self.raw_feed)
-            print(self.raw_feed.entries[0].read)
 
             try:
                 if self.raw_feed.feed.icon:
                     self._load_icon(self.raw_feed.feed.icon)
                     self.has_icon = True
-                    # url = self.raw_feed.feed.icon
-                    # logo_raw = urllib.request.urlretrieve(url)
-                    # logo = logo_raw[0]
-                    # self.icon = logo
             except AttributeError as aerr:
                 print(aerr)
 
@@ -102,7 +96,6 @@ class Feed(GObject.GObject):
             self.emit('created')
 
     def update(self):
-        print("update called", self.url)
         document = DOWNLOADER.download(self.url)
         if document is not None:
             document.connect('finish', self._parse_update)
@@ -110,15 +103,12 @@ class Feed(GObject.GObject):
             self.emit("updated")
 
     def _parse_update(self, document):
-        print("parse_update in feed")
+        print("Updating Feed: "+self.name)
         if self.raw_feed:
             if document:
                 try:
                     new_raw_feed = feedparser.parse(document.data)
-                    print("before compare_entries Aufruf")
                     self._compare_entries(new_raw_feed)
-                    #hier noch überlegen, in welchem Fall signal abgesetzt wird !!!
-                    print("VOR self.emit in _parse_update")
                     self.emit('updated')
                 except AttributeError as aerror:
                     print(aerror)
@@ -130,8 +120,6 @@ class Feed(GObject.GObject):
         for new_entry in new_raw_feed.entries:
                 if new_entry.id not in [entry.id for entry in self.raw_feed.entries]:
                     self.new_entries.append(new_entry)
-        print("compare_entries in Feed", self.get_name(), "!!!!...new_entries:")
-        print("Neue Entries in compare_entries:", len(self.new_entries))
 
         try:
             if new_raw_feed.entries[0].published_parsed:
@@ -147,12 +135,10 @@ class Feed(GObject.GObject):
             print(ae)
 
 
-        print("NEUEEEEEEE Entries im Feed:", len(self.new_entries))
         if len(self.new_entries) > 0:
             self.set_is_clicked(False)
             self.count_new_entries += len(self.new_entries)
             self._send_notification()
-            print("COUNT new entries nach Hochsetzen:", self.count_new_entries)
 
         #getestet, i.O.
         for entry in self.new_entries:
@@ -232,11 +218,8 @@ class Feed(GObject.GObject):
         msg.set_timeout(60*1000)
         msg.show()
 
-    def delete_old_entries(self, day_range=None):
-        if day_range:
-            DAY_RANGE = day_range
-        else:
-            DAY_RANGE = 30*24*60*60
+    def delete_old_entries(self):
+        DAY_RANGE = self.delete_interval*24*60*60
 
         min_local_time = time.gmtime(time.time() - DAY_RANGE)
 
@@ -246,7 +229,6 @@ class Feed(GObject.GObject):
                     entry["deleted"] = True
                 else:
                     entry["deleted"] = False
-                print("deleted? ", entry.deleted)
             except:
                 print("delete_old_entries, except")
 
@@ -270,7 +252,6 @@ class SumFeed(Feed):
     def __init__(self, feedhandler):
         Feed.__init__(self, type(self).init_data, feedhandler=feedhandler, feedtype="summarized")
         self.feedhandler = feedhandler
-        print("SumFeed erstellt")
 
     def get_entries(self):
         entries = []

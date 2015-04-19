@@ -52,7 +52,7 @@ class Downloader():
             if lastmodi and lastmodi == self.dict_lastmodi.get(url):
                 return None
 
-            print("Okay, fucked up.")
+            print("No etag or lastmodi, get all.")
             self.dict_lastmodi[url] = lastmodi
 
         return self._get_data(url)
