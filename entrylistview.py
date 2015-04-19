@@ -123,7 +123,6 @@ class EntryListView(View):
                 if entry.read == True:
                     row.get_style_context().add_class("read")
                     row.check_read.show()
-                    # row.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(.5,.5,.5,.5))
 
     def on_view_enter(self):
         selected_row = self.app_window.feedview.listbox.get_selected_row()
