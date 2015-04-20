@@ -68,6 +68,9 @@ class ViewSwitcher(Gtk.Box):
         except TypeError:
             pass
 
+        prev._is_visible = False
+        child._is_visible = True
+
         # setzt aktuelle prev als neue prev
         if update_prev:
             self._prev = prev
@@ -187,7 +190,7 @@ class MainWindow(Gtk.ApplicationWindow):
 
         self.views.switch("feedview")
 
-        self.connect("key_press_event", self._key_navigation)
+        self.connect("key-press-event", self._key_navigation)
 
 
     def _load_application_icon(self):
@@ -206,11 +209,11 @@ class MainWindow(Gtk.ApplicationWindow):
             if (child_name == "entrylist"):
                 print("right-key pressed to open entry-details")
                 self.entry_details.show_entry_details(self.entrylist.listbox,
-                self.entrylist.listbox.get_selected_row()
-                )
+                    self.entrylist.listbox.get_selected_row()
+                    )
             else:
                 self.entrylist.show_entries(self.feedview.listbox,
-                self.feedview.listbox.get_selected_row()
+                    self.feedview.listbox.get_selected_row()
                 )
         if key == Gdk.KEY_Left:
             if (child_name == "entrydetails"):

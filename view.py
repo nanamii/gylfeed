@@ -31,11 +31,24 @@ class View(Gtk.Grid):
         self.searchbar.add(self.searchentry)
         self.searchbar.set_hexpand(True)
         self.searchbar.set_search_mode(False)
+        self.app_window.connect(
+            'key-press-event',
+            self._on_key_press_event,
+            self.searchbar
+        )
 
         self.scrolled_window = Gtk.ScrolledWindow()
         self.scrolled_window.props.expand = True
         self.attach(self.searchbar, 1, 0, 1, 1)
         self.attach(self.scrolled_window, 1, 1, 1, 1)
+
+    def _on_key_press_event(self, window, event, search_bar):
+        if self.is_visible and self.searchbar.get_search_mode():
+            self.searchentry.grab_focus()
+            self.searchentry.select_region(-1, -1)
+            return search_bar.handle_event(event)
+
+        return False
 
     def add(self, widget):
         self.scrolled_window.add(widget)
@@ -55,9 +68,9 @@ class View(Gtk.Grid):
         # self.sub_title = self._sub_title
 
     def _on_view_leave(self, _):
+        self._is_visible = False
         self.searchentry.set_text("")
         self.searchbar.set_search_mode(False)
-        self._is_visible = False
 
         if hasattr(self, 'on_view_leave'):
             self.on_view_leave()
