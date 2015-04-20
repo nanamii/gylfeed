@@ -8,7 +8,7 @@ from feed import SumFeed
 from feedview import Feedview
 from feedoptionsview import FeedOptionsView
 from entrylistview import EntryListView
-from simple_popup_menu import SimplePopupMenu
+#from simple_popup_menu import SimplePopupMenu
 from entrydetailsview import EntryDetailsView
 from functools import partial
 import os
