@@ -67,7 +67,7 @@ class EntryDetailsView(View):
         self.web.load_uri(self.entry_id)
         self.browse_button.hide()
 
-    # i.O. call-back-function für listbox in entryview, Row=entry gewählt
+    # call-back-function für listbox in entryview, Row=entry gewählt
     def show_entry_details(self, listbox, row):
         selected_row = listbox.get_selected_row()
         self.load_headline(selected_row.get_title(),selected_row.get_time(),

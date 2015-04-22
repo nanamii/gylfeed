@@ -113,7 +113,6 @@ class Feed(GObject.GObject):
                 except AttributeError as aerror:
                     print(aerror)
 
-    # wird durch update aufgerufen
     def _compare_entries(self, new_raw_feed):
 
         self.new_entries = []
@@ -140,7 +139,6 @@ class Feed(GObject.GObject):
             self.count_new_entries += len(self.new_entries)
             self._send_notification()
 
-        #getestet, i.O.
         for entry in self.new_entries:
             entry["read"] = False
             entry["deleted"] = False
@@ -212,7 +210,7 @@ class Feed(GObject.GObject):
     def _send_notification(self):
         Notify.init("gylfeed")
         msg=Notify.Notification.new(self.get_name(), "   "+ str(self.get_num_of_new_entries())+" new Feed-Messages")
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file("./graphics/gylfeed_logo_blank.png")
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file("./graphics/default_icon.png")
         msg.set_image_from_pixbuf(pixbuf)
         msg.set_app_name("gylfeed")
         msg.set_timeout(60*1000)
@@ -230,13 +228,12 @@ class Feed(GObject.GObject):
                 else:
                     entry["deleted"] = False
             except:
-                print("delete_old_entries, except")
+                print("delete_old_entries.")
 
     def set_entry_is_read(self, entry_id):
         for entry in self.raw_feed.entries:
             if entry.id == entry_id:
                 entry["read"] = True
-                print("in Feed auf TRUE gesetzt!!")
 
 
 class SumFeed(Feed):

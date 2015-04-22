@@ -205,7 +205,7 @@ class FeedOptionsView(View):
         self.naming_entry.set_editable(True)
         self.url_entry.set_editable(True)
 
-    # callback_function für button_apply_changes; zum Ändern der settings im feed
+    # callback-function für button_apply_changes; zum Ändern der settings im feed
     def change_data(self, button):
         feed_to_change = self.current_feed
         feed_to_change.automatic_update = self.get_uswitch_state()
@@ -219,7 +219,7 @@ class FeedOptionsView(View):
         self.empty_form()
         self.app.fh.save_to_disk()
 
-    # i.O. call-back-function für feed-optionen-gewählt
+    # callback-function für feed-optionen-gewählt
     def show_options_filled(self, feedview, feed):
         self.set_change_mode(True)
         self.set_current_feed(feed)

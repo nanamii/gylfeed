@@ -8,7 +8,6 @@ from feed import SumFeed
 from feedview import Feedview
 from feedoptionsview import FeedOptionsView
 from entrylistview import EntryListView
-#from simple_popup_menu import SimplePopupMenu
 from entrydetailsview import EntryDetailsView
 from functools import partial
 import os
@@ -20,7 +19,6 @@ class ViewSwitcher(Gtk.Box):
         self._stack = stack
         self._prev = None
 
-        # Make the buttons appear connected:
         self.get_style_context().add_class('linked')
 
         self.go_left, self.go_right = Gtk.Button(), Gtk.Button()
@@ -94,7 +92,6 @@ class ViewSwitcher(Gtk.Box):
         self._set_visible_child(widget)
         self._update_sensitivness()
 
-    # wird aktuell nicht genutzt
     def switch_to_previous(self):
         if self._prev is None:
             return
@@ -198,8 +195,6 @@ class MainWindow(Gtk.ApplicationWindow):
         return pixbuf
 
     def _key_navigation(self, window, event):
-        print("key clicked")
-        print(event.keyval)
         key = event.keyval
 
         vis_child = self.stack.get_visible_child()
@@ -207,7 +202,6 @@ class MainWindow(Gtk.ApplicationWindow):
 
         if key == Gdk.KEY_Right:
             if (child_name == "entrylist"):
-                print("right-key pressed to open entry-details")
                 self.entry_details.show_entry_details(self.entrylist.listbox,
                     self.entrylist.listbox.get_selected_row()
                     )
@@ -280,7 +274,7 @@ class MainWindow(Gtk.ApplicationWindow):
         self.infobar.hide()
         self.feed_options.empty_form()
 
-    #callback-function für delete-feed, ok-button in ActionBar gewählt
+    # callback-function für delete-feed, ok-button in ActionBar gewählt
     def delete_feed_actions(self, feedview, feed):
         self.feedhandler.delete_feed(feed)
         self.feedview.remove_feedrow(feed)
@@ -340,7 +334,6 @@ class MainApplication(Gtk.Application):
         self.add_action(create_action("about", self.win.show_about))
         self.add_action(create_action("quit", lambda *_: self.quit()))
         self.add_action(create_action("search", self.win.emit_search_signal))
-        #self.add_action(create_action("save" ))
 
         self.set_accels_for_action('app.add', ['<Ctrl>A'])
         self.set_accels_for_action('app.quit', ['<Ctrl>Q'])

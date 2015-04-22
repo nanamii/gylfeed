@@ -64,9 +64,6 @@ class View(Gtk.Grid):
         if hasattr(self, 'on_view_enter'):
             self.on_view_enter()
 
-        # Restore the sub_title.
-        # self.sub_title = self._sub_title
-
     def _on_view_leave(self, _):
         self._is_visible = False
         self.searchentry.set_text("")

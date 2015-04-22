@@ -136,7 +136,6 @@ class EntryListView(View):
         GLib.idle_add(
             lambda: self.app_window.views.go_right.set_sensitive(False))
 
-        # gelesene entries anders darstellen lassen
         for row in self.listbox:
             self._mark_read_entries(row.get_feed(), row, row.get_id())
 
@@ -152,7 +151,7 @@ class EntryListView(View):
                     title, time, plot, id, feed, updated_parsed, feed_name
                     )
 
-    # i.O. callback-function für listbox in feedview, Row=feed gewählt
+    # callback-function für listbox in feedview, Row=feed gewählt
     def show_entries(self, listbox, row):
         selected_row = listbox.get_selected_row()
         self.update_entryview(None, selected_row.get_feed())
