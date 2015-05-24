@@ -144,6 +144,13 @@ class EntryListView(View):
         return self.listbox
 
     def _mark_read_entries(self, feed, row, id):
+        """Set different style to read entries.
+
+        :param feed: Feed to search for read entries.
+        :param row: Row which gets different style.
+        :param id: Id of entry to consider.
+        """
+
         for entry in feed.raw_feed.entries:
             if id == entry.id:
                 if entry.read == True:
@@ -151,6 +158,8 @@ class EntryListView(View):
                     row.check_read.show()
 
     def on_view_enter(self):
+        """Actions performing while enter EntryListView."""
+
         selected_row = self.app_window.feedview.listbox.get_selected_row()
         subtitle = str(selected_row.get_feed().get_num_of_entries())+ " Entries, "+ str(selected_row.get_feed().get_num_of_unread()) + " unread"
 
@@ -165,9 +174,15 @@ class EntryListView(View):
         for row in self.listbox:
             self._mark_read_entries(row.get_feed(), row, row.get_id())
 
-    # callback-function um feedentries darzustellen, nach update; Hilfsfunktion
-    # für show_entries
+
     def update_entryview(self, feedhandler=None, feed=None):
+        """Callback-function to show entries, calling after update;
+        Helper-Function to show_entries
+
+        :param feedhandler: Instance of class Feedhandler (default=None)
+        :param feed: Instance of class Feed (default=None)
+        """
+
         self.clear_listbox()
         entries = feed.get_entries()
         feed_name = feed.get_name()
@@ -177,8 +192,13 @@ class EntryListView(View):
                     title, time, plot, id, feed, updated_parsed, feed_name
                     )
 
-    # callback-function für listbox in feedview, Row=feed gewählt
     def show_entries(self, listbox, row):
+        """Callback-function to show entries, calling after selecting a Row=feed.
+
+        :param listbox: Listbox with Feeds.
+        :param row: Selected row within listbox.
+        """
+
         selected_row = listbox.get_selected_row()
         self.update_entryview(None, selected_row.get_feed())
         self.app_window.views.switch("entrylist")
