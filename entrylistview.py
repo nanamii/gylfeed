@@ -86,6 +86,8 @@ class EntryListView(View):
         self.add(self.listbox)
 
     def _new_listboxrow(self, logo, title, time, plot, id, feed, updated_parsed,feed_name):
+        """ Create a new instance of EntryRow by given parameters."""
+
         row = EntryRow(logo, title, time, plot, id, feed, updated_parsed, feed_name)
         self._mark_read_entries(feed, row, id)
         self.listbox.add(row)
@@ -94,6 +96,15 @@ class EntryListView(View):
         row.show_all()
 
     def _sort_function(self, row_1, row_2):
+        """ Sort rows within listbox.
+
+        :param row_1: First Row to compare.
+        :param row_2: Second Row to compare.
+        :return: -1 if First Row before second Row,
+                0 if First Row equivalent to second Row,
+                1 otherwise.
+        """
+
         if row_1.get_updated_parsed() > row_2.get_updated_parsed():
             return -1
         elif row_1.get_updated_parsed() == row_2.get_updated_parsed():
@@ -102,15 +113,30 @@ class EntryListView(View):
             return 1
 
     def _filter_function(self, row):
+        """ Filterfunction for listbox.
+
+        :param row: Row to filter within it's title.
+        :return: True if no searchterm is insert or
+                 searchterm is equivalent to title of row,
+                 False otherwise
+        """
+
         query = self.search_term.lower()
         if not query:
             return True
         return query in row.get_title().lower()
 
     def _on_invalidate_filter(self, searchentry):
+        """ Update the filtering for all rows, especially if search string has changed.
+
+        :param searchentry: Gtk.SearchEntry within searchbar.
+        """
+
         self.listbox.invalidate_filter()
 
     def clear_listbox(self):
+        """ Delete all items within listbox."""
+
         for entry in self.listbox:
             self.listbox.remove(entry)
 
